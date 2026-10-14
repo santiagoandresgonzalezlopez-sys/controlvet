@@ -35,6 +35,21 @@
   ansible.builtin.set_fact:
     cv_version_actual: "{{ (version_actual_raw.content | default('') | b64decode).strip() }}"
 
+- name: Crear directorio de credenciales de monitoreo (lectura para Nagios)
+  ansible.builtin.file:
+    path: "{{ cv_ops_dir }}/monitor"
+    state: directory
+    mode: "0755"
+
+# El usuario nagios_mon solo tiene privilegio USAGE (conectarse, sin leer
+# datos), por eso su clave puede ser legible por el proceso de Nagios.
+- name: Publicar la clave del usuario de monitoreo para Nagios
+  ansible.builtin.copy:
+    dest: "{{ cv_ops_dir }}/monitor/mysql.pass"
+    content: "{{ lookup('ansible.builtin.password', cv_ops_dir ~ '/secrets/db_monitor', length=28, chars=['ascii_letters', 'digits']) }}"
+    mode: "0644"
+  no_log: true
+
 - name: Generar archivo de entorno con secretos persistentes
   ansible.builtin.template:
     src: templates/controlvet.env.j2

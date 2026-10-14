@@ -1,0 +1,10 @@
+#!/bin/sh
+# Comprueba la conexión a MariaDB con el usuario de monitoreo nagios_mon
+# (privilegio USAGE: puede conectarse pero no leer datos). La clave la genera
+# Ansible en el volumen de operación, montado en solo lectura.
+CNF=/opt/controlvet/monitor/mysql.pass
+if [ ! -r "$CNF" ]; then
+    echo "UNKNOWN - no se encuentra la clave de monitoreo ($CNF). Ejecute el despliegue con Ansible."
+    exit 3
+fi
+exec /opt/nagios/libexec/check_mysql -H "$1" -u nagios_mon -p "$(cat "$CNF")"
