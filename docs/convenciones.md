@@ -28,10 +28,11 @@ Tipos: `feat`, `fix`, `test`, `docs`, `refactor`, `ci`, `ops`, `chore`. Ejemplo:
 
 ## Revisiones
 
+- Scripts PowerShell (`.ps1`) en UTF-8 **con BOM** (PowerShell 5.1 lee mal las tildes sin BOM); argumentos con puntos (`-Dx.y`, `-h127.0.0.1`) siempre entre comillas.
 - Ningún cambio llega a `main` sin la revisión del otro integrante (Santiago revisa a Sebastian y viceversa).
 - Lista de control: pruebas en verde localmente (`composer install && vendor/bin/phpunit`), contrato API actualizado, sin secretos (`.env` nunca se versiona), sin acceso a esquemas de otro servicio.
 - La revisión se registra en la incidencia de Jira (enlace al commit). GitHub se usa únicamente como repositorio.
 
 ## Versionado
 
-`VERSION` contiene `MAJOR.MINOR`; Jenkins añade el número de build: `1.1.<build>`. Imágenes: `localhost:5000/controlvet/<servicio>:<versión>`. La línea base del monolito es la etiqueta `v1.0.0-monolito`.
+`VERSION` contiene `MAJOR.MINOR`; Jenkins añade el número de build: `1.1.<build>`. Artefacto: `controlvet-<versión>.zip` + `.sha256` en el repositorio de artefactos `C:/controlvet/artefactos/<versión>/` (estado `candidato` → `publicado`). Cada servicio expone su versión en `/health`. La línea base del monolito es la etiqueta `v1.0.0-monolito`.

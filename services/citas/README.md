@@ -26,4 +26,4 @@
 | PUT | `/citas/{id}` | admin, recepción | Reprogramación / edición |
 | PATCH | `/citas/{id}/estado` | admin, recepción, veterinario | `{estado}` |
 
-Variables: `PACIENTES_URL`, `AUTH_URL` además de las comunes (`JWT_SECRET`, `DB_*`).
+Configuración (`config/servicio.php`): `PACIENTES_URL`, `AUTH_URL` (endpoints de los servicios dependientes) además de las comunes (`JWT_SECRET`, `DB_*`, `APP_*`).

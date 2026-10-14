@@ -1,6 +1,6 @@
 {
     "name": "controlvet/e2e-tests",
-    "description": "Pruebas de integración, API REST, autorización, aislamiento y regresión contra el entorno ControlVet desplegado en Docker.",
+    "description": "Pruebas de integración, API REST, autorización, aislamiento y regresión contra los endpoints de ControlVet publicados en XAMPP.",
     "type": "project",
     "license": "proprietary",
     "require": {

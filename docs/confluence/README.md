@@ -7,6 +7,7 @@
 | Inicio · ControlVet DevOps | `README.md` | Santiago Gonzalez |
 | Code › Arquitectura de microservicios | `docs/arquitectura.md` | Sebastian Gomez |
 | Code › Decisiones técnicas (ADR) | `docs/adr/README.md` | Santiago Gonzalez |
+| Code › Catálogo de endpoints (XAMPP) | `docs/endpoints.md` | Santiago Gonzalez |
 | Code › Convenciones de código, ramas, commits y revisiones | `docs/convenciones.md` | Sebastian Gomez |
 | Code › Contrato API · auth | `services/auth/README.md` | Santiago Gonzalez |
 | Code › Contrato API · pacientes | `services/pacientes/README.md` | Sebastian Gomez |

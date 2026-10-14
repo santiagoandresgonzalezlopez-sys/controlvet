@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace ControlVet\Kernel\Log;
 
 /**
- * Registro estructurado (una línea JSON por evento) hacia stderr, que
- * Docker recoge con `docker logs`. Nunca se registran contraseñas ni tokens.
+ * Registro estructurado (una línea JSON por evento) hacia stderr, que en
+ * XAMPP termina en el error.log de Apache (C:\xampp\apache\logs\error.log).
+ * Nunca se registran contraseñas ni tokens.
  */
 class Logger
 {

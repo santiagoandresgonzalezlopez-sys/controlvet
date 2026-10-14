@@ -3,7 +3,7 @@ ini_set('display_errors', '0');
 /**
  * Ruta: controlvet/web/health.php
  *
- * Comprobación de salud del frontend para Docker y Nagios. Verifica que el
+ * Comprobación de salud del frontend para Ansible y Nagios. Verifica que el
  * proceso responde y que alcanza el /health de cada microservicio. No
  * requiere sesión y no expone datos de negocio.
  *   200 {"status":"ok"}        todo disponible

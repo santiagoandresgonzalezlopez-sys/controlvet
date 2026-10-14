@@ -12,9 +12,9 @@
 ## Contenido
 
 - 8 épicas, una por fase DevOps (PLAN … MONITOR).
-- 44 incidencias: historias de usuario, tareas técnicas y 9 defectos (encontrados por las pruebas y la revisión de seguridad).
-- Distribución: Santiago Gonzalez 24 · Sebastian Gomez 20 · 117 puntos.
-- Estados: 38 *Done* (ejecutadas y verificadas en este repositorio) · 6 *To Do* (requieren acceso externo o son mejoras).
+- 53 incidencias: 10 historias de usuario, 27 tareas técnicas y 16 defectos reales (encontrados por pruebas, el pipeline y revisiones de seguridad).
+- Distribución: Santiago Gonzalez 27 (71 puntos) · Sebastian Gomez 26 (67 puntos) · 138 puntos.
+- Estados: 47 *Done* (ejecutadas y verificadas en este repositorio) · 6 *To Do* (requieren acceso externo o son mejoras).
 
 ## Dependencias principales
 
@@ -26,7 +26,9 @@
 | CV-10 Clínica | CV-8 |
 | CV-12 Documentos | CV-9, CV-10 |
 | CV-13 Frontend | CV-7 … CV-12 |
+| CV-45 Microservicios sin Docker | CV-13 |
 | CV-32 Jenkinsfile | CV-31, CV-20, CV-21 |
+| CV-50 Staging y producción | CV-35 |
 | CV-37 Deploy Ansible | CV-36, CV-33 |
 | CV-40 Prueba de alerta | CV-39, CV-38 |
 

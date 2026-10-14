@@ -38,8 +38,8 @@ Errores: `{"error": "...", "errors": {"campo": "mensaje"}}` con 401, 403, 404, 4
 
 ## JWT emitido
 
-`{"sub": id, "rol": "...", "email": "...", "propietario_id": n|null, "iss": "ControlVet", "iat", "exp"}` firmado HS256 con `JWT_SECRET` (variable de entorno, ≥ 32 caracteres). Duración: `JWT_TTL_SECONDS` (4 h por defecto).
+`{"sub": id, "rol": "...", "email": "...", "propietario_id": n|null, "iss": "ControlVet", "iat", "exp"}` firmado HS256 con `JWT_SECRET` (aleatorio por entorno, ≥ 32 caracteres, en `config/servicio.php`). Duración: `JWT_TTL_SECONDS` (4 h por defecto).
 
-## Variables de entorno
+## Configuración
 
-`JWT_SECRET`, `JWT_ISSUER`, `DB_HOST`, `DB_PORT`, `DB_NAME=cv_auth`, `DB_USER=auth_svc`, `DB_PASSWORD`, `APP_VERSION`.
+`config/servicio.php` (generado por `infra/xampp/instalar.php`, no versionado): `JWT_SECRET`, `JWT_ISSUER`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `APP_VERSION`, `APP_BASE_PATH`, `APP_TIMEZONE`. Endpoints publicados en `http://localhost/<instalación>/api/auth` (ver `docs/endpoints.md`).
