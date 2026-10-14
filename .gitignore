@@ -24,3 +24,9 @@ Thumbs.db
 
 # Secretos de la plataforma (Jenkins/Nagios)
 infra/.env.platform
+
+# Configuración local de XAMPP (secretos)
+services/*/config/servicio.env
+web/config/web.env
+infra/xampp/monitor.env
+infra/xampp/bd-root.env

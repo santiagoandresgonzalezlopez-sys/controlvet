@@ -141,6 +141,12 @@ services:
       APP_ENV: ${APP_ENV:-prod}
       JWT_SECRET: ${JWT_SECRET:?}
       JWT_ISSUER: ControlVet
+      AUTH_URL: http://auth
+      PACIENTES_URL: http://pacientes
+      CITAS_URL: http://citas
+      CLINICA_URL: http://clinica
+      INVENTARIO_URL: http://inventario
+      DOCUMENTOS_URL: http://documentos
     ports:
       - "${WEB_BIND:-0.0.0.0}:${WEB_PORT-8090}:80"
     networks: [frontend, backend]

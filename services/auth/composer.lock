@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5071a223b90a22b51c54a1de5775401b",
+    "content-hash": "df88e018d2d0a4905aced7c49fb4db02",
     "packages": [
         {
             "name": "controlvet/kernel",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "dist": {
                 "type": "path",
                 "url": "../../libs/kernel",
-                "reference": "dbace2d9d6b5df11d16dd9ac8bd7d5ebaaf1c3a4"
+                "reference": "17cbb5ef97aa34ae010bec5b5f77a149bf191429"
             },
             "require": {
                 "ext-json": "*",

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ControlVet\Kernel\Security;
 
+use ControlVet\Kernel\Config\Env;
+
 /**
  * JSON Web Token HS256 sin dependencias externas (derivado de la
  * implementación original de ControlVet, ahora parametrizado: el secreto
@@ -24,9 +26,9 @@ final class Jwt
     public static function fromEnv(): self
     {
         return new self(
-            (string)getenv('JWT_SECRET'),
-            (string)(getenv('JWT_ISSUER') ?: 'ControlVet'),
-            (int)(getenv('JWT_TTL_SECONDS') ?: 14400),
+            Env::get('JWT_SECRET'),
+            Env::get('JWT_ISSUER', 'ControlVet'),
+            (int)Env::get('JWT_TTL_SECONDS', '14400'),
         );
     }
 

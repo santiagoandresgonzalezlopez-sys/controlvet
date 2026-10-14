@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ControlVet\Kernel;
 
 use Closure;
+use ControlVet\Kernel\Config\Env;
 use ControlVet\Kernel\Http\HttpException;
 use ControlVet\Kernel\Http\Request;
 use ControlVet\Kernel\Http\Response;
@@ -36,7 +37,7 @@ final class App
 
     public static function version(): string
     {
-        return (string)(getenv('APP_VERSION') ?: 'dev');
+        return Env::get('APP_VERSION', 'dev');
     }
 
     /** Conexión perezosa: solo se abre si la ruta la necesita. */

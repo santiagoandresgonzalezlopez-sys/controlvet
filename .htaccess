@@ -1,0 +1,39 @@
+# =====================================================================
+# ControlVet en XAMPP (Apache) · microservicios sin Docker
+#
+#   http://localhost/controlvet/                 -> frontend (web/)
+#   http://localhost/controlvet/api/<servicio>/  -> endpoints REST del microservicio
+#
+# Cada microservicio tiene su propio punto de entrada, configuración,
+# esquema de base de datos y usuario MySQL (ver docs/endpoints.md).
+# =====================================================================
+
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /controlvet/
+
+    # 1) Endpoints de los microservicios: /api/<servicio>/... -> services/<servicio>/public/index.php
+    RewriteRule ^api/(auth|pacientes|citas|clinica|inventario|documentos)(/.*)?$ services/$1/public/index.php [QSA,L]
+
+    # 2) Raíz -> frontend
+    RewriteRule ^$ web/ [R=302,L]
+
+    # 3) Acceso directo a código interno, configuración, respaldos y documentación: prohibido.
+    #    (Solo peticiones originales; las reescritas internamente por la regla 1 sí pasan.)
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteRule ^(services|libs|infra|docs|tests|backups|vendor)(/|$) - [F,L]
+
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteRule ^web/(config|core|includes|models|viewmodels|views)(/|$) - [F,L]
+</IfModule>
+
+# Archivos ocultos (.env, .git...), secretos y metadatos nunca se sirven.
+<FilesMatch "(^\.|\.(env|sql|md|lock|ya?ml|sh|ps1|xml|example|cfg|csv|log)$|^(composer\.json|Jenkinsfile|Dockerfile|VERSION)$)">
+    Require all denied
+</FilesMatch>
+<IfModule mod_alias.c>
+    RedirectMatch 403 /\.git(/|$)
+</IfModule>

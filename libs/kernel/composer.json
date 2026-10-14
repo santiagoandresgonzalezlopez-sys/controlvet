@@ -2,7 +2,7 @@
     "name": "controlvet/kernel",
     "description": "Infraestructura transversal de los microservicios ControlVet (HTTP, JWT, logging, salud). No contiene lógica de negocio ni conexiones compartidas.",
     "type": "library",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "license": "proprietary",
     "require": {
         "php": ">=8.2",

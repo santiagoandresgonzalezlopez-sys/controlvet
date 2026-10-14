@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', '0');
 /**
  * Ruta: controlvet/web/health.php
  *
@@ -12,7 +13,7 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
-$servicios = require __DIR__ . '/config/services.php';
+$servicios = require __DIR__ . '/config/services.php'; // incluye config/env.php
 $estado = [];
 foreach ($servicios as $nombre => $url) {
     $ctx = stream_context_create(['http' => ['timeout' => 2, 'ignore_errors' => true]]);
@@ -26,7 +27,7 @@ http_response_code($ok ? 200 : 503);
 echo json_encode([
     'status' => $ok ? 'ok' : 'degraded',
     'service' => 'web',
-    'version' => getenv('APP_VERSION') ?: 'dev',
+    'version' => cv_env('APP_VERSION', 'dev'),
     'dependencies' => $estado,
     'time' => gmdate('c'),
 ]);

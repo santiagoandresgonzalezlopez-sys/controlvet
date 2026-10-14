@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', '0');
 /**
  * Ruta: controlvet/web/api/stock.php
  *

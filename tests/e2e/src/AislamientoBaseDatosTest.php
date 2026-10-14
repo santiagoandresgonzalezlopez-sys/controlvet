@@ -31,7 +31,8 @@ final class AislamientoBaseDatosTest extends TestCase
         if (!$pass) {
             self::markTestSkipped('Credenciales de base de datos no disponibles en este entorno.');
         }
-        return new PDO('mysql:host=' . (getenv('DB_HOST') ?: 'db') . ';charset=utf8mb4', "{$servicio}_svc", $pass, [
+        $dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', getenv('DB_HOST') ?: '127.0.0.1', getenv('DB_PORT') ?: '3307');
+        return new PDO($dsn, "{$servicio}_svc", $pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]);
     }

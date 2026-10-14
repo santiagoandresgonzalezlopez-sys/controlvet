@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ControlVet\Kernel\Http;
 
+use ControlVet\Kernel\Config\Env;
+
 /**
  * Representación inmutable de la petición HTTP entrante.
  */
@@ -46,6 +48,12 @@ final class Request
         }
 
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+        // En XAMPP el servicio se publica bajo un prefijo (p. ej. /controlvet/api/citas):
+        // se elimina para que las rutas del controlador sean las mismas en cualquier entorno.
+        $base = rtrim(Env::get('APP_BASE_PATH'), '/');
+        if ($base !== '' && ($path === $base || str_starts_with($path, $base . '/'))) {
+            $path = substr($path, strlen($base)) ?: '/';
+        }
         $raw = file_get_contents('php://input') ?: '';
         $body = [];
         if ($raw !== '') {

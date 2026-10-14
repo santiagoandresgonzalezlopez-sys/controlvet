@@ -36,7 +36,7 @@
                 <button type="submit" class="btn btn-success w-100"><i class="bi bi-box-arrow-in-right"></i> Ingresar</button>
             </form>
 
-            <?php if (getenv('APP_ENV') === 'dev'): /* Solo en desarrollo local: nunca en producción. */ ?>
+            <?php if (cv_env('APP_ENV') === 'dev'): /* Solo en desarrollo local: nunca en producción. */ ?>
             <hr>
             <p class="small text-muted mb-1">Credenciales de prueba:</p>
             <ul class="small text-muted mb-0">
