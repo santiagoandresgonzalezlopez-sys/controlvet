@@ -1,0 +1,51 @@
+/* Ruta: controlvet/assets/css/style.css — Identidad visual ControlVet */
+
+:root {
+    --vet-primary: #1f7a5c;
+    --vet-primary-dark: #145c45;
+    --vet-light: #f4faf7;
+}
+
+body {
+    background-color: var(--vet-light);
+}
+
+.navbar-vet {
+    background: linear-gradient(90deg, var(--vet-primary-dark), var(--vet-primary));
+}
+
+.login-bg {
+    background: linear-gradient(135deg, var(--vet-primary-dark), var(--vet-primary));
+}
+
+.sidebar-vet {
+    width: 230px;
+    min-height: calc(100vh - 56px);
+    background: #ffffff;
+    border-right: 1px solid #e3ece8;
+}
+
+.sidebar-vet .nav-link.active {
+    background-color: var(--vet-primary);
+    color: #fff !important;
+}
+
+.sidebar-vet .nav-link:hover {
+    background-color: #e3f3ec;
+}
+
+.card-vet {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.card-vet .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #eef3f1;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+table thead {
+    background-color: #f0f7f4;
+}
