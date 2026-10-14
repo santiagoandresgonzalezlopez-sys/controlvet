@@ -8,6 +8,9 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 export DEBIAN_FRONTEND=noninteractive
 
+# En la red del laboratorio IPv6 no tiene salida: apt usa IPv4.
+echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99controlvet-ipv4
+
 echo "[controlvet] Instalando Ansible y utilidades..."
 apt-get update -qq
 apt-get install -y -qq ansible unzip curl >/dev/null

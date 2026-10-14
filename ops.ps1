@@ -26,7 +26,8 @@ param(
 )
 
 $env:WSL_UTF8 = '1'
-$repo = (wsl -d $Distro -u root -- wslpath -a "$PSScriptRoot").Trim()
+# wsl.exe elimina las barras invertidas de los argumentos: se pasa la ruta con "/".
+$repo = (wsl -d $Distro -u root -- wslpath -a ($PSScriptRoot -replace '\\', '/')).Trim()
 
 $vars = "-e cv_entorno=$Entorno"
 if ($Version) { $vars += " -e cv_version=$Version" }

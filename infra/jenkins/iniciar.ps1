@@ -47,7 +47,8 @@ $pluginsDir = Join-Path $home_ 'plugins'
 if (-not (Test-Path (Join-Path $pluginsDir 'configuration-as-code.jpi'))) {
     'Instalando plugins de Jenkins...'
     $env:JENKINS_UC_DOWNLOAD_URL = $DescargaPlugins
-    & $java -jar (Join-Path $Base 'jenkins-plugin-manager.jar') --war $war --plugin-download-directory $pluginsDir --plugin-file (Join-Path $PSScriptRoot 'plugins.txt') | Out-Null
+    # IPv4 forzado: en esta red las conexiones IPv6 a los espejos de Jenkins fallan.
+    & $java '-Djava.net.preferIPv4Stack=true' -jar (Join-Path $Base 'jenkins-plugin-manager.jar') --war $war --plugin-download-directory $pluginsDir --plugin-file (Join-Path $PSScriptRoot 'plugins.txt') | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'No fue posible instalar los plugins' }
 }
 
@@ -61,7 +62,7 @@ $vars = @{
 }
 $set = ($vars.GetEnumerator() | ForEach-Object { "set `"$($_.Key)=$($_.Value)`"" }) -join ' && '
 $log = Join-Path $Base 'jenkins.log'
-$opts = '-Djenkins.install.runSetupWizard=false -Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true -Dfile.encoding=UTF-8'
+$opts = '-Djava.net.preferIPv4Stack=true -Djenkins.install.runSetupWizard=false -Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true -Dfile.encoding=UTF-8'
 $cmd = "cmd /c `"$set && `"$java`" $opts -jar `"$war`" --httpPort=$Puerto --httpListenAddress=127.0.0.1 >> `"$log`" 2>&1`""
 Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $Base } | Out-Null
 

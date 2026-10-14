@@ -16,7 +16,8 @@ def COMPONENTES = ['libs/kernel', 'services/auth', 'services/pacientes', 'servic
 
 // Ejecuta un playbook de Ansible en WSL (Ansible no corre nativo en Windows).
 def ansible(String playbook, String extra) {
-    def ws = powershell(returnStdout: true, script: "wsl -d ${env.CV_WSL_DISTRO} -u root -- wslpath -a '${env.WORKSPACE}'").trim()
+    // wsl.exe elimina las barras invertidas de los argumentos: se pasa la ruta con "/".
+    def ws = powershell(returnStdout: true, script: "wsl -d ${env.CV_WSL_DISTRO} -u root -- wslpath -a '${env.WORKSPACE.replace('\\', '/')}'").trim()
     powershell """
         wsl -d ${env.CV_WSL_DISTRO} -u root -- bash -lc "cd '${ws}/infra/ansible' && ANSIBLE_FORCE_COLOR=0 ansible-playbook -i inventarios/local.yml playbooks/${playbook} ${extra}"
         if (\$LASTEXITCODE -ne 0) { throw 'ansible-playbook ${playbook} falló' }
