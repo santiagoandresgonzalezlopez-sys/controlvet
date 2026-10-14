@@ -129,7 +129,8 @@ pipeline {
                 sh '''
                     set -e
                     docker compose -p "$CI_PROJECT" --env-file ci.env up -d --no-build --wait --wait-timeout 180
-                    set -a; . ./ci.env; set +a
+                    # Sin traza (set +x): cargar ci.env no debe imprimir los secretos en el log.
+                    set +x; set -a; . ./ci.env; set +a; set -x
                     docker run --name "$CI_PROJECT-e2e" --network "${CI_PROJECT}_backend" \
                         -e EXPECTED_VERSION="$CV_VERSION" \
                         -e AUTH_DB_PASSWORD -e PACIENTES_DB_PASSWORD -e CITAS_DB_PASSWORD \
