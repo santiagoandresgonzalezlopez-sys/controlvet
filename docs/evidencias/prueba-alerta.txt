@@ -1,0 +1,11 @@
+FALLO INYECTADO 2026-10-14T17:57:15Z: docker stop controlvet-inventario-1
+ACCION CORRECTIVA 2026-10-14T17:59:18Z: .\ops.ps1 recover
+Wed Oct 14 12:58:57 -05 2026 | SERVICE | PROBLEM | web | Dependencias del frontend | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 12:58:57 -05 2026 | SERVICE | PROBLEM | web | Dependencias del frontend | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 12:58:58 -05 2026 | HOST | PROBLEM | inventario | - | DOWN | TCP CRITICAL - Invalid hostname, address or socket: inventario | contacto=santiago.gonzalez
+Wed Oct 14 12:58:58 -05 2026 | HOST | PROBLEM | inventario | - | DOWN | TCP CRITICAL - Invalid hostname, address or socket: inventario | contacto=sebastian.gomez
+Wed Oct 14 12:59:53 -05 2026 | HOST | RECOVERY | inventario | - | UP | TCP OK - 0.000 second response time on inventario port 80 | contacto=sebastian.gomez
+Wed Oct 14 12:59:53 -05 2026 | HOST | RECOVERY | inventario | - | UP | TCP OK - 0.000 second response time on inventario port 80 | contacto=santiago.gonzalez
+Wed Oct 14 12:59:57 -05 2026 | SERVICE | RECOVERY | web | Dependencias del frontend | OK | HTTP OK: Status line output matched 200 - 464 bytes in 0.020 second response time | contacto=sebastian.gomez
+Wed Oct 14 12:59:57 -05 2026 | SERVICE | RECOVERY | web | Dependencias del frontend | OK | HTTP OK: Status line output matched 200 - 464 bytes in 0.020 second response time | contacto=santiago.gonzalez
+RECUPERACION CONFIRMADA 2026-10-14T18:00:05Z

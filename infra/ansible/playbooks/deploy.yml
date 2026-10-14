@@ -19,6 +19,8 @@
       block:
         - name: Actualizar contenedores a {{ cv_version }}
           ansible.builtin.include_tasks: tasks/compose_up.yml
+          vars:
+            cv_version_objetivo: "{{ cv_version }}"
 
         - name: Verificación posterior al despliegue
           ansible.builtin.include_tasks: tasks/verificar.yml
@@ -53,7 +55,7 @@
             - name: Restaurar {{ cv_version_actual }}
               ansible.builtin.include_tasks: tasks/compose_up.yml
               vars:
-                cv_version: "{{ cv_version_actual }}"
+                cv_version_objetivo: "{{ cv_version_actual }}"
 
             - name: Verificar la versión restaurada
               ansible.builtin.include_tasks: tasks/verificar.yml

@@ -1,0 +1,340 @@
+﻿
+PLAY [Revertir ControlVet a una versión anterior] ******************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [local]
+
+TASK [Preparación común] *******************************************************
+included: /ops/ansible/playbooks/tasks/preparar.yml for local
+
+TASK [Verificar que el motor Docker está disponible] ***************************
+ok: [local]
+
+TASK [Mostrar motor Docker detectado] ******************************************
+ok: [local] => 
+    msg: Docker 29.8.2 Docker Desktop (containerized)
+
+TASK [Verificar Docker Compose v2] *********************************************
+ok: [local]
+
+TASK [Crear directorios de operación] ******************************************
+ok: [local] => (item={'path': '/opt/controlvet', 'mode': '0750', 'group': '101'})
+ok: [local] => (item={'path': '/opt/controlvet/secrets', 'mode': '0700'})
+ok: [local] => (item={'path': '/opt/controlvet/releases', 'mode': '0750'})
+ok: [local] => (item={'path': '/opt/controlvet/logs', 'mode': '0750'})
+ok: [local] => (item={'path': '/backups', 'mode': '0750'})
+
+TASK [Leer la versión desplegada actualmente] **********************************
+ok: [local]
+
+TASK [Registrar versión actual] ************************************************
+ok: [local]
+
+TASK [Crear directorio de credenciales de monitoreo] ***************************
+ok: [local]
+
+TASK [Publicar la clave del usuario de monitoreo para Nagios] ******************
+ok: [local]
+
+TASK [Generar archivo de entorno con secretos persistentes] ********************
+changed: [local]
+
+TASK [Leer la versión anterior registrada] *************************************
+ok: [local]
+
+TASK [Determinar la versión destino] *******************************************
+ok: [local]
+
+TASK [Validar que existe una versión destino] **********************************
+ok: [local] => 
+    changed: false
+    msg: All assertions passed
+
+TASK [Desplegar 1.1.2] *********************************************************
+included: /ops/ansible/playbooks/tasks/compose_up.yml for local
+
+TASK [Renderizar el entorno para la versión 1.1.2] *****************************
+changed: [local]
+
+TASK [Descargar imágenes de la versión 1.1.2 desde el registro] ****************
+ok: [local]
+
+TASK [Desplegar contenedores (docker compose up --wait)] ***********************
+changed: [local]
+
+TASK [Verificar la versión restaurada] *****************************************
+included: /ops/ansible/playbooks/tasks/verificar.yml for local
+
+TASK [Esperar a que cada contenedor reporte estado healthy] ********************
+ok: [local] => (item=db)
+ok: [local] => (item=auth)
+ok: [local] => (item=pacientes)
+ok: [local] => (item=citas)
+ok: [local] => (item=clinica)
+ok: [local] => (item=inventario)
+ok: [local] => (item=documentos)
+ok: [local] => (item=web)
+
+TASK [Consultar salud agregada desde el frontend (red interna)] ****************
+ok: [local]
+
+TASK [Consultar /health de cada microservicio] *********************************
+ok: [local] => (item=auth)
+ok: [local] => (item=pacientes)
+ok: [local] => (item=citas)
+ok: [local] => (item=clinica)
+ok: [local] => (item=inventario)
+ok: [local] => (item=documentos)
+
+TASK [Validar estado y versión de cada microservicio] **************************
+ok: [local] => (item=auth) => 
+    ansible_loop_var: item
+    changed: false
+    item:
+        ansible_loop_var: item
+        changed: false
+        cmd:
+        - docker
+        - exec
+        - controlvet-web-1
+        - curl
+        - -fsS
+        - http://auth/health
+        delta: '0:00:00.106794'
+        end: '2026-10-14 13:01:02.534843'
+        failed: false
+        invocation:
+            module_args:
+                _raw_params: docker exec controlvet-web-1 curl -fsS http://auth/health
+                _uses_shell: false
+                argv: null
+                chdir: null
+                creates: null
+                executable: null
+                expand_argument_vars: true
+                removes: null
+                stdin: null
+                stdin_add_newline: true
+                strip_empty_ends: true
+        item: auth
+        msg: ''
+        rc: 0
+        start: '2026-10-14 13:01:02.428049'
+        stderr: ''
+        stderr_lines: []
+        stdout: '{"status":"ok","service":"auth","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
+        stdout_lines:
+        - '{"status":"ok","service":"auth","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
+    msg: auth OK · versión 1.1.2
+ok: [local] => (item=pacientes) => 
+    ansible_loop_var: item
+    changed: false
+    item:
+        ansible_loop_var: item
+        changed: false
+        cmd:
+        - docker
+        - exec
+        - controlvet-web-1
+        - curl
+        - -fsS
+        - http://pacientes/health
+        delta: '0:00:00.101587'
+        end: '2026-10-14 13:01:02.942382'
+        failed: false
+        invocation:
+            module_args:
+                _raw_params: docker exec controlvet-web-1 curl -fsS http://pacientes/health
+                _uses_shell: false
+                argv: null
+                chdir: null
+                creates: null
+                executable: null
+                expand_argument_vars: true
+                removes: null
+                stdin: null
+                stdin_add_newline: true
+                strip_empty_ends: true
+        item: pacientes
+        msg: ''
+        rc: 0
+        start: '2026-10-14 13:01:02.840795'
+        stderr: ''
+        stderr_lines: []
+        stdout: '{"status":"ok","service":"pacientes","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
+        stdout_lines:
+        - '{"status":"ok","service":"pacientes","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
+    msg: pacientes OK · versión 1.1.2
+ok: [local] => (item=citas) => 
+    ansible_loop_var: item
+    changed: false
+    item:
+        ansible_loop_var: item
+        changed: false
+        cmd:
+        - docker
+        - exec
+        - controlvet-web-1
+        - curl
+        - -fsS
+        - http://citas/health
+        delta: '0:00:00.104628'
+        end: '2026-10-14 13:01:03.368166'
+        failed: false
+        invocation:
+            module_args:
+                _raw_params: docker exec controlvet-web-1 curl -fsS http://citas/health
+                _uses_shell: false
+                argv: null
+                chdir: null
+                creates: null
+                executable: null
+                expand_argument_vars: true
+                removes: null
+                stdin: null
+                stdin_add_newline: true
+                strip_empty_ends: true
+        item: citas
+        msg: ''
+        rc: 0
+        start: '2026-10-14 13:01:03.263538'
+        stderr: ''
+        stderr_lines: []
+        stdout: '{"status":"ok","service":"citas","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
+        stdout_lines:
+        - '{"status":"ok","service":"citas","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
+    msg: citas OK · versión 1.1.2
+ok: [local] => (item=clinica) => 
+    ansible_loop_var: item
+    changed: false
+    item:
+        ansible_loop_var: item
+        changed: false
+        cmd:
+        - docker
+        - exec
+        - controlvet-web-1
+        - curl
+        - -fsS
+        - http://clinica/health
+        delta: '0:00:00.103645'
+        end: '2026-10-14 13:01:03.771686'
+        failed: false
+        invocation:
+            module_args:
+                _raw_params: docker exec controlvet-web-1 curl -fsS http://clinica/health
+                _uses_shell: false
+                argv: null
+                chdir: null
+                creates: null
+                executable: null
+                expand_argument_vars: true
+                removes: null
+                stdin: null
+                stdin_add_newline: true
+                strip_empty_ends: true
+        item: clinica
+        msg: ''
+        rc: 0
+        start: '2026-10-14 13:01:03.668041'
+        stderr: ''
+        stderr_lines: []
+        stdout: '{"status":"ok","service":"clinica","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
+        stdout_lines:
+        - '{"status":"ok","service":"clinica","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
+    msg: clinica OK · versión 1.1.2
+ok: [local] => (item=inventario) => 
+    ansible_loop_var: item
+    changed: false
+    item:
+        ansible_loop_var: item
+        changed: false
+        cmd:
+        - docker
+        - exec
+        - controlvet-web-1
+        - curl
+        - -fsS
+        - http://inventario/health
+        delta: '0:00:00.109034'
+        end: '2026-10-14 13:01:04.201483'
+        failed: false
+        invocation:
+            module_args:
+                _raw_params: docker exec controlvet-web-1 curl -fsS http://inventario/health
+                _uses_shell: false
+                argv: null
+                chdir: null
+                creates: null
+                executable: null
+                expand_argument_vars: true
+                removes: null
+                stdin: null
+                stdin_add_newline: true
+                strip_empty_ends: true
+        item: inventario
+        msg: ''
+        rc: 0
+        start: '2026-10-14 13:01:04.092449'
+        stderr: ''
+        stderr_lines: []
+        stdout: '{"status":"ok","service":"inventario","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
+        stdout_lines:
+        - '{"status":"ok","service":"inventario","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
+    msg: inventario OK · versión 1.1.2
+ok: [local] => (item=documentos) => 
+    ansible_loop_var: item
+    changed: false
+    item:
+        ansible_loop_var: item
+        changed: false
+        cmd:
+        - docker
+        - exec
+        - controlvet-web-1
+        - curl
+        - -fsS
+        - http://documentos/health
+        delta: '0:00:00.120575'
+        end: '2026-10-14 13:01:04.629358'
+        failed: false
+        invocation:
+            module_args:
+                _raw_params: docker exec controlvet-web-1 curl -fsS http://documentos/health
+                _uses_shell: false
+                argv: null
+                chdir: null
+                creates: null
+                executable: null
+                expand_argument_vars: true
+                removes: null
+                stdin: null
+                stdin_add_newline: true
+                strip_empty_ends: true
+        item: documentos
+        msg: ''
+        rc: 0
+        start: '2026-10-14 13:01:04.508783'
+        stderr: ''
+        stderr_lines: []
+        stdout: '{"status":"ok","service":"documentos","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
+        stdout_lines:
+        - '{"status":"ok","service":"documentos","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
+    msg: documentos OK · versión 1.1.2
+
+TASK [Validar que el frontend alcanza todas sus dependencias] ******************
+ok: [local] => 
+    changed: false
+    msg: 'Frontend OK · dependencias: {''auth'': ''ok'', ''pacientes'': ''ok'', ''citas'':
+        ''ok'', ''clinica'': ''ok'', ''inventario'': ''ok'', ''documentos'': ''ok''}'
+
+TASK [Registrar la reversión] **************************************************
+changed: [local] => (item={'dest': '/opt/controlvet/releases/current', 'content': '1.1.2'})
+changed: [local] => (item={'dest': '/opt/controlvet/releases/previous', 'content': '1.1.4'})
+
+TASK [Anotar en el historial] **************************************************
+changed: [local]
+
+PLAY RECAP *********************************************************************
+local                      : ok=26   changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

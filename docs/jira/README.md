@@ -12,9 +12,9 @@
 ## Contenido
 
 - 8 épicas, una por fase DevOps (PLAN … MONITOR).
-- 43 incidencias: historias de usuario, tareas técnicas y 8 defectos (encontrados por las pruebas y la revisión de seguridad).
-- Distribución: Santiago Gonzalez 23 · Sebastian Gomez 20 · 115 puntos.
-- Estados: 37 *Done* (ejecutadas y verificadas en este repositorio) · 6 *To Do* (requieren acceso externo o son mejoras).
+- 44 incidencias: historias de usuario, tareas técnicas y 9 defectos (encontrados por las pruebas y la revisión de seguridad).
+- Distribución: Santiago Gonzalez 24 · Sebastian Gomez 20 · 117 puntos.
+- Estados: 38 *Done* (ejecutadas y verificadas en este repositorio) · 6 *To Do* (requieren acceso externo o son mejoras).
 
 ## Dependencias principales
 

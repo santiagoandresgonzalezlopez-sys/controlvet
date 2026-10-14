@@ -26,7 +26,7 @@
     - name: Desplegar {{ cv_destino }}
       ansible.builtin.include_tasks: tasks/compose_up.yml
       vars:
-        cv_version: "{{ cv_destino }}"
+        cv_version_objetivo: "{{ cv_destino }}"
 
     - name: Verificar la versión restaurada
       ansible.builtin.include_tasks: tasks/verificar.yml

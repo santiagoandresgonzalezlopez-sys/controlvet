@@ -1,0 +1,133 @@
+﻿
+PLAY [Desplegar ControlVet] ****************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [local]
+
+TASK [Exigir la versión a desplegar] *******************************************
+ok: [local] => 
+    changed: false
+    msg: All assertions passed
+
+TASK [Preparación común] *******************************************************
+included: /ops/ansible/playbooks/tasks/preparar.yml for local
+
+TASK [Verificar que el motor Docker está disponible] ***************************
+ok: [local]
+
+TASK [Mostrar motor Docker detectado] ******************************************
+ok: [local] => 
+    msg: Docker 29.8.2 Docker Desktop (containerized)
+
+TASK [Verificar Docker Compose v2] *********************************************
+ok: [local]
+
+TASK [Crear directorios de operación] ******************************************
+ok: [local] => (item={'path': '/opt/controlvet', 'mode': '0750', 'group': '101'})
+ok: [local] => (item={'path': '/opt/controlvet/secrets', 'mode': '0700'})
+ok: [local] => (item={'path': '/opt/controlvet/releases', 'mode': '0750'})
+ok: [local] => (item={'path': '/opt/controlvet/logs', 'mode': '0750'})
+ok: [local] => (item={'path': '/opt/controlvet/backups', 'mode': '0750'})
+
+TASK [Leer la versión desplegada actualmente] **********************************
+ok: [local]
+
+TASK [Registrar versión actual] ************************************************
+ok: [local]
+
+TASK [Crear directorio de credenciales de monitoreo] ***************************
+ok: [local]
+
+TASK [Publicar la clave del usuario de monitoreo para Nagios] ******************
+ok: [local]
+
+TASK [Generar archivo de entorno con secretos persistentes] ********************
+changed: [local]
+
+TASK [Actualizar contenedores a 9.9.9] *****************************************
+included: /ops/ansible/playbooks/tasks/compose_up.yml for local
+
+TASK [Renderizar el entorno para la versión 9.9.9] *****************************
+ok: [local]
+
+TASK [Descargar imágenes de la versión 9.9.9 desde el registro] ****************
+fatal: [local]: FAILED! => 
+    changed: false
+    cmd:
+    - docker
+    - compose
+    - -p
+    - controlvet
+    - -f
+    - /ops/app/compose.yaml
+    - --env-file
+    - /opt/controlvet/controlvet.env
+    - pull
+    - --quiet
+    delta: '0:00:01.909400'
+    end: '2026-10-14 13:26:21.117122'
+    msg: non-zero return code
+    rc: 18
+    start: '2026-10-14 13:26:19.207722'
+    stderr: |-
+        8 errors occurred:
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/auth:9.9.9": localhost:5000/controlvet/auth:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/pacientes:9.9.9": localhost:5000/controlvet/pacientes:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/citas:9.9.9": localhost:5000/controlvet/citas:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/clinica:9.9.9": localhost:5000/controlvet/clinica:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/inventario:9.9.9": localhost:5000/controlvet/inventario:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/documentos:9.9.9": localhost:5000/controlvet/documentos:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/web:9.9.9": localhost:5000/controlvet/web:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/db:9.9.9": localhost:5000/controlvet/db:9.9.9: not found
+    stderr_lines: <omitted>
+    stdout: ''
+    stdout_lines: <omitted>
+
+TASK [Anotar el fallo en el historial] *****************************************
+changed: [local]
+
+TASK [Restaurar 1.1.4] *********************************************************
+included: /ops/ansible/playbooks/tasks/compose_up.yml for local
+
+TASK [Renderizar el entorno para la versión 9.9.9] *****************************
+ok: [local]
+
+TASK [Descargar imágenes de la versión 9.9.9 desde el registro] ****************
+fatal: [local]: FAILED! => 
+    changed: false
+    cmd:
+    - docker
+    - compose
+    - -p
+    - controlvet
+    - -f
+    - /ops/app/compose.yaml
+    - --env-file
+    - /opt/controlvet/controlvet.env
+    - pull
+    - --quiet
+    delta: '0:00:01.905452'
+    end: '2026-10-14 13:26:35.729898'
+    msg: non-zero return code
+    rc: 18
+    start: '2026-10-14 13:26:33.824446'
+    stderr: |-
+        8 errors occurred:
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/auth:9.9.9": localhost:5000/controlvet/auth:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/pacientes:9.9.9": localhost:5000/controlvet/pacientes:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/citas:9.9.9": localhost:5000/controlvet/citas:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/clinica:9.9.9": localhost:5000/controlvet/clinica:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/inventario:9.9.9": localhost:5000/controlvet/inventario:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/documentos:9.9.9": localhost:5000/controlvet/documentos:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/web:9.9.9": localhost:5000/controlvet/web:9.9.9: not found
+                * Error response from daemon: failed to resolve reference "localhost:5000/controlvet/db:9.9.9": localhost:5000/controlvet/db:9.9.9: not found
+    stderr_lines: <omitted>
+    stdout: ''
+    stdout_lines: <omitted>
+
+PLAY RECAP *********************************************************************
+local                      : ok=17   changed=2    unreachable=0    failed=1    skipped=0    rescued=1    ignored=0   
+
+
+NOTA: la línea "DEPLOY 9.9.9 FALLIDO -> rollback a 1.1.4" de esta ejecución (ops 1.1.4) es engañosa: el rescate
+reintentó 9.9.9 por la precedencia de -e cv_version (defecto CV-44). Ver ansible-deploy-fallido-rollback-v2.txt.
