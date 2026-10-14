@@ -7,6 +7,7 @@ cv_env_file: "{{ cv_ops_dir }}/controlvet.env"
 cv_backup_dir: "{{ cv_ops_dir }}/backups"
 cv_backup_retention: 7
 cv_wait_timeout: 180
+cv_nagios_gid: "101"   # grupo nagios dentro de la imagen de Nagios
 
 cv_app_env: prod
 cv_web_port: 8090
