@@ -53,6 +53,20 @@ final class EnvTest extends TestCase
         self::assertSame('', Env::get('CV_PRUEBA_A'));
     }
 
+    public function testLeeArchivoPhpQueRetornaArreglo(): void
+    {
+        $php = $this->file . '.php';
+        file_put_contents($php, "<?php\nreturn ['DB_NAME' => 'cv_citas', 'DB_PORT' => 3307, 'malo-clave' => 'x', 'LISTA' => [1]];\n");
+        try {
+            Env::load($php);
+            self::assertSame('cv_citas', Env::get('DB_NAME'));
+            self::assertSame('3307', Env::get('DB_PORT'));
+            self::assertSame('', Env::get('LISTA'));
+        } finally {
+            @unlink($php);
+        }
+    }
+
     public function testEliminaElPrefijoDePublicacion(): void
     {
         Env::load($this->file);

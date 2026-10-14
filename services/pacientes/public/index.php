@@ -21,8 +21,8 @@ use ControlVet\Pacientes\Microservicio\PdoPacientesRepository;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Configuración propia del servicio (XAMPP): config/servicio.env, no versionado.
-Env::load(__DIR__ . '/../config/servicio.env');
+// Configuración propia del servicio (XAMPP): config/servicio.php, no versionado.
+Env::load(__DIR__ . '/../config/servicio.php');
 
 $request = Request::fromGlobals();
 $app = new App('pacientes', (new Logger('pacientes'))->withRequestId($request->requestId()), fn() => Db::fromEnv());

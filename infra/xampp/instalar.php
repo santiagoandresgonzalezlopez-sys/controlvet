@@ -15,9 +15,14 @@
  *      (concedidos por tabla: no dependen de mysql.db, que en algunas
  *      instalaciones de XAMPP queda dañada tras un cierre inesperado);
  *   2. aplica sus scripts services/<servicio>/database/*.sql;
- *   3. genera services/<servicio>/config/servicio.env (no versionado) con su
- *      conexión, el prefijo de sus endpoints y las URL de los servicios de los que depende.
- * Además crea el usuario de monitoreo nagios_mon (solo USAGE) y web/config/web.env.
+ *   3. genera services/<servicio>/config/servicio.php (arreglo PHP, no versionado)
+ *      con su conexión, el prefijo de sus endpoints y las URL de los servicios de
+ *      los que depende. Al ser PHP, si se pidiera por URL se ejecuta sin mostrar nada.
+ * Además crea el usuario de monitoreo nagios_mon (solo USAGE), cuya clave queda
+ * FUERA de htdocs (C:\xampp\controlvet-secretos\monitor.env), y web/config/web.php.
+ *
+ * Opciones de entorno: --prefijo=cv_ (esquemas/usuarios) y --base-url (URL pública),
+ * para instalar entornos separados (desarrollo, staging, producción) en la misma instancia.
  * Las contraseñas existentes se conservan; nunca se imprimen.
  */
 
@@ -42,9 +47,15 @@ function leerEnv(string $archivo): array
 
 $raiz = dirname(__DIR__, 2);
 
-$opts = getopt('', ['root-user::', 'root-pass::', 'db-host::', 'db-port::', 'base-url::', 'app-env::', 'permitir-3306']);
+$secretos = getenv('CV_SECRETOS_DIR') ?: 'C:\\xampp\\controlvet-secretos';
+$opts = getopt('', ['root-user::', 'root-pass::', 'db-host::', 'db-port::', 'base-url::', 'app-env::', 'prefijo::', 'reiniciar-datos', 'permitir-3306']);
 $rootUser = $opts['root-user'] ?? 'root';
-$rootPass = $opts['root-pass'] ?? (leerEnv(__DIR__ . '/bd-root.env')['DB_ROOT_PASSWORD'] ?? '');
+$rootPass = $opts['root-pass'] ?? (leerEnv($secretos . '/bd-root.env')['DB_ROOT_PASSWORD'] ?? '');
+$prefijo = $opts['prefijo'] ?? 'cv_';
+if (!preg_match('/^[a-z][a-z0-9]{0,9}_$/', $prefijo)) {
+    fwrite(STDERR, "Prefijo inválido (ej.: cv_, cvstg_, cvprod_).\n");
+    exit(2);
+}
 $dbHost = $opts['db-host'] ?? '127.0.0.1';
 $dbPort = $opts['db-port'] ?? '3307';
 if ($dbPort === '3306' && !isset($opts['permitir-3306'])) {
@@ -68,12 +79,27 @@ $servicios = [
 function escribirEnv(string $archivo, string $titulo, array $vars): void
 {
     @mkdir(dirname($archivo), 0750, true);
-    $txt = "# $titulo\n# Generado por infra/xampp/instalar.php el " . date('c') . ". NO versionar.\n";
-    foreach ($vars as $k => $v) {
-        $txt .= "$k=$v\n";
+    if (str_ends_with($archivo, '.php')) {
+        $txt = "<?php\n// $titulo\n// Generado por infra/xampp/instalar.php el " . date('c') . ". NO versionar.\nreturn "
+            . var_export($vars, true) . ";\n";
+    } else {
+        $txt = "# $titulo\n# Generado por infra/xampp/instalar.php el " . date('c') . ". NO versionar.\n";
+        foreach ($vars as $k => $v) {
+            $txt .= "$k=$v\n";
+        }
     }
     file_put_contents($archivo, $txt);
     @chmod($archivo, 0600);
+}
+
+/** Lee config generada (arreglo PHP) o un archivo KEY=VALOR. */
+function leerConfig(string $archivo): array
+{
+    if (str_ends_with($archivo, '.php')) {
+        $datos = is_file($archivo) ? require $archivo : [];
+        return is_array($datos) ? $datos : [];
+    }
+    return leerEnv($archivo);
 }
 
 function secreto(int $bytes = 24): string
@@ -96,15 +122,21 @@ try {
 }
 paso('Conectado a ' . $pdo->query('SELECT VERSION()')->fetchColumn());
 
-$webEnvFile = $raiz . '/web/config/web.env';
-$jwt = leerEnv($webEnvFile)['JWT_SECRET'] ?? secreto(36);
+$webEnvFile = $raiz . '/web/config/web.php';
+$jwt = leerConfig($webEnvFile)['JWT_SECRET'] ?? secreto(36);
 $hosts = ['localhost', '127.0.0.1'];
 
 foreach ($servicios as $svc => $dependencias) {
-    $envFile = "$raiz/services/$svc/config/servicio.env";
-    $pass = leerEnv($envFile)['DB_PASSWORD'] ?? secreto();
-    $esquema = "cv_$svc";
-    $usuario = "{$svc}_svc";
+    $envFile = "$raiz/services/$svc/config/servicio.php";
+    $pass = leerConfig($envFile)['DB_PASSWORD'] ?? secreto();
+    $esquema = $prefijo . $svc;
+    // Usuario de BD: <servicio>_svc en el entorno base (cv_); <prefijo><servicio> en los demás (ej. cvstg_citas).
+    $usuario = $prefijo === 'cv_' ? "{$svc}_svc" : $prefijo . $svc;
+
+    if (isset($opts['reiniciar-datos'])) {
+        $pdo->exec("DROP DATABASE IF EXISTS `$esquema`");
+        paso("  esquema $esquema reiniciado (--reiniciar-datos)");
+    }
 
     paso("Servicio $svc: esquema $esquema, usuario $usuario");
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$esquema` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
@@ -143,10 +175,11 @@ foreach ($servicios as $svc => $dependencias) {
         $vars[$var] = "$baseUrl/api/$dep";
     }
     escribirEnv($envFile, "Configuración del microservicio $svc", $vars);
-    paso("  generado services/$svc/config/servicio.env");
+    paso("  generado services/$svc/config/servicio.php");
 }
 
-$monitorFile = $raiz . '/infra/xampp/monitor.env';
+@mkdir($secretos, 0700, true);
+$monitorFile = $secretos . '/monitor.env';
 $monitorPass = leerEnv($monitorFile)['MONITOR_DB_PASSWORD'] ?? secreto();
 foreach ($hosts as $h) {
     $pdo->exec("CREATE USER IF NOT EXISTS 'nagios_mon'@'$h' IDENTIFIED BY " . $pdo->quote($monitorPass));
@@ -160,6 +193,6 @@ foreach (array_keys($servicios) as $svc) {
     $web[strtoupper($svc) . '_URL'] = "$baseUrl/api/$svc";
 }
 escribirEnv($webEnvFile, 'Configuración del frontend web', $web);
-paso('Generado web/config/web.env');
+paso('Generado web/config/web.php');
 
 paso("Listo. Frontend: $baseUrl/web/ · Endpoints: $baseUrl/api/<servicio>/... (ver docs/endpoints.md)");

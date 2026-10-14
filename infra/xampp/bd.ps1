@@ -7,7 +7,7 @@
   separado del MySQL general de XAMPP (3306), para que los usuarios y
   privilegios por microservicio no dependan de otras bases del equipo.
   Solo escucha en 127.0.0.1. La clave de root se genera una vez y se guarda
-  en infra\xampp\bd-root.env (no versionado).
+  FUERA de htdocs, en C:\xampp\controlvet-secretos\bd-root.env.
 
 .EXAMPLE
   .\infra\xampp\bd.ps1 iniciar
@@ -22,7 +22,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $bin = 'C:\xampp\mysql\bin'
-$rootEnv = Join-Path $PSScriptRoot 'bd-root.env'
+$secretos = 'C:\xampp\controlvet-secretos'
+New-Item -ItemType Directory -Force $secretos | Out-Null
+$rootEnv = Join-Path $secretos 'bd-root.env'
+# Migración: versiones anteriores guardaban la clave dentro del proyecto.
+$antiguo = Join-Path $PSScriptRoot 'bd-root.env'
+if ((Test-Path $antiguo) -and -not (Test-Path $rootEnv)) { Move-Item $antiguo $rootEnv }
 $ini = Join-Path $DataDir 'my.ini'
 
 function Get-RootPass {

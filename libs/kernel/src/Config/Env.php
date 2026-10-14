@@ -19,10 +19,24 @@ final class Env
     /** @var array<string,string> */
     private static array $valores = [];
 
+    /**
+     * Acepta config/servicio.php (recomendado: un archivo PHP que retorna un
+     * arreglo; si se solicitara por URL se ejecuta sin mostrar nada) o un
+     * archivo KEY=VALOR.
+     */
     public static function load(string $file): void
     {
         self::$valores = [];
         if (!is_file($file) || !is_readable($file)) {
+            return;
+        }
+        if (str_ends_with($file, '.php')) {
+            $datos = (static fn(string $f): mixed => require $f)($file);
+            foreach (is_array($datos) ? $datos : [] as $key => $value) {
+                if (is_string($key) && preg_match('/^[A-Z][A-Z0-9_]*$/', $key) && is_scalar($value)) {
+                    self::$valores[$key] = (string)$value;
+                }
+            }
             return;
         }
         foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {

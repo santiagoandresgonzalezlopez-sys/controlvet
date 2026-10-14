@@ -6,7 +6,7 @@ Configuration: C:\xampp\htdocs\controlvet\tests\e2e\phpunit.xml
 ................................................................. 65 / 87 ( 74%)
 ......................                                            87 / 87 (100%)
 
-Time: 00:07.291, Memory: 8.00 MB
+Time: 00:11.039, Memory: 8.00 MB
 
 Aislamiento Base Datos (ControlVet\E2E\AislamientoBaseDatos)
  ✔ Servicio lee solo su esquema with data set #0
@@ -115,4 +115,4 @@ Regresion Web (ControlVet\E2E\RegresionWeb)
  ✔ Comprobante pdf desde el frontend
  ✔ Crear propietario desde formulario con errores del servicio
 
-OK (87 tests, 237 assertions)
+OK (87 tests, 253 assertions)

@@ -31,6 +31,9 @@ final class App
         public readonly Logger $logger,
         private readonly Closure $connect,
     ) {
+        // La zona horaria es de la aplicación, no del php.ini del servidor
+        // (XAMPP trae Europe/Berlin y "hoy" no coincidiría con CURDATE() de MySQL).
+        date_default_timezone_set(Env::get('APP_TIMEZONE', 'America/Bogota'));
         $this->router = new Router();
         $this->router->get('/health', fn() => $this->health());
     }

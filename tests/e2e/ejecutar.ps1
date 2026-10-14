@@ -20,9 +20,9 @@ $servicios = 'auth', 'pacientes', 'citas', 'clinica', 'inventario', 'documentos'
 foreach ($s in $servicios) {
     [Environment]::SetEnvironmentVariable(($s.ToUpper() + '_URL'), "$BaseUrl/api/$s")
     # Credenciales de BD de cada servicio (para la prueba de aislamiento de esquemas).
-    $env = Join-Path $Raiz "services\$s\config\servicio.env"
-    foreach ($l in Get-Content $env) {
-        if ($l -match '^(DB_PASSWORD|DB_HOST|DB_PORT)=(.*)$') {
+    $config = Join-Path $Raiz "services\$s\config\servicio.php"
+    foreach ($l in Get-Content $config) {
+        if ($l -match "^\s*'(DB_PASSWORD|DB_HOST|DB_PORT)'\s*=>\s*'([^']*)'") {
             $nombre = if ($Matches[1] -eq 'DB_PASSWORD') { $s.ToUpper() + '_DB_PASSWORD' } else { $Matches[1] }
             [Environment]::SetEnvironmentVariable($nombre, $Matches[2])
         }
