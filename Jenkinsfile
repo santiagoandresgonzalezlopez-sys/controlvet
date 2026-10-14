@@ -49,7 +49,7 @@ pipeline {
         }
 
         stage('Validar') {
-            agent { dockerfile { filename 'infra/ci/php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
+            agent { dockerfile { filename 'php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
             steps {
                 sh '''
                     set -e
@@ -74,7 +74,7 @@ pipeline {
         }
 
         stage('Dependencias (Composer)') {
-            agent { dockerfile { filename 'infra/ci/php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
+            agent { dockerfile { filename 'php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
             steps {
                 script {
                     for (c in COMPONENTES) {
@@ -85,7 +85,7 @@ pipeline {
         }
 
         stage('Pruebas unitarias (PHPUnit)') {
-            agent { dockerfile { filename 'infra/ci/php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
+            agent { dockerfile { filename 'php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
             steps {
                 script {
                     for (c in COMPONENTES) {
