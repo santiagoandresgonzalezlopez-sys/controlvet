@@ -1,0 +1,1273 @@
+Lanzada por el usuario admin
+Checking out git file:///C:/xampp/htdocs/controlvet into C:\jenkins\home\workspace\controlvet-pipeline@script\3459df67262569b80f2f95ee488dab7b8c20416ccda4171c421362290443ec2c to read Jenkinsfile
+The recommended git tool is: NONE
+No credentials specified
+ > git.exe rev-parse --resolve-git-dir C:\jenkins\home\workspace\controlvet-pipeline@script\3459df67262569b80f2f95ee488dab7b8c20416ccda4171c421362290443ec2c\.git # timeout=10
+Fetching changes from the remote Git repository
+ > git.exe config remote.origin.url file:///C:/xampp/htdocs/controlvet # timeout=10
+Fetching upstream changes from file:///C:/xampp/htdocs/controlvet
+ > git.exe --version # timeout=10
+ > git --version # 'git version 2.54.0.windows.1'
+ > git.exe fetch --tags --force --progress -- file:///C:/xampp/htdocs/controlvet +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+Checking out Revision b37dcc2da74c3812b1e0dd22277c082ffde9bd82 (refs/remotes/origin/main)
+ > git.exe config core.sparsecheckout # timeout=10
+ > git.exe checkout -f b37dcc2da74c3812b1e0dd22277c082ffde9bd82 # timeout=10
+Commit message: "fix(ci): etapa Release como script (infra/ci/publicar.ps1) que verifica SHA-256; BOM en .ps1"
+ > git.exe rev-list --no-walk 0afc1046a21412a1753fa2d0a0bfca6bdd4586ad # timeout=10
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins  in C:\jenkins\home\workspace\controlvet-pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+The recommended git tool is: NONE
+No credentials specified
+ > git.exe rev-parse --resolve-git-dir C:\jenkins\home\workspace\controlvet-pipeline\.git # timeout=10
+Fetching changes from the remote Git repository
+ > git.exe config remote.origin.url file:///C:/xampp/htdocs/controlvet # timeout=10
+Fetching upstream changes from file:///C:/xampp/htdocs/controlvet
+ > git.exe --version # timeout=10
+ > git --version # 'git version 2.54.0.windows.1'
+ > git.exe fetch --tags --force --progress -- file:///C:/xampp/htdocs/controlvet +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+Checking out Revision b37dcc2da74c3812b1e0dd22277c082ffde9bd82 (refs/remotes/origin/main)
+ > git.exe config core.sparsecheckout # timeout=10
+ > git.exe checkout -f b37dcc2da74c3812b1e0dd22277c082ffde9bd82 # timeout=10
+Commit message: "fix(ci): etapa Release como script (infra/ci/publicar.ps1) que verifica SHA-256; BOM en .ps1"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timestamps
+[Pipeline] {
+[Pipeline] timeout
+[2026-10-14T23:06:18.656Z] Timeout set to expire in 45 Min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] checkout
+[2026-10-14T23:06:18.744Z] The recommended git tool is: NONE
+[2026-10-14T23:06:18.744Z] No credentials specified
+[2026-10-14T23:06:18.745Z]  > git.exe rev-parse --resolve-git-dir C:\jenkins\home\workspace\controlvet-pipeline\.git # timeout=10
+[2026-10-14T23:06:18.821Z] Fetching changes from the remote Git repository
+[2026-10-14T23:06:18.825Z]  > git.exe config remote.origin.url file:///C:/xampp/htdocs/controlvet # timeout=10
+[2026-10-14T23:06:18.910Z] Fetching upstream changes from file:///C:/xampp/htdocs/controlvet
+[2026-10-14T23:06:18.910Z]  > git.exe --version # timeout=10
+[2026-10-14T23:06:18.986Z]  > git --version # 'git version 2.54.0.windows.1'
+[2026-10-14T23:06:18.986Z]  > git.exe fetch --tags --force --progress -- file:///C:/xampp/htdocs/controlvet +refs/heads/*:refs/remotes/origin/* # timeout=10
+[2026-10-14T23:06:19.192Z]  > git.exe rev-parse "refs/remotes/origin/main^{commit}" # timeout=10
+[2026-10-14T23:06:19.266Z] Checking out Revision b37dcc2da74c3812b1e0dd22277c082ffde9bd82 (refs/remotes/origin/main)
+[2026-10-14T23:06:19.266Z]  > git.exe config core.sparsecheckout # timeout=10
+[2026-10-14T23:06:19.336Z]  > git.exe checkout -f b37dcc2da74c3812b1e0dd22277c082ffde9bd82 # timeout=10
+[2026-10-14T23:06:19.479Z] Commit message: "fix(ci): etapa Release como script (infra/ci/publicar.ps1) que verifica SHA-256; BOM en .ps1"
+[Pipeline] script
+[Pipeline] {
+[Pipeline] powershell
+[Pipeline] readFile
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] powershell
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Validar)
+[Pipeline] powershell
+[2026-10-14T23:06:30.786Z] == Sintaxis PHP (php -l) ==
+[2026-10-14T23:06:42.989Z] 144 archivos PHP revisados, 0 con errores
+[2026-10-14T23:06:42.989Z] == composer validate ==
+[2026-10-14T23:06:43.285Z] powershell.exe : ./composer.json is valid, but with a few warnings
+[2026-10-14T23:06:43.285Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-1098cdd0\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:06:43.285Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:06:43.285Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:06:43.285Z]     + CategoryInfo          : NotSpecified: (./composer.json... a few warnings:String) [], RemoteException
+[2026-10-14T23:06:43.285Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:06:43.285Z]  
+[2026-10-14T23:06:43.285Z] See https://getcomposer.org/doc/04-schema.md for details on the schema
+[2026-10-14T23:06:43.285Z] # General warnings
+[2026-10-14T23:06:43.285Z] - The version field is present, it is recommended to leave it out if the package is published on Packagist.
+[2026-10-14T23:06:44.671Z] ./composer.json is valid
+[2026-10-14T23:06:46.608Z] ./composer.json is valid
+[2026-10-14T23:06:48.020Z] ./composer.json is valid
+[2026-10-14T23:06:49.409Z] ./composer.json is valid
+[2026-10-14T23:06:50.798Z] ./composer.json is valid
+[2026-10-14T23:06:52.203Z] ./composer.json is valid
+[2026-10-14T23:06:54.116Z] ./composer.json is valid
+[2026-10-14T23:06:54.116Z] == Control de secretos versionados ==
+[2026-10-14T23:06:54.116Z] Sin secretos detectados
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Dependencias (Composer))
+[Pipeline] script
+[Pipeline] {
+[Pipeline] powershell
+[2026-10-14T23:06:58.450Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:06:58.450Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-c4a34afd\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:06:58.450Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:06:58.450Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:06:58.450Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:06:58.450Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:06:58.450Z]  
+[2026-10-14T23:06:58.450Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:06:59.033Z] Nothing to install, update or remove
+[2026-10-14T23:06:59.033Z] Generating autoload files
+[2026-10-14T23:06:59.315Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:06:59.315Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:03.788Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:03.788Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-3d1e81b6\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:03.788Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:03.788Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:03.788Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:03.788Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:03.788Z]  
+[2026-10-14T23:07:03.788Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:04.371Z] Nothing to install, update or remove
+[2026-10-14T23:07:04.371Z] Generating autoload files
+[2026-10-14T23:07:04.623Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:04.623Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:08.915Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:08.915Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-21f18609\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:08.915Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:08.915Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:08.915Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:08.915Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:08.915Z]  
+[2026-10-14T23:07:08.915Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:09.189Z] Nothing to install, update or remove
+[2026-10-14T23:07:09.189Z] Generating autoload files
+[2026-10-14T23:07:09.755Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:09.755Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:15.106Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:15.106Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-cca1a8d5\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:15.106Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:15.106Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:15.106Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:15.106Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:15.106Z]  
+[2026-10-14T23:07:15.106Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:15.106Z] Nothing to install, update or remove
+[2026-10-14T23:07:15.106Z] Generating autoload files
+[2026-10-14T23:07:15.681Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:15.681Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:19.941Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:19.941Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-446d34f1\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:19.941Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:19.941Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:19.941Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:19.941Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:19.941Z]  
+[2026-10-14T23:07:19.941Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:20.891Z] Nothing to install, update or remove
+[2026-10-14T23:07:20.891Z] Generating autoload files
+[2026-10-14T23:07:21.176Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:21.176Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:25.679Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:25.679Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-1eabc958\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:25.679Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:25.679Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:25.679Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:25.679Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:25.679Z]  
+[2026-10-14T23:07:25.679Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:26.639Z] Nothing to install, update or remove
+[2026-10-14T23:07:26.639Z] Generating autoload files
+[2026-10-14T23:07:26.893Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:26.893Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:31.168Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:31.168Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-7990bb8f\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:31.168Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:31.168Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:31.168Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:31.168Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:31.168Z]  
+[2026-10-14T23:07:31.168Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:33.089Z] Nothing to install, update or remove
+[2026-10-14T23:07:33.089Z] Generating autoload files
+[2026-10-14T23:07:33.089Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:33.089Z] Use the `composer fund` command to find out more!
+[Pipeline] powershell
+[2026-10-14T23:07:37.343Z] powershell.exe : Installing dependencies from lock file (including require-dev)
+[2026-10-14T23:07:37.343Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-f9fd05f5\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:07:37.343Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:07:37.343Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:07:37.343Z]     + CategoryInfo          : NotSpecified: (Installing depe...ng require-dev):String) [], RemoteException
+[2026-10-14T23:07:37.343Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:07:37.343Z]  
+[2026-10-14T23:07:37.343Z] Verifying lock file contents can be installed on current platform.
+[2026-10-14T23:07:38.294Z] Nothing to install, update or remove
+[2026-10-14T23:07:38.294Z] Generating autoload files
+[2026-10-14T23:07:38.550Z] 24 packages you are using are looking for funding.
+[2026-10-14T23:07:38.550Z] Use the `composer fund` command to find out more!
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Pruebas unitarias (PHPUnit))
+[Pipeline] script
+[Pipeline] {
+[Pipeline] powershell
+[2026-10-14T23:07:42.881Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:07:42.881Z] 
+[2026-10-14T23:07:42.881Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:07:42.881Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\libs\kernel\phpunit.xml
+[2026-10-14T23:07:42.881Z] 
+[2026-10-14T23:07:42.881Z] ........................                                          24 / 24 (100%)
+[2026-10-14T23:07:42.881Z] 
+[2026-10-14T23:07:42.881Z] Time: 00:00.051, Memory: 8.00 MB
+[2026-10-14T23:07:42.881Z] 
+[2026-10-14T23:07:42.881Z] OK (24 tests, 36 assertions)
+[Pipeline] powershell
+[2026-10-14T23:07:47.121Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:07:47.121Z] 
+[2026-10-14T23:07:47.121Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:07:47.121Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\services\auth\phpunit.xml
+[2026-10-14T23:07:47.121Z] 
+[2026-10-14T23:07:47.121Z] ..............                                                    14 / 14 (100%)
+[2026-10-14T23:07:47.121Z] 
+[2026-10-14T23:07:47.121Z] Time: 00:00.351, Memory: 8.00 MB
+[2026-10-14T23:07:47.121Z] 
+[2026-10-14T23:07:47.121Z] OK (14 tests, 23 assertions)
+[Pipeline] powershell
+[2026-10-14T23:07:50.469Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:07:50.469Z] 
+[2026-10-14T23:07:50.469Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:07:50.469Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\services\pacientes\phpunit.xml
+[2026-10-14T23:07:50.469Z] 
+[2026-10-14T23:07:50.729Z] .................                                                 17 / 17 (100%)
+[2026-10-14T23:07:50.729Z] 
+[2026-10-14T23:07:50.729Z] Time: 00:00.019, Memory: 8.00 MB
+[2026-10-14T23:07:50.729Z] 
+[2026-10-14T23:07:50.729Z] OK (17 tests, 21 assertions)
+[Pipeline] powershell
+[2026-10-14T23:07:54.976Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:07:54.976Z] 
+[2026-10-14T23:07:54.976Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:07:54.976Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\services\citas\phpunit.xml
+[2026-10-14T23:07:54.976Z] 
+[2026-10-14T23:07:54.976Z] ..................                                                18 / 18 (100%)
+[2026-10-14T23:07:54.976Z] 
+[2026-10-14T23:07:54.976Z] Time: 00:00.018, Memory: 8.00 MB
+[2026-10-14T23:07:54.976Z] 
+[2026-10-14T23:07:54.976Z] OK (18 tests, 22 assertions)
+[Pipeline] powershell
+[2026-10-14T23:07:58.335Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:07:58.335Z] 
+[2026-10-14T23:07:58.335Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:07:58.335Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\services\clinica\phpunit.xml
+[2026-10-14T23:07:58.335Z] 
+[2026-10-14T23:07:58.599Z] ..........                                                        10 / 10 (100%)
+[2026-10-14T23:07:58.599Z] 
+[2026-10-14T23:07:58.599Z] Time: 00:00.022, Memory: 8.00 MB
+[2026-10-14T23:07:58.599Z] 
+[2026-10-14T23:07:58.599Z] OK (10 tests, 18 assertions)
+[Pipeline] powershell
+[2026-10-14T23:08:02.843Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:08:02.843Z] 
+[2026-10-14T23:08:02.843Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:08:02.843Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\services\inventario\phpunit.xml
+[2026-10-14T23:08:02.843Z] 
+[2026-10-14T23:08:02.843Z] ........                                                            8 / 8 (100%)
+[2026-10-14T23:08:02.843Z] 
+[2026-10-14T23:08:02.843Z] Time: 00:00.017, Memory: 8.00 MB
+[2026-10-14T23:08:02.843Z] 
+[2026-10-14T23:08:02.843Z] OK (8 tests, 10 assertions)
+[Pipeline] powershell
+[2026-10-14T23:08:07.083Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:08:07.083Z] 
+[2026-10-14T23:08:07.083Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:08:07.083Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\services\documentos\phpunit.xml
+[2026-10-14T23:08:07.083Z] 
+[2026-10-14T23:08:07.083Z] .......                                                             7 / 7 (100%)
+[2026-10-14T23:08:07.083Z] 
+[2026-10-14T23:08:07.083Z] Time: 00:00.019, Memory: 8.00 MB
+[2026-10-14T23:08:07.083Z] 
+[2026-10-14T23:08:07.083Z] OK (7 tests, 15 assertions)
+[Pipeline] }
+[Pipeline] // script
+Post stage
+[Pipeline] junit
+[2026-10-14T23:08:07.136Z] Grabando resultados de tests
+[2026-10-14T23:08:07.151Z] [Checks API] No suitable checks publisher found.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Empaquetado (artefacto))
+[Pipeline] powershell
+[2026-10-14T23:08:39.288Z] Artefacto: dist\controlvet-1.1.8.zip (0.41 MB) - SHA-256 e1e3ac780e31069346f3caca5e4736b604db04f539f8331d544cc78a1c11efd4
+[Pipeline] powershell
+[2026-10-14T23:08:42.611Z] Candidato publicado en C:\controlvet\artefactos\1.1.8
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Staging + integración y regresión)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] powershell
+[Pipeline] powershell
+[2026-10-14T23:08:50.683Z] 
+[2026-10-14T23:08:50.683Z] PLAY [Desplegar ControlVet] ****************************************************
+[2026-10-14T23:08:50.683Z] 
+[2026-10-14T23:08:50.683Z] TASK [Gathering Facts] *********************************************************
+[2026-10-14T23:08:53.221Z] ok: [equipo-local]
+[2026-10-14T23:08:53.221Z] 
+[2026-10-14T23:08:53.221Z] TASK [Exigir versión y entorno] ************************************************
+[2026-10-14T23:08:53.221Z] ok: [equipo-local] => {
+[2026-10-14T23:08:53.221Z]     "changed": false,
+[2026-10-14T23:08:53.221Z]     "msg": "All assertions passed"
+[2026-10-14T23:08:53.221Z] }
+[2026-10-14T23:08:53.221Z] 
+[2026-10-14T23:08:53.221Z] TASK [Preparación y verificaciones del equipo] *********************************
+[2026-10-14T23:08:53.221Z] included: /mnt/c/jenkins/home/workspace/controlvet-pipeline/infra/ansible/playbooks/tasks/preparar.yml for equipo-local
+[2026-10-14T23:08:53.221Z] 
+[2026-10-14T23:08:53.221Z] TASK [Validar el entorno solicitado] *******************************************
+[2026-10-14T23:08:53.221Z] ok: [equipo-local] => {
+[2026-10-14T23:08:53.221Z]     "changed": false,
+[2026-10-14T23:08:53.221Z]     "msg": "All assertions passed"
+[2026-10-14T23:08:53.221Z] }
+[2026-10-14T23:08:53.221Z] 
+[2026-10-14T23:08:53.221Z] TASK [Fijar datos del entorno staging] *****************************************
+[2026-10-14T23:08:53.221Z] ok: [equipo-local]
+[2026-10-14T23:08:53.221Z] 
+[2026-10-14T23:08:53.221Z] TASK [Verificar la interoperabilidad WSL -> Windows] ***************************
+[2026-10-14T23:08:53.485Z] ok: [equipo-local]
+[2026-10-14T23:08:53.485Z] 
+[2026-10-14T23:08:53.485Z] TASK [Verificar que Apache de XAMPP responde en el puerto 80] ******************
+[2026-10-14T23:08:53.751Z] ok: [equipo-local]
+[2026-10-14T23:08:53.751Z] 
+[2026-10-14T23:08:53.751Z] TASK [Verificar la instancia MariaDB de ControlVet (127.0.0.1:3307)] ***********
+[2026-10-14T23:08:57.951Z] ok: [equipo-local]
+[2026-10-14T23:08:57.951Z] 
+[2026-10-14T23:08:57.951Z] TASK [Exigir la base de datos activa] ******************************************
+[2026-10-14T23:08:57.951Z] ok: [equipo-local] => {
+[2026-10-14T23:08:57.951Z]     "changed": false,
+[2026-10-14T23:08:57.951Z]     "msg": "All assertions passed"
+[2026-10-14T23:08:57.951Z] }
+[2026-10-14T23:08:57.951Z] 
+[2026-10-14T23:08:57.951Z] TASK [Crear directorios de operación] ******************************************
+[2026-10-14T23:08:58.220Z] ok: [equipo-local] => (item=/mnt/c/controlvet/artefactos)
+[2026-10-14T23:08:58.221Z] ok: [equipo-local] => (item=/mnt/c/controlvet/releases/staging)
+[2026-10-14T23:08:58.221Z] ok: [equipo-local] => (item=/mnt/c/controlvet/estado/staging)
+[2026-10-14T23:08:58.221Z] ok: [equipo-local] => (item=/mnt/c/controlvet/respaldos)
+[2026-10-14T23:08:58.221Z] 
+[2026-10-14T23:08:58.221Z] TASK [Leer la versión activa del entorno] **************************************
+[2026-10-14T23:08:58.507Z] ok: [equipo-local]
+[2026-10-14T23:08:58.507Z] 
+[2026-10-14T23:08:58.507Z] TASK [Registrar la versión activa] *********************************************
+[2026-10-14T23:08:58.507Z] ok: [equipo-local]
+[2026-10-14T23:08:58.507Z] 
+[2026-10-14T23:08:58.507Z] TASK [Ubicar el artefacto de la versión 1.1.8] *********************************
+[2026-10-14T23:08:58.778Z] ok: [equipo-local]
+[2026-10-14T23:08:58.778Z] 
+[2026-10-14T23:08:58.778Z] TASK [Verificar la integridad del artefacto (SHA-256)] *************************
+[2026-10-14T23:08:59.061Z] ok: [equipo-local]
+[2026-10-14T23:08:59.061Z] 
+[2026-10-14T23:08:59.061Z] TASK [Crear el directorio de la versión] ***************************************
+[2026-10-14T23:08:59.344Z] changed: [equipo-local]
+[2026-10-14T23:08:59.344Z] 
+[2026-10-14T23:08:59.344Z] TASK [Extraer la versión en /mnt/c/controlvet/releases/staging/1.1.8] **********
+[2026-10-14T23:09:25.926Z] changed: [equipo-local]
+[2026-10-14T23:09:25.926Z] 
+[2026-10-14T23:09:25.926Z] TASK [Ruta Windows del instalador de la versión] *******************************
+[2026-10-14T23:09:26.208Z] ok: [equipo-local]
+[2026-10-14T23:09:26.208Z] 
+[2026-10-14T23:09:26.208Z] TASK [Configurar la versión (esquemas, usuarios por servicio y config/servicio.php)] ***
+[2026-10-14T23:09:27.624Z] changed: [equipo-local]
+[2026-10-14T23:09:27.624Z] 
+[2026-10-14T23:09:27.624Z] TASK [Activar 1.1.8] ***********************************************************
+[2026-10-14T23:09:27.624Z] included: /mnt/c/jenkins/home/workspace/controlvet-pipeline/infra/ansible/playbooks/tasks/activar.yml for equipo-local
+[2026-10-14T23:09:27.624Z] 
+[2026-10-14T23:09:27.624Z] TASK [Ruta Windows de la versión 1.1.8] ****************************************
+[2026-10-14T23:09:27.908Z] ok: [equipo-local]
+[2026-10-14T23:09:27.908Z] 
+[2026-10-14T23:09:27.908Z] TASK [Ruta Windows del enlace publicado] ***************************************
+[2026-10-14T23:09:27.908Z] ok: [equipo-local]
+[2026-10-14T23:09:27.908Z] 
+[2026-10-14T23:09:27.908Z] TASK [Comprobar que el enlace no es un directorio real (no se borran datos)] ***
+[2026-10-14T23:09:30.471Z] ok: [equipo-local]
+[2026-10-14T23:09:30.471Z] 
+[2026-10-14T23:09:30.471Z] TASK [Retirar el enlace anterior (solo el enlace; la versión queda intacta)] ***
+[2026-10-14T23:09:30.743Z] changed: [equipo-local]
+[2026-10-14T23:09:30.743Z] 
+[2026-10-14T23:09:30.743Z] TASK [Apuntar /mnt/c/xampp/htdocs/cv-staging a la versión 1.1.8] ***************
+[2026-10-14T23:09:31.359Z] powershell.exe : [DEPRECATION WARNING]: Module "ansible.builtin.command" returned non UTF-8 data
+[2026-10-14T23:09:31.359Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-4db0671e\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:09:31.359Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:09:31.359Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:09:31.359Z]     + CategoryInfo          : NotSpecified: ([DEPRECATION WA... non UTF-8 data:String) [], RemoteException
+[2026-10-14T23:09:31.359Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:09:31.359Z]  
+[2026-10-14T23:09:31.359Z]  in the JSON response. This will become an error in the future. This feature 
+[2026-10-14T23:09:31.359Z] will be removed in version 2.18. Deprecation warnings can be disabled by 
+[2026-10-14T23:09:31.359Z] setting deprecation_warnings=False in ansible.cfg.
+[2026-10-14T23:09:31.359Z] changed: [equipo-local]
+[2026-10-14T23:09:31.359Z] 
+[2026-10-14T23:09:31.359Z] TASK [Verificación posterior al despliegue] ************************************
+[2026-10-14T23:09:31.359Z] included: /mnt/c/jenkins/home/workspace/controlvet-pipeline/infra/ansible/playbooks/tasks/verificar.yml for equipo-local
+[2026-10-14T23:09:31.359Z] 
+[2026-10-14T23:09:31.359Z] TASK [Consultar /health de cada microservicio] *********************************
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=auth)
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=pacientes)
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=citas)
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=clinica)
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=inventario)
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=documentos)
+[2026-10-14T23:09:33.927Z] 
+[2026-10-14T23:09:33.927Z] TASK [Validar estado, base de datos y versión] *********************************
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=auth) => {
+[2026-10-14T23:09:33.927Z]     "ansible_loop_var": "item",
+[2026-10-14T23:09:33.927Z]     "changed": false,
+[2026-10-14T23:09:33.927Z]     "item": {
+[2026-10-14T23:09:33.927Z]         "ansible_loop_var": "item",
+[2026-10-14T23:09:33.927Z]         "attempts": 1,
+[2026-10-14T23:09:33.927Z]         "changed": false,
+[2026-10-14T23:09:33.927Z]         "cmd": [
+[2026-10-14T23:09:33.927Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:09:33.927Z]             "-s",
+[2026-10-14T23:09:33.927Z]             "--max-time",
+[2026-10-14T23:09:33.927Z]             "10",
+[2026-10-14T23:09:33.927Z]             "http://localhost/cv-staging/api/auth/health"
+[2026-10-14T23:09:33.927Z]         ],
+[2026-10-14T23:09:33.927Z]         "delta": "0:00:00.111793",
+[2026-10-14T23:09:33.927Z]         "end": "2026-10-14 18:09:31.602580",
+[2026-10-14T23:09:33.927Z]         "failed": false,
+[2026-10-14T23:09:33.927Z]         "invocation": {
+[2026-10-14T23:09:33.927Z]             "module_args": {
+[2026-10-14T23:09:33.927Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv-staging/api/auth/health",
+[2026-10-14T23:09:33.927Z]                 "_uses_shell": false,
+[2026-10-14T23:09:33.927Z]                 "argv": null,
+[2026-10-14T23:09:33.927Z]                 "chdir": null,
+[2026-10-14T23:09:33.927Z]                 "creates": null,
+[2026-10-14T23:09:33.927Z]                 "executable": null,
+[2026-10-14T23:09:33.927Z]                 "expand_argument_vars": true,
+[2026-10-14T23:09:33.927Z]                 "removes": null,
+[2026-10-14T23:09:33.927Z]                 "stdin": null,
+[2026-10-14T23:09:33.927Z]                 "stdin_add_newline": true,
+[2026-10-14T23:09:33.927Z]                 "strip_empty_ends": true
+[2026-10-14T23:09:33.927Z]             }
+[2026-10-14T23:09:33.927Z]         },
+[2026-10-14T23:09:33.927Z]         "item": "auth",
+[2026-10-14T23:09:33.927Z]         "msg": "",
+[2026-10-14T23:09:33.927Z]         "rc": 0,
+[2026-10-14T23:09:33.927Z]         "start": "2026-10-14 18:09:31.490787",
+[2026-10-14T23:09:33.927Z]         "stderr": "",
+[2026-10-14T23:09:33.927Z]         "stderr_lines": [],
+[2026-10-14T23:09:33.927Z]         "stdout": "{\"status\":\"ok\",\"service\":\"auth\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:31+00:00\"}",
+[2026-10-14T23:09:33.927Z]         "stdout_lines": [
+[2026-10-14T23:09:33.927Z]             "{\"status\":\"ok\",\"service\":\"auth\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:31+00:00\"}"
+[2026-10-14T23:09:33.927Z]         ]
+[2026-10-14T23:09:33.927Z]     },
+[2026-10-14T23:09:33.927Z]     "msg": "auth OK · versión 1.1.8"
+[2026-10-14T23:09:33.927Z] }
+[2026-10-14T23:09:33.927Z] ok: [equipo-local] => (item=pacientes) => {
+[2026-10-14T23:09:33.927Z]     "ansible_loop_var": "item",
+[2026-10-14T23:09:33.927Z]     "changed": false,
+[2026-10-14T23:09:33.927Z]     "item": {
+[2026-10-14T23:09:33.927Z]         "ansible_loop_var": "item",
+[2026-10-14T23:09:33.927Z]         "attempts": 1,
+[2026-10-14T23:09:33.927Z]         "changed": false,
+[2026-10-14T23:09:33.927Z]         "cmd": [
+[2026-10-14T23:09:33.927Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:09:33.927Z]             "-s",
+[2026-10-14T23:09:33.927Z]             "--max-time",
+[2026-10-14T23:09:33.927Z]             "10",
+[2026-10-14T23:09:33.927Z]             "http://localhost/cv-staging/api/pacientes/health"
+[2026-10-14T23:09:33.927Z]         ],
+[2026-10-14T23:09:33.927Z]         "delta": "0:00:00.099521",
+[2026-10-14T23:09:33.927Z]         "end": "2026-10-14 18:09:32.002154",
+[2026-10-14T23:09:33.927Z]         "failed": false,
+[2026-10-14T23:09:33.927Z]         "invocation": {
+[2026-10-14T23:09:33.927Z]             "module_args": {
+[2026-10-14T23:09:33.927Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv-staging/api/pacientes/health",
+[2026-10-14T23:09:33.927Z]                 "_uses_shell": false,
+[2026-10-14T23:09:33.927Z]                 "argv": null,
+[2026-10-14T23:09:33.927Z]                 "chdir": null,
+[2026-10-14T23:09:33.927Z]                 "creates": null,
+[2026-10-14T23:09:33.927Z]                 "executable": null,
+[2026-10-14T23:09:33.927Z]                 "expand_argument_vars": true,
+[2026-10-14T23:09:33.927Z]                 "removes": null,
+[2026-10-14T23:09:33.927Z]                 "stdin": null,
+[2026-10-14T23:09:33.927Z]                 "stdin_add_newline": true,
+[2026-10-14T23:09:33.929Z]                 "strip_empty_ends": true
+[2026-10-14T23:09:33.929Z]             }
+[2026-10-14T23:09:33.929Z]         },
+[2026-10-14T23:09:33.929Z]         "item": "pacientes",
+[2026-10-14T23:09:33.929Z]         "msg": "",
+[2026-10-14T23:09:33.929Z]         "rc": 0,
+[2026-10-14T23:09:33.929Z]         "start": "2026-10-14 18:09:31.902633",
+[2026-10-14T23:09:33.929Z]         "stderr": "",
+[2026-10-14T23:09:33.929Z]         "stderr_lines": [],
+[2026-10-14T23:09:33.929Z]         "stdout": "{\"status\":\"ok\",\"service\":\"pacientes\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:31+00:00\"}",
+[2026-10-14T23:09:33.929Z]         "stdout_lines": [
+[2026-10-14T23:09:33.929Z]             "{\"status\":\"ok\",\"service\":\"pacientes\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:31+00:00\"}"
+[2026-10-14T23:09:33.929Z]         ]
+[2026-10-14T23:09:33.929Z]     },
+[2026-10-14T23:09:33.929Z]     "msg": "pacientes OK · versión 1.1.8"
+[2026-10-14T23:09:33.929Z] }
+[2026-10-14T23:09:33.929Z] ok: [equipo-local] => (item=citas) => {
+[2026-10-14T23:09:33.929Z]     "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]     "changed": false,
+[2026-10-14T23:09:33.929Z]     "item": {
+[2026-10-14T23:09:33.929Z]         "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]         "attempts": 1,
+[2026-10-14T23:09:33.929Z]         "changed": false,
+[2026-10-14T23:09:33.929Z]         "cmd": [
+[2026-10-14T23:09:33.929Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:09:33.929Z]             "-s",
+[2026-10-14T23:09:33.929Z]             "--max-time",
+[2026-10-14T23:09:33.929Z]             "10",
+[2026-10-14T23:09:33.929Z]             "http://localhost/cv-staging/api/citas/health"
+[2026-10-14T23:09:33.929Z]         ],
+[2026-10-14T23:09:33.929Z]         "delta": "0:00:00.082905",
+[2026-10-14T23:09:33.929Z]         "end": "2026-10-14 18:09:32.358505",
+[2026-10-14T23:09:33.929Z]         "failed": false,
+[2026-10-14T23:09:33.929Z]         "invocation": {
+[2026-10-14T23:09:33.929Z]             "module_args": {
+[2026-10-14T23:09:33.929Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv-staging/api/citas/health",
+[2026-10-14T23:09:33.929Z]                 "_uses_shell": false,
+[2026-10-14T23:09:33.929Z]                 "argv": null,
+[2026-10-14T23:09:33.929Z]                 "chdir": null,
+[2026-10-14T23:09:33.929Z]                 "creates": null,
+[2026-10-14T23:09:33.929Z]                 "executable": null,
+[2026-10-14T23:09:33.929Z]                 "expand_argument_vars": true,
+[2026-10-14T23:09:33.929Z]                 "removes": null,
+[2026-10-14T23:09:33.929Z]                 "stdin": null,
+[2026-10-14T23:09:33.929Z]                 "stdin_add_newline": true,
+[2026-10-14T23:09:33.929Z]                 "strip_empty_ends": true
+[2026-10-14T23:09:33.929Z]             }
+[2026-10-14T23:09:33.929Z]         },
+[2026-10-14T23:09:33.929Z]         "item": "citas",
+[2026-10-14T23:09:33.929Z]         "msg": "",
+[2026-10-14T23:09:33.929Z]         "rc": 0,
+[2026-10-14T23:09:33.929Z]         "start": "2026-10-14 18:09:32.275600",
+[2026-10-14T23:09:33.929Z]         "stderr": "",
+[2026-10-14T23:09:33.929Z]         "stderr_lines": [],
+[2026-10-14T23:09:33.929Z]         "stdout": "{\"status\":\"ok\",\"service\":\"citas\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:32+00:00\"}",
+[2026-10-14T23:09:33.929Z]         "stdout_lines": [
+[2026-10-14T23:09:33.929Z]             "{\"status\":\"ok\",\"service\":\"citas\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:32+00:00\"}"
+[2026-10-14T23:09:33.929Z]         ]
+[2026-10-14T23:09:33.929Z]     },
+[2026-10-14T23:09:33.929Z]     "msg": "citas OK · versión 1.1.8"
+[2026-10-14T23:09:33.929Z] }
+[2026-10-14T23:09:33.929Z] ok: [equipo-local] => (item=clinica) => {
+[2026-10-14T23:09:33.929Z]     "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]     "changed": false,
+[2026-10-14T23:09:33.929Z]     "item": {
+[2026-10-14T23:09:33.929Z]         "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]         "attempts": 1,
+[2026-10-14T23:09:33.929Z]         "changed": false,
+[2026-10-14T23:09:33.929Z]         "cmd": [
+[2026-10-14T23:09:33.929Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:09:33.929Z]             "-s",
+[2026-10-14T23:09:33.929Z]             "--max-time",
+[2026-10-14T23:09:33.929Z]             "10",
+[2026-10-14T23:09:33.929Z]             "http://localhost/cv-staging/api/clinica/health"
+[2026-10-14T23:09:33.929Z]         ],
+[2026-10-14T23:09:33.929Z]         "delta": "0:00:00.085166",
+[2026-10-14T23:09:33.929Z]         "end": "2026-10-14 18:09:32.706402",
+[2026-10-14T23:09:33.929Z]         "failed": false,
+[2026-10-14T23:09:33.929Z]         "invocation": {
+[2026-10-14T23:09:33.929Z]             "module_args": {
+[2026-10-14T23:09:33.929Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv-staging/api/clinica/health",
+[2026-10-14T23:09:33.929Z]                 "_uses_shell": false,
+[2026-10-14T23:09:33.929Z]                 "argv": null,
+[2026-10-14T23:09:33.929Z]                 "chdir": null,
+[2026-10-14T23:09:33.929Z]                 "creates": null,
+[2026-10-14T23:09:33.929Z]                 "executable": null,
+[2026-10-14T23:09:33.929Z]                 "expand_argument_vars": true,
+[2026-10-14T23:09:33.929Z]                 "removes": null,
+[2026-10-14T23:09:33.929Z]                 "stdin": null,
+[2026-10-14T23:09:33.929Z]                 "stdin_add_newline": true,
+[2026-10-14T23:09:33.929Z]                 "strip_empty_ends": true
+[2026-10-14T23:09:33.929Z]             }
+[2026-10-14T23:09:33.929Z]         },
+[2026-10-14T23:09:33.929Z]         "item": "clinica",
+[2026-10-14T23:09:33.929Z]         "msg": "",
+[2026-10-14T23:09:33.929Z]         "rc": 0,
+[2026-10-14T23:09:33.929Z]         "start": "2026-10-14 18:09:32.621236",
+[2026-10-14T23:09:33.929Z]         "stderr": "",
+[2026-10-14T23:09:33.929Z]         "stderr_lines": [],
+[2026-10-14T23:09:33.929Z]         "stdout": "{\"status\":\"ok\",\"service\":\"clinica\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:32+00:00\"}",
+[2026-10-14T23:09:33.929Z]         "stdout_lines": [
+[2026-10-14T23:09:33.929Z]             "{\"status\":\"ok\",\"service\":\"clinica\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:32+00:00\"}"
+[2026-10-14T23:09:33.929Z]         ]
+[2026-10-14T23:09:33.929Z]     },
+[2026-10-14T23:09:33.929Z]     "msg": "clinica OK · versión 1.1.8"
+[2026-10-14T23:09:33.929Z] }
+[2026-10-14T23:09:33.929Z] ok: [equipo-local] => (item=inventario) => {
+[2026-10-14T23:09:33.929Z]     "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]     "changed": false,
+[2026-10-14T23:09:33.929Z]     "item": {
+[2026-10-14T23:09:33.929Z]         "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]         "attempts": 1,
+[2026-10-14T23:09:33.929Z]         "changed": false,
+[2026-10-14T23:09:33.929Z]         "cmd": [
+[2026-10-14T23:09:33.929Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:09:33.929Z]             "-s",
+[2026-10-14T23:09:33.929Z]             "--max-time",
+[2026-10-14T23:09:33.929Z]             "10",
+[2026-10-14T23:09:33.929Z]             "http://localhost/cv-staging/api/inventario/health"
+[2026-10-14T23:09:33.929Z]         ],
+[2026-10-14T23:09:33.929Z]         "delta": "0:00:00.135652",
+[2026-10-14T23:09:33.929Z]         "end": "2026-10-14 18:09:33.233383",
+[2026-10-14T23:09:33.929Z]         "failed": false,
+[2026-10-14T23:09:33.929Z]         "invocation": {
+[2026-10-14T23:09:33.929Z]             "module_args": {
+[2026-10-14T23:09:33.929Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv-staging/api/inventario/health",
+[2026-10-14T23:09:33.929Z]                 "_uses_shell": false,
+[2026-10-14T23:09:33.929Z]                 "argv": null,
+[2026-10-14T23:09:33.929Z]                 "chdir": null,
+[2026-10-14T23:09:33.929Z]                 "creates": null,
+[2026-10-14T23:09:33.929Z]                 "executable": null,
+[2026-10-14T23:09:33.929Z]                 "expand_argument_vars": true,
+[2026-10-14T23:09:33.929Z]                 "removes": null,
+[2026-10-14T23:09:33.929Z]                 "stdin": null,
+[2026-10-14T23:09:33.929Z]                 "stdin_add_newline": true,
+[2026-10-14T23:09:33.929Z]                 "strip_empty_ends": true
+[2026-10-14T23:09:33.929Z]             }
+[2026-10-14T23:09:33.929Z]         },
+[2026-10-14T23:09:33.929Z]         "item": "inventario",
+[2026-10-14T23:09:33.929Z]         "msg": "",
+[2026-10-14T23:09:33.929Z]         "rc": 0,
+[2026-10-14T23:09:33.929Z]         "start": "2026-10-14 18:09:33.097731",
+[2026-10-14T23:09:33.929Z]         "stderr": "",
+[2026-10-14T23:09:33.929Z]         "stderr_lines": [],
+[2026-10-14T23:09:33.929Z]         "stdout": "{\"status\":\"ok\",\"service\":\"inventario\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:32+00:00\"}",
+[2026-10-14T23:09:33.929Z]         "stdout_lines": [
+[2026-10-14T23:09:33.929Z]             "{\"status\":\"ok\",\"service\":\"inventario\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:32+00:00\"}"
+[2026-10-14T23:09:33.929Z]         ]
+[2026-10-14T23:09:33.929Z]     },
+[2026-10-14T23:09:33.929Z]     "msg": "inventario OK · versión 1.1.8"
+[2026-10-14T23:09:33.929Z] }
+[2026-10-14T23:09:33.929Z] ok: [equipo-local] => (item=documentos) => {
+[2026-10-14T23:09:33.929Z]     "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]     "changed": false,
+[2026-10-14T23:09:33.929Z]     "item": {
+[2026-10-14T23:09:33.929Z]         "ansible_loop_var": "item",
+[2026-10-14T23:09:33.929Z]         "attempts": 1,
+[2026-10-14T23:09:33.929Z]         "changed": false,
+[2026-10-14T23:09:33.929Z]         "cmd": [
+[2026-10-14T23:09:33.929Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:09:33.929Z]             "-s",
+[2026-10-14T23:09:33.929Z]             "--max-time",
+[2026-10-14T23:09:33.929Z]             "10",
+[2026-10-14T23:09:33.929Z]             "http://localhost/cv-staging/api/documentos/health"
+[2026-10-14T23:09:33.929Z]         ],
+[2026-10-14T23:09:33.929Z]         "delta": "0:00:00.102261",
+[2026-10-14T23:09:33.929Z]         "end": "2026-10-14 18:09:33.656314",
+[2026-10-14T23:09:33.929Z]         "failed": false,
+[2026-10-14T23:09:33.929Z]         "invocation": {
+[2026-10-14T23:09:33.929Z]             "module_args": {
+[2026-10-14T23:09:33.929Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv-staging/api/documentos/health",
+[2026-10-14T23:09:33.929Z]                 "_uses_shell": false,
+[2026-10-14T23:09:33.929Z]                 "argv": null,
+[2026-10-14T23:09:33.929Z]                 "chdir": null,
+[2026-10-14T23:09:33.929Z]                 "creates": null,
+[2026-10-14T23:09:33.929Z]                 "executable": null,
+[2026-10-14T23:09:33.929Z]                 "expand_argument_vars": true,
+[2026-10-14T23:09:33.929Z]                 "removes": null,
+[2026-10-14T23:09:33.929Z]                 "stdin": null,
+[2026-10-14T23:09:33.929Z]                 "stdin_add_newline": true,
+[2026-10-14T23:09:33.929Z]                 "strip_empty_ends": true
+[2026-10-14T23:09:33.929Z]             }
+[2026-10-14T23:09:33.929Z]         },
+[2026-10-14T23:09:33.929Z]         "item": "documentos",
+[2026-10-14T23:09:33.929Z]         "msg": "",
+[2026-10-14T23:09:33.929Z]         "rc": 0,
+[2026-10-14T23:09:33.929Z]         "start": "2026-10-14 18:09:33.554053",
+[2026-10-14T23:09:33.929Z]         "stderr": "",
+[2026-10-14T23:09:33.929Z]         "stderr_lines": [],
+[2026-10-14T23:09:33.929Z]         "stdout": "{\"status\":\"ok\",\"service\":\"documentos\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:33+00:00\"}",
+[2026-10-14T23:09:33.929Z]         "stdout_lines": [
+[2026-10-14T23:09:33.929Z]             "{\"status\":\"ok\",\"service\":\"documentos\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:09:33+00:00\"}"
+[2026-10-14T23:09:33.929Z]         ]
+[2026-10-14T23:09:33.929Z]     },
+[2026-10-14T23:09:33.929Z]     "msg": "documentos OK · versión 1.1.8"
+[2026-10-14T23:09:33.929Z] }
+[2026-10-14T23:09:33.929Z] 
+[2026-10-14T23:09:33.929Z] TASK [Salud agregada del frontend] *********************************************
+[2026-10-14T23:09:34.224Z] ok: [equipo-local]
+[2026-10-14T23:09:34.224Z] 
+[2026-10-14T23:09:34.224Z] TASK [Página de login del frontend] ********************************************
+[2026-10-14T23:09:34.824Z] ok: [equipo-local]
+[2026-10-14T23:09:34.824Z] 
+[2026-10-14T23:09:34.824Z] TASK [Registrar la versión activa y la anterior] *******************************
+[2026-10-14T23:09:36.237Z] changed: [equipo-local] => (item={'dest': '/mnt/c/controlvet/estado/staging/current', 'content': '1.1.8'})
+[2026-10-14T23:09:36.237Z] changed: [equipo-local] => (item={'dest': '/mnt/c/controlvet/estado/staging/previous', 'content': '1.1.7'})
+[2026-10-14T23:09:36.237Z] 
+[2026-10-14T23:09:36.237Z] TASK [Historial de despliegues] ************************************************
+[2026-10-14T23:09:36.822Z] changed: [equipo-local]
+[2026-10-14T23:09:36.822Z] 
+[2026-10-14T23:09:36.822Z] PLAY RECAP *********************************************************************
+[2026-10-14T23:09:36.822Z] equipo-local               : ok=31   changed=7    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+[2026-10-14T23:09:36.822Z] 
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] powershell
+[2026-10-14T23:09:42.453Z] PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+[2026-10-14T23:09:42.453Z] 
+[2026-10-14T23:09:42.453Z] Runtime:       PHP 8.2.12
+[2026-10-14T23:09:42.453Z] Configuration: C:\jenkins\home\workspace\controlvet-pipeline\tests\e2e\phpunit.xml
+[2026-10-14T23:09:42.453Z] 
+[2026-10-14T23:09:46.656Z] ................................................................. 65 / 87 ( 74%)
+[2026-10-14T23:09:49.188Z] ......................                                            87 / 87 (100%)
+[2026-10-14T23:09:49.188Z] 
+[2026-10-14T23:09:49.189Z] Time: 00:07.444, Memory: 8.00 MB
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Aislamiento Base Datos (ControlVet\E2E\AislamientoBaseDatos)
+[2026-10-14T23:09:49.189Z]  ✔ Servicio lee solo su esquema with data set #0
+[2026-10-14T23:09:49.189Z]  ✔ Servicio lee solo su esquema with data set #1
+[2026-10-14T23:09:49.189Z]  ✔ Servicio lee solo su esquema with data set #2
+[2026-10-14T23:09:49.189Z]  ✔ Servicio lee solo su esquema with data set #3
+[2026-10-14T23:09:49.189Z]  ✔ Servicio lee solo su esquema with data set #4
+[2026-10-14T23:09:49.189Z]  ✔ Servicio lee solo su esquema with data set #5
+[2026-10-14T23:09:49.189Z]  ✔ Usuarios de servicio no pueden alterar esquema
+[2026-10-14T23:09:49.189Z]  ✔ Historia clinica se almacena con copia del propietario
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Aislamiento Datos (ControlVet\E2E\AislamientoDatos)
+[2026-10-14T23:09:49.189Z]  ✔ Cliente solo recibe sus mascotas aunque filtre por otro propietario
+[2026-10-14T23:09:49.189Z]  ✔ Cliente no accede a mascota ajena por id
+[2026-10-14T23:09:49.189Z]  ✔ Cliente solo ve sus citas
+[2026-10-14T23:09:49.189Z]  ✔ Cliente solo ve su historial clinico
+[2026-10-14T23:09:49.189Z]  ✔ Cliente no genera documentos de otros propietarios
+[2026-10-14T23:09:49.189Z]  ✔ Cliente genera su comprobante y solo lista sus documentos
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Auth Api (ControlVet\E2E\AuthApi)
+[2026-10-14T23:09:49.189Z]  ✔ Login devuelve token y usuario sin hash
+[2026-10-14T23:09:49.189Z]  ✔ Credenciales incorrectas retornan 401
+[2026-10-14T23:09:49.189Z]  ✔ Login sin datos retorna 422 con errores por campo
+[2026-10-14T23:09:49.189Z]  ✔ Me identifica al usuario del token
+[2026-10-14T23:09:49.189Z]  ✔ Cada servicio rechaza peticiones sin token
+[2026-10-14T23:09:49.189Z]  ✔ Token manipulado es rechazado
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Autorizacion (ControlVet\E2E\Autorizacion)
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "cliente no lista usuarios"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "recepción no lista usuarios"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "admin lista usuarios"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "recepción no ve inventario"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "veterinario no ve inventario"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "admin ve inventario"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "cliente no lista propietarios"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "veterinario no lista propietarios"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "veterinario ve pacientes"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "veterinario no agenda citas"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "cliente no agenda citas"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "recepción no registra consultas"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "admin no registra consultas"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "cliente no crea mascotas"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "veterinario no edita mascotas"
+[2026-10-14T23:09:49.189Z]  ✔ Permiso with data set "recepción no cambia peso"
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Citas Api (ControlVet\E2E\CitasApi)
+[2026-10-14T23:09:49.189Z]  ✔ Recepcion agenda cita con validacion entre servicios
+[2026-10-14T23:09:49.189Z]  ✔ No se agenda con mascota o veterinario inexistentes
+[2026-10-14T23:09:49.189Z]  ✔ Veterinario solo marca atendidas sus citas
+[2026-10-14T23:09:49.189Z]  ✔ Veterinario ve solo su agenda
+[2026-10-14T23:09:49.189Z]  ✔ Estado invalido es rechazado
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Clinica Documentos Api (ControlVet\E2E\ClinicaDocumentosApi)
+[2026-10-14T23:09:49.189Z]  ✔ Consulta actualiza peso y genera resumen y formula
+[2026-10-14T23:09:49.189Z]  ✔ Historia es inmutable
+[2026-10-14T23:09:49.189Z]  ✔ Consulta sin diagnostico es rechazada
+[2026-10-14T23:09:49.189Z]  ✔ Documento de referencia inexistente retorna 404
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Health (ControlVet\E2E\Health)
+[2026-10-14T23:09:49.189Z]  ✔ Servicio saludable con base de datos with data set #0
+[2026-10-14T23:09:49.189Z]  ✔ Servicio saludable con base de datos with data set #1
+[2026-10-14T23:09:49.189Z]  ✔ Servicio saludable con base de datos with data set #2
+[2026-10-14T23:09:49.189Z]  ✔ Servicio saludable con base de datos with data set #3
+[2026-10-14T23:09:49.189Z]  ✔ Servicio saludable con base de datos with data set #4
+[2026-10-14T23:09:49.189Z]  ✔ Servicio saludable con base de datos with data set #5
+[2026-10-14T23:09:49.189Z]  ✔ Frontend reporta todas las dependencias disponibles
+[2026-10-14T23:09:49.189Z]  ✔ Pagina de login disponible
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Inventario Api (ControlVet\E2E\InventarioApi)
+[2026-10-14T23:09:49.189Z]  ✔ Crear producto actualizar stock y desactivar
+[2026-10-14T23:09:49.189Z]  ✔ Cantidad negativa es rechazada
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Pacientes Api (ControlVet\E2E\PacientesApi)
+[2026-10-14T23:09:49.189Z]  ✔ Flujo propietario mascota y desactivacion
+[2026-10-14T23:09:49.189Z]  ✔ Mascota sin propietario es rechazada
+[2026-10-14T23:09:49.189Z]  ✔ Mascota con propietario inexistente es rechazada
+[2026-10-14T23:09:49.189Z]  ✔ Busqueda de mascotas por nombre de propietario
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] Regresion Web (ControlVet\E2E\RegresionWeb)
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #0
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #1
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #2
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #3
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #4
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #5
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #6
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #7
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #8
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #9
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #10
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #11
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #12
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #13
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #14
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #15
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #16
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #17
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #18
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #19
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #20
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #21
+[2026-10-14T23:09:49.189Z]  ✔ Pantalla por rol with data set #22
+[2026-10-14T23:09:49.189Z]  ✔ Ruta protegida sin sesion redirige al login
+[2026-10-14T23:09:49.189Z]  ✔ Login con contrasena incorrecta muestra mensaje
+[2026-10-14T23:09:49.189Z]  ✔ Accion sin token csrf es rechazada
+[2026-10-14T23:09:49.189Z]  ✔ Comprobante pdf desde el frontend
+[2026-10-14T23:09:49.189Z]  ✔ Crear propietario desde formulario con errores del servicio
+[2026-10-14T23:09:49.189Z] 
+[2026-10-14T23:09:49.189Z] OK (87 tests, 237 assertions)
+Post stage
+[Pipeline] junit
+[2026-10-14T23:09:49.222Z] Grabando resultados de tests
+[2026-10-14T23:09:49.232Z] [Checks API] No suitable checks publisher found.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Release)
+[Pipeline] powershell
+[2026-10-14T23:09:54.580Z] Versión 1.1.8 publicada (artefacto C:\controlvet\artefactos\1.1.8\controlvet-1.1.8.zip)
+[Pipeline] archiveArtifacts
+[2026-10-14T23:09:54.615Z] Guardando archivos
+[2026-10-14T23:09:54.676Z] Almacenando firmas
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy a producción (Ansible))
+[Pipeline] script
+[Pipeline] {
+[Pipeline] powershell
+[Pipeline] powershell
+[2026-10-14T23:10:04.440Z] 
+[2026-10-14T23:10:04.440Z] PLAY [Desplegar ControlVet] ****************************************************
+[2026-10-14T23:10:04.440Z] 
+[2026-10-14T23:10:04.440Z] TASK [Gathering Facts] *********************************************************
+[2026-10-14T23:10:07.734Z] ok: [equipo-local]
+[2026-10-14T23:10:07.734Z] 
+[2026-10-14T23:10:07.734Z] TASK [Exigir versión y entorno] ************************************************
+[2026-10-14T23:10:07.734Z] ok: [equipo-local] => {
+[2026-10-14T23:10:07.734Z]     "changed": false,
+[2026-10-14T23:10:07.734Z]     "msg": "All assertions passed"
+[2026-10-14T23:10:07.734Z] }
+[2026-10-14T23:10:07.734Z] 
+[2026-10-14T23:10:07.734Z] TASK [Preparación y verificaciones del equipo] *********************************
+[2026-10-14T23:10:07.734Z] included: /mnt/c/jenkins/home/workspace/controlvet-pipeline/infra/ansible/playbooks/tasks/preparar.yml for equipo-local
+[2026-10-14T23:10:07.734Z] 
+[2026-10-14T23:10:07.734Z] TASK [Validar el entorno solicitado] *******************************************
+[2026-10-14T23:10:08.015Z] ok: [equipo-local] => {
+[2026-10-14T23:10:08.015Z]     "changed": false,
+[2026-10-14T23:10:08.015Z]     "msg": "All assertions passed"
+[2026-10-14T23:10:08.015Z] }
+[2026-10-14T23:10:08.015Z] 
+[2026-10-14T23:10:08.015Z] TASK [Fijar datos del entorno produccion] **************************************
+[2026-10-14T23:10:08.015Z] ok: [equipo-local]
+[2026-10-14T23:10:08.015Z] 
+[2026-10-14T23:10:08.015Z] TASK [Verificar la interoperabilidad WSL -> Windows] ***************************
+[2026-10-14T23:10:08.292Z] ok: [equipo-local]
+[2026-10-14T23:10:08.292Z] 
+[2026-10-14T23:10:08.292Z] TASK [Verificar que Apache de XAMPP responde en el puerto 80] ******************
+[2026-10-14T23:10:08.568Z] ok: [equipo-local]
+[2026-10-14T23:10:08.568Z] 
+[2026-10-14T23:10:08.568Z] TASK [Verificar la instancia MariaDB de ControlVet (127.0.0.1:3307)] ***********
+[2026-10-14T23:10:12.783Z] ok: [equipo-local]
+[2026-10-14T23:10:12.783Z] 
+[2026-10-14T23:10:12.783Z] TASK [Exigir la base de datos activa] ******************************************
+[2026-10-14T23:10:12.783Z] ok: [equipo-local] => {
+[2026-10-14T23:10:12.783Z]     "changed": false,
+[2026-10-14T23:10:12.783Z]     "msg": "All assertions passed"
+[2026-10-14T23:10:12.783Z] }
+[2026-10-14T23:10:12.783Z] 
+[2026-10-14T23:10:12.783Z] TASK [Crear directorios de operación] ******************************************
+[2026-10-14T23:10:13.736Z] ok: [equipo-local] => (item=/mnt/c/controlvet/artefactos)
+[2026-10-14T23:10:13.736Z] changed: [equipo-local] => (item=/mnt/c/controlvet/releases/produccion)
+[2026-10-14T23:10:13.736Z] changed: [equipo-local] => (item=/mnt/c/controlvet/estado/produccion)
+[2026-10-14T23:10:13.736Z] ok: [equipo-local] => (item=/mnt/c/controlvet/respaldos)
+[2026-10-14T23:10:13.736Z] 
+[2026-10-14T23:10:13.736Z] TASK [Leer la versión activa del entorno] **************************************
+[2026-10-14T23:10:14.012Z] ok: [equipo-local]
+[2026-10-14T23:10:14.012Z] 
+[2026-10-14T23:10:14.012Z] TASK [Registrar la versión activa] *********************************************
+[2026-10-14T23:10:14.012Z] ok: [equipo-local]
+[2026-10-14T23:10:14.012Z] 
+[2026-10-14T23:10:14.012Z] TASK [Ubicar el artefacto de la versión 1.1.8] *********************************
+[2026-10-14T23:10:14.284Z] ok: [equipo-local]
+[2026-10-14T23:10:14.284Z] 
+[2026-10-14T23:10:14.284Z] TASK [Verificar la integridad del artefacto (SHA-256)] *************************
+[2026-10-14T23:10:14.284Z] ok: [equipo-local]
+[2026-10-14T23:10:14.284Z] 
+[2026-10-14T23:10:14.284Z] TASK [Crear el directorio de la versión] ***************************************
+[2026-10-14T23:10:14.563Z] changed: [equipo-local]
+[2026-10-14T23:10:14.563Z] 
+[2026-10-14T23:10:14.563Z] TASK [Extraer la versión en /mnt/c/controlvet/releases/produccion/1.1.8] *******
+[2026-10-14T23:10:36.564Z] changed: [equipo-local]
+[2026-10-14T23:10:36.564Z] 
+[2026-10-14T23:10:36.564Z] TASK [Ruta Windows del instalador de la versión] *******************************
+[2026-10-14T23:10:36.564Z] ok: [equipo-local]
+[2026-10-14T23:10:36.564Z] 
+[2026-10-14T23:10:36.564Z] TASK [Configurar la versión (esquemas, usuarios por servicio y config/servicio.php)] ***
+[2026-10-14T23:10:36.564Z] changed: [equipo-local]
+[2026-10-14T23:10:36.564Z] 
+[2026-10-14T23:10:36.565Z] TASK [Activar 1.1.8] ***********************************************************
+[2026-10-14T23:10:36.565Z] included: /mnt/c/jenkins/home/workspace/controlvet-pipeline/infra/ansible/playbooks/tasks/activar.yml for equipo-local
+[2026-10-14T23:10:36.565Z] 
+[2026-10-14T23:10:36.565Z] TASK [Ruta Windows de la versión 1.1.8] ****************************************
+[2026-10-14T23:10:36.565Z] ok: [equipo-local]
+[2026-10-14T23:10:36.565Z] 
+[2026-10-14T23:10:36.565Z] TASK [Ruta Windows del enlace publicado] ***************************************
+[2026-10-14T23:10:36.565Z] ok: [equipo-local]
+[2026-10-14T23:10:36.565Z] 
+[2026-10-14T23:10:36.565Z] TASK [Comprobar que el enlace no es un directorio real (no se borran datos)] ***
+[2026-10-14T23:10:38.502Z] ok: [equipo-local]
+[2026-10-14T23:10:38.502Z] 
+[2026-10-14T23:10:38.502Z] TASK [Retirar el enlace anterior (solo el enlace; la versión queda intacta)] ***
+[2026-10-14T23:10:38.502Z] skipping: [equipo-local]
+[2026-10-14T23:10:38.502Z] 
+[2026-10-14T23:10:38.502Z] TASK [Apuntar /mnt/c/xampp/htdocs/cv a la versión 1.1.8] ***********************
+[2026-10-14T23:10:38.797Z] powershell.exe : [DEPRECATION WARNING]: Module "ansible.builtin.command" returned non UTF-8 data
+[2026-10-14T23:10:38.797Z] En C:\jenkins\home\workspace\controlvet-pipeline@tmp\durable-53336816\powershellWrapper.ps1: 3 Carácter: 1
+[2026-10-14T23:10:38.797Z] + & powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Comm ...
+[2026-10-14T23:10:38.797Z] + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[2026-10-14T23:10:38.797Z]     + CategoryInfo          : NotSpecified: ([DEPRECATION WA... non UTF-8 data:String) [], RemoteException
+[2026-10-14T23:10:38.797Z]     + FullyQualifiedErrorId : NativeCommandError
+[2026-10-14T23:10:38.797Z]  
+[2026-10-14T23:10:38.797Z]  in the JSON response. This will become an error in the future. This feature 
+[2026-10-14T23:10:38.797Z] will be removed in version 2.18. Deprecation warnings can be disabled by 
+[2026-10-14T23:10:38.797Z] setting deprecation_warnings=False in ansible.cfg.
+[2026-10-14T23:10:38.797Z] changed: [equipo-local]
+[2026-10-14T23:10:38.797Z] 
+[2026-10-14T23:10:38.797Z] TASK [Verificación posterior al despliegue] ************************************
+[2026-10-14T23:10:38.797Z] included: /mnt/c/jenkins/home/workspace/controlvet-pipeline/infra/ansible/playbooks/tasks/verificar.yml for equipo-local
+[2026-10-14T23:10:38.797Z] 
+[2026-10-14T23:10:38.797Z] TASK [Consultar /health de cada microservicio] *********************************
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=auth)
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=pacientes)
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=citas)
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=clinica)
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=inventario)
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=documentos)
+[2026-10-14T23:10:41.350Z] 
+[2026-10-14T23:10:41.350Z] TASK [Validar estado, base de datos y versión] *********************************
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=auth) => {
+[2026-10-14T23:10:41.350Z]     "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]     "changed": false,
+[2026-10-14T23:10:41.350Z]     "item": {
+[2026-10-14T23:10:41.350Z]         "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]         "attempts": 1,
+[2026-10-14T23:10:41.350Z]         "changed": false,
+[2026-10-14T23:10:41.350Z]         "cmd": [
+[2026-10-14T23:10:41.350Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:10:41.350Z]             "-s",
+[2026-10-14T23:10:41.350Z]             "--max-time",
+[2026-10-14T23:10:41.350Z]             "10",
+[2026-10-14T23:10:41.350Z]             "http://localhost/cv/api/auth/health"
+[2026-10-14T23:10:41.350Z]         ],
+[2026-10-14T23:10:41.350Z]         "delta": "0:00:00.169186",
+[2026-10-14T23:10:41.350Z]         "end": "2026-10-14 18:10:38.238663",
+[2026-10-14T23:10:41.350Z]         "failed": false,
+[2026-10-14T23:10:41.350Z]         "invocation": {
+[2026-10-14T23:10:41.350Z]             "module_args": {
+[2026-10-14T23:10:41.350Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/auth/health",
+[2026-10-14T23:10:41.350Z]                 "_uses_shell": false,
+[2026-10-14T23:10:41.350Z]                 "argv": null,
+[2026-10-14T23:10:41.350Z]                 "chdir": null,
+[2026-10-14T23:10:41.350Z]                 "creates": null,
+[2026-10-14T23:10:41.350Z]                 "executable": null,
+[2026-10-14T23:10:41.350Z]                 "expand_argument_vars": true,
+[2026-10-14T23:10:41.350Z]                 "removes": null,
+[2026-10-14T23:10:41.350Z]                 "stdin": null,
+[2026-10-14T23:10:41.350Z]                 "stdin_add_newline": true,
+[2026-10-14T23:10:41.350Z]                 "strip_empty_ends": true
+[2026-10-14T23:10:41.350Z]             }
+[2026-10-14T23:10:41.350Z]         },
+[2026-10-14T23:10:41.350Z]         "item": "auth",
+[2026-10-14T23:10:41.350Z]         "msg": "",
+[2026-10-14T23:10:41.350Z]         "rc": 0,
+[2026-10-14T23:10:41.350Z]         "start": "2026-10-14 18:10:38.069477",
+[2026-10-14T23:10:41.350Z]         "stderr": "",
+[2026-10-14T23:10:41.350Z]         "stderr_lines": [],
+[2026-10-14T23:10:41.350Z]         "stdout": "{\"status\":\"ok\",\"service\":\"auth\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:38+00:00\"}",
+[2026-10-14T23:10:41.350Z]         "stdout_lines": [
+[2026-10-14T23:10:41.350Z]             "{\"status\":\"ok\",\"service\":\"auth\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:38+00:00\"}"
+[2026-10-14T23:10:41.350Z]         ]
+[2026-10-14T23:10:41.350Z]     },
+[2026-10-14T23:10:41.350Z]     "msg": "auth OK · versión 1.1.8"
+[2026-10-14T23:10:41.350Z] }
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=pacientes) => {
+[2026-10-14T23:10:41.350Z]     "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]     "changed": false,
+[2026-10-14T23:10:41.350Z]     "item": {
+[2026-10-14T23:10:41.350Z]         "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]         "attempts": 1,
+[2026-10-14T23:10:41.350Z]         "changed": false,
+[2026-10-14T23:10:41.350Z]         "cmd": [
+[2026-10-14T23:10:41.350Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:10:41.350Z]             "-s",
+[2026-10-14T23:10:41.350Z]             "--max-time",
+[2026-10-14T23:10:41.350Z]             "10",
+[2026-10-14T23:10:41.350Z]             "http://localhost/cv/api/pacientes/health"
+[2026-10-14T23:10:41.350Z]         ],
+[2026-10-14T23:10:41.350Z]         "delta": "0:00:00.121975",
+[2026-10-14T23:10:41.350Z]         "end": "2026-10-14 18:10:38.746655",
+[2026-10-14T23:10:41.350Z]         "failed": false,
+[2026-10-14T23:10:41.350Z]         "invocation": {
+[2026-10-14T23:10:41.350Z]             "module_args": {
+[2026-10-14T23:10:41.350Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/pacientes/health",
+[2026-10-14T23:10:41.350Z]                 "_uses_shell": false,
+[2026-10-14T23:10:41.350Z]                 "argv": null,
+[2026-10-14T23:10:41.350Z]                 "chdir": null,
+[2026-10-14T23:10:41.350Z]                 "creates": null,
+[2026-10-14T23:10:41.350Z]                 "executable": null,
+[2026-10-14T23:10:41.350Z]                 "expand_argument_vars": true,
+[2026-10-14T23:10:41.350Z]                 "removes": null,
+[2026-10-14T23:10:41.350Z]                 "stdin": null,
+[2026-10-14T23:10:41.350Z]                 "stdin_add_newline": true,
+[2026-10-14T23:10:41.350Z]                 "strip_empty_ends": true
+[2026-10-14T23:10:41.350Z]             }
+[2026-10-14T23:10:41.350Z]         },
+[2026-10-14T23:10:41.350Z]         "item": "pacientes",
+[2026-10-14T23:10:41.350Z]         "msg": "",
+[2026-10-14T23:10:41.350Z]         "rc": 0,
+[2026-10-14T23:10:41.350Z]         "start": "2026-10-14 18:10:38.624680",
+[2026-10-14T23:10:41.350Z]         "stderr": "",
+[2026-10-14T23:10:41.350Z]         "stderr_lines": [],
+[2026-10-14T23:10:41.350Z]         "stdout": "{\"status\":\"ok\",\"service\":\"pacientes\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:39+00:00\"}",
+[2026-10-14T23:10:41.350Z]         "stdout_lines": [
+[2026-10-14T23:10:41.350Z]             "{\"status\":\"ok\",\"service\":\"pacientes\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:39+00:00\"}"
+[2026-10-14T23:10:41.350Z]         ]
+[2026-10-14T23:10:41.350Z]     },
+[2026-10-14T23:10:41.350Z]     "msg": "pacientes OK · versión 1.1.8"
+[2026-10-14T23:10:41.350Z] }
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=citas) => {
+[2026-10-14T23:10:41.350Z]     "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]     "changed": false,
+[2026-10-14T23:10:41.350Z]     "item": {
+[2026-10-14T23:10:41.350Z]         "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]         "attempts": 1,
+[2026-10-14T23:10:41.350Z]         "changed": false,
+[2026-10-14T23:10:41.350Z]         "cmd": [
+[2026-10-14T23:10:41.350Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:10:41.350Z]             "-s",
+[2026-10-14T23:10:41.350Z]             "--max-time",
+[2026-10-14T23:10:41.350Z]             "10",
+[2026-10-14T23:10:41.350Z]             "http://localhost/cv/api/citas/health"
+[2026-10-14T23:10:41.350Z]         ],
+[2026-10-14T23:10:41.350Z]         "delta": "0:00:00.112320",
+[2026-10-14T23:10:41.350Z]         "end": "2026-10-14 18:10:39.169662",
+[2026-10-14T23:10:41.350Z]         "failed": false,
+[2026-10-14T23:10:41.350Z]         "invocation": {
+[2026-10-14T23:10:41.350Z]             "module_args": {
+[2026-10-14T23:10:41.350Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/citas/health",
+[2026-10-14T23:10:41.350Z]                 "_uses_shell": false,
+[2026-10-14T23:10:41.350Z]                 "argv": null,
+[2026-10-14T23:10:41.350Z]                 "chdir": null,
+[2026-10-14T23:10:41.350Z]                 "creates": null,
+[2026-10-14T23:10:41.350Z]                 "executable": null,
+[2026-10-14T23:10:41.350Z]                 "expand_argument_vars": true,
+[2026-10-14T23:10:41.350Z]                 "removes": null,
+[2026-10-14T23:10:41.350Z]                 "stdin": null,
+[2026-10-14T23:10:41.350Z]                 "stdin_add_newline": true,
+[2026-10-14T23:10:41.350Z]                 "strip_empty_ends": true
+[2026-10-14T23:10:41.350Z]             }
+[2026-10-14T23:10:41.350Z]         },
+[2026-10-14T23:10:41.350Z]         "item": "citas",
+[2026-10-14T23:10:41.350Z]         "msg": "",
+[2026-10-14T23:10:41.350Z]         "rc": 0,
+[2026-10-14T23:10:41.350Z]         "start": "2026-10-14 18:10:39.057342",
+[2026-10-14T23:10:41.350Z]         "stderr": "",
+[2026-10-14T23:10:41.350Z]         "stderr_lines": [],
+[2026-10-14T23:10:41.350Z]         "stdout": "{\"status\":\"ok\",\"service\":\"citas\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:39+00:00\"}",
+[2026-10-14T23:10:41.350Z]         "stdout_lines": [
+[2026-10-14T23:10:41.350Z]             "{\"status\":\"ok\",\"service\":\"citas\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:39+00:00\"}"
+[2026-10-14T23:10:41.350Z]         ]
+[2026-10-14T23:10:41.350Z]     },
+[2026-10-14T23:10:41.350Z]     "msg": "citas OK · versión 1.1.8"
+[2026-10-14T23:10:41.350Z] }
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=clinica) => {
+[2026-10-14T23:10:41.350Z]     "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]     "changed": false,
+[2026-10-14T23:10:41.350Z]     "item": {
+[2026-10-14T23:10:41.350Z]         "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]         "attempts": 1,
+[2026-10-14T23:10:41.350Z]         "changed": false,
+[2026-10-14T23:10:41.350Z]         "cmd": [
+[2026-10-14T23:10:41.350Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:10:41.350Z]             "-s",
+[2026-10-14T23:10:41.350Z]             "--max-time",
+[2026-10-14T23:10:41.350Z]             "10",
+[2026-10-14T23:10:41.350Z]             "http://localhost/cv/api/clinica/health"
+[2026-10-14T23:10:41.350Z]         ],
+[2026-10-14T23:10:41.350Z]         "delta": "0:00:00.094644",
+[2026-10-14T23:10:41.350Z]         "end": "2026-10-14 18:10:39.509659",
+[2026-10-14T23:10:41.350Z]         "failed": false,
+[2026-10-14T23:10:41.350Z]         "invocation": {
+[2026-10-14T23:10:41.350Z]             "module_args": {
+[2026-10-14T23:10:41.350Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/clinica/health",
+[2026-10-14T23:10:41.350Z]                 "_uses_shell": false,
+[2026-10-14T23:10:41.350Z]                 "argv": null,
+[2026-10-14T23:10:41.350Z]                 "chdir": null,
+[2026-10-14T23:10:41.350Z]                 "creates": null,
+[2026-10-14T23:10:41.350Z]                 "executable": null,
+[2026-10-14T23:10:41.350Z]                 "expand_argument_vars": true,
+[2026-10-14T23:10:41.350Z]                 "removes": null,
+[2026-10-14T23:10:41.350Z]                 "stdin": null,
+[2026-10-14T23:10:41.350Z]                 "stdin_add_newline": true,
+[2026-10-14T23:10:41.350Z]                 "strip_empty_ends": true
+[2026-10-14T23:10:41.350Z]             }
+[2026-10-14T23:10:41.350Z]         },
+[2026-10-14T23:10:41.350Z]         "item": "clinica",
+[2026-10-14T23:10:41.350Z]         "msg": "",
+[2026-10-14T23:10:41.350Z]         "rc": 0,
+[2026-10-14T23:10:41.350Z]         "start": "2026-10-14 18:10:39.415015",
+[2026-10-14T23:10:41.350Z]         "stderr": "",
+[2026-10-14T23:10:41.350Z]         "stderr_lines": [],
+[2026-10-14T23:10:41.350Z]         "stdout": "{\"status\":\"ok\",\"service\":\"clinica\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:40+00:00\"}",
+[2026-10-14T23:10:41.350Z]         "stdout_lines": [
+[2026-10-14T23:10:41.350Z]             "{\"status\":\"ok\",\"service\":\"clinica\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:40+00:00\"}"
+[2026-10-14T23:10:41.350Z]         ]
+[2026-10-14T23:10:41.350Z]     },
+[2026-10-14T23:10:41.350Z]     "msg": "clinica OK · versión 1.1.8"
+[2026-10-14T23:10:41.350Z] }
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=inventario) => {
+[2026-10-14T23:10:41.350Z]     "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]     "changed": false,
+[2026-10-14T23:10:41.350Z]     "item": {
+[2026-10-14T23:10:41.350Z]         "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]         "attempts": 1,
+[2026-10-14T23:10:41.350Z]         "changed": false,
+[2026-10-14T23:10:41.350Z]         "cmd": [
+[2026-10-14T23:10:41.350Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:10:41.350Z]             "-s",
+[2026-10-14T23:10:41.350Z]             "--max-time",
+[2026-10-14T23:10:41.350Z]             "10",
+[2026-10-14T23:10:41.350Z]             "http://localhost/cv/api/inventario/health"
+[2026-10-14T23:10:41.350Z]         ],
+[2026-10-14T23:10:41.350Z]         "delta": "0:00:00.109089",
+[2026-10-14T23:10:41.350Z]         "end": "2026-10-14 18:10:39.856034",
+[2026-10-14T23:10:41.350Z]         "failed": false,
+[2026-10-14T23:10:41.350Z]         "invocation": {
+[2026-10-14T23:10:41.350Z]             "module_args": {
+[2026-10-14T23:10:41.350Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/inventario/health",
+[2026-10-14T23:10:41.350Z]                 "_uses_shell": false,
+[2026-10-14T23:10:41.350Z]                 "argv": null,
+[2026-10-14T23:10:41.350Z]                 "chdir": null,
+[2026-10-14T23:10:41.350Z]                 "creates": null,
+[2026-10-14T23:10:41.350Z]                 "executable": null,
+[2026-10-14T23:10:41.350Z]                 "expand_argument_vars": true,
+[2026-10-14T23:10:41.350Z]                 "removes": null,
+[2026-10-14T23:10:41.350Z]                 "stdin": null,
+[2026-10-14T23:10:41.350Z]                 "stdin_add_newline": true,
+[2026-10-14T23:10:41.350Z]                 "strip_empty_ends": true
+[2026-10-14T23:10:41.350Z]             }
+[2026-10-14T23:10:41.350Z]         },
+[2026-10-14T23:10:41.350Z]         "item": "inventario",
+[2026-10-14T23:10:41.350Z]         "msg": "",
+[2026-10-14T23:10:41.350Z]         "rc": 0,
+[2026-10-14T23:10:41.350Z]         "start": "2026-10-14 18:10:39.746945",
+[2026-10-14T23:10:41.350Z]         "stderr": "",
+[2026-10-14T23:10:41.350Z]         "stderr_lines": [],
+[2026-10-14T23:10:41.350Z]         "stdout": "{\"status\":\"ok\",\"service\":\"inventario\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:40+00:00\"}",
+[2026-10-14T23:10:41.350Z]         "stdout_lines": [
+[2026-10-14T23:10:41.350Z]             "{\"status\":\"ok\",\"service\":\"inventario\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:40+00:00\"}"
+[2026-10-14T23:10:41.350Z]         ]
+[2026-10-14T23:10:41.350Z]     },
+[2026-10-14T23:10:41.350Z]     "msg": "inventario OK · versión 1.1.8"
+[2026-10-14T23:10:41.350Z] }
+[2026-10-14T23:10:41.350Z] ok: [equipo-local] => (item=documentos) => {
+[2026-10-14T23:10:41.350Z]     "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]     "changed": false,
+[2026-10-14T23:10:41.350Z]     "item": {
+[2026-10-14T23:10:41.350Z]         "ansible_loop_var": "item",
+[2026-10-14T23:10:41.350Z]         "attempts": 1,
+[2026-10-14T23:10:41.350Z]         "changed": false,
+[2026-10-14T23:10:41.350Z]         "cmd": [
+[2026-10-14T23:10:41.350Z]             "/mnt/c/Windows/System32/curl.exe",
+[2026-10-14T23:10:41.350Z]             "-s",
+[2026-10-14T23:10:41.350Z]             "--max-time",
+[2026-10-14T23:10:41.350Z]             "10",
+[2026-10-14T23:10:41.350Z]             "http://localhost/cv/api/documentos/health"
+[2026-10-14T23:10:41.350Z]         ],
+[2026-10-14T23:10:41.350Z]         "delta": "0:00:00.086954",
+[2026-10-14T23:10:41.350Z]         "end": "2026-10-14 18:10:40.176084",
+[2026-10-14T23:10:41.350Z]         "failed": false,
+[2026-10-14T23:10:41.350Z]         "invocation": {
+[2026-10-14T23:10:41.350Z]             "module_args": {
+[2026-10-14T23:10:41.350Z]                 "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/documentos/health",
+[2026-10-14T23:10:41.350Z]                 "_uses_shell": false,
+[2026-10-14T23:10:41.350Z]                 "argv": null,
+[2026-10-14T23:10:41.350Z]                 "chdir": null,
+[2026-10-14T23:10:41.350Z]                 "creates": null,
+[2026-10-14T23:10:41.350Z]                 "executable": null,
+[2026-10-14T23:10:41.350Z]                 "expand_argument_vars": true,
+[2026-10-14T23:10:41.350Z]                 "removes": null,
+[2026-10-14T23:10:41.350Z]                 "stdin": null,
+[2026-10-14T23:10:41.350Z]                 "stdin_add_newline": true,
+[2026-10-14T23:10:41.350Z]                 "strip_empty_ends": true
+[2026-10-14T23:10:41.350Z]             }
+[2026-10-14T23:10:41.350Z]         },
+[2026-10-14T23:10:41.350Z]         "item": "documentos",
+[2026-10-14T23:10:41.350Z]         "msg": "",
+[2026-10-14T23:10:41.350Z]         "rc": 0,
+[2026-10-14T23:10:41.350Z]         "start": "2026-10-14 18:10:40.089130",
+[2026-10-14T23:10:41.350Z]         "stderr": "",
+[2026-10-14T23:10:41.350Z]         "stderr_lines": [],
+[2026-10-14T23:10:41.350Z]         "stdout": "{\"status\":\"ok\",\"service\":\"documentos\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:40+00:00\"}",
+[2026-10-14T23:10:41.350Z]         "stdout_lines": [
+[2026-10-14T23:10:41.350Z]             "{\"status\":\"ok\",\"service\":\"documentos\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:10:40+00:00\"}"
+[2026-10-14T23:10:41.350Z]         ]
+[2026-10-14T23:10:41.350Z]     },
+[2026-10-14T23:10:41.350Z]     "msg": "documentos OK · versión 1.1.8"
+[2026-10-14T23:10:41.350Z] }
+[2026-10-14T23:10:41.350Z] 
+[2026-10-14T23:10:41.350Z] TASK [Salud agregada del frontend] *********************************************
+[2026-10-14T23:10:41.642Z] ok: [equipo-local]
+[2026-10-14T23:10:41.642Z] 
+[2026-10-14T23:10:41.642Z] TASK [Página de login del frontend] ********************************************
+[2026-10-14T23:10:41.926Z] ok: [equipo-local]
+[2026-10-14T23:10:41.926Z] 
+[2026-10-14T23:10:41.926Z] TASK [Registrar la versión activa y la anterior] *******************************
+[2026-10-14T23:10:43.328Z] changed: [equipo-local] => (item={'dest': '/mnt/c/controlvet/estado/produccion/current', 'content': '1.1.8'})
+[2026-10-14T23:10:43.328Z] changed: [equipo-local] => (item={'dest': '/mnt/c/controlvet/estado/produccion/previous', 'content': ''})
+[2026-10-14T23:10:43.328Z] 
+[2026-10-14T23:10:43.328Z] TASK [Historial de despliegues] ************************************************
+[2026-10-14T23:10:43.614Z] changed: [equipo-local]
+[2026-10-14T23:10:43.614Z] 
+[2026-10-14T23:10:43.614Z] PLAY RECAP *********************************************************************
+[2026-10-14T23:10:43.614Z] equipo-local               : ok=30   changed=7    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+[2026-10-14T23:10:43.614Z] 
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+[2026-10-14T23:10:43.980Z] Versión 1.1.8 publicada y desplegada en producción.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

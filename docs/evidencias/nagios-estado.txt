@@ -1,17 +1,11 @@
-auth        -                          UP        TCP OK - 0.001 second response time on auth port 80
-citas       -                          UP        TCP OK - 0.000 second response time on citas port 80
-clinica     -                          UP        TCP OK - 0.002 second response time on clinica port 80
-db          -                          UP        TCP OK - 0.001 second response time on db port 3306
-documentos  -                          UP        TCP OK - 0.001 second response time on documentos port 80
-inventario  -                          UP        TCP OK - 0.000 second response time on inventario port 80
-pacientes   -                          UP        TCP OK - 0.001 second response time on pacientes port 80
-web         -                          UP        TCP OK - 0.000 second response time on web port 80
-auth        API salud                  OK        HTTP OK: Status line output matched "200" - 304 bytes in 0.005 second response time
-citas       API salud                  OK        HTTP OK: Status line output matched "200" - 305 bytes in 0.004 second response time
-clinica     API salud                  OK        HTTP OK: Status line output matched "200" - 307 bytes in 0.004 second response time
-db          MariaDB conexion           OK        Uptime: 328  Threads: 3  Questions: 999  Slow queries: 0  Opens: 17  Open tables: 10  Quer
-documentos  API salud                  OK        HTTP OK: Status line output matched "200" - 310 bytes in 0.003 second response time
-inventario  API salud                  OK        HTTP OK: Status line output matched "200" - 310 bytes in 0.005 second response time
-pacientes   API salud                  OK        HTTP OK: Status line output matched "200" - 309 bytes in 0.003 second response time
-web         Dependencias del frontend  OK        HTTP OK: Status line output matched "200" - 464 bytes in 0.020 second response time
-web         Login web                  OK        HTTP OK: Status line output matched "200" - 2747 bytes in 0.002 second response time
+﻿mariadb-controlvet  -                          UP        MYSQL OK - MariaDB de ControlVet responde (97 ms)
+xampp-apache        -                          UP        TCP OK - 0.001 second response time on 172.20.240.1 port 80
+mariadb-controlvet  MariaDB conexion           OK        MYSQL OK - MariaDB de ControlVet responde (178 ms)
+xampp-apache        API auth                   OK        HTTP OK: Status line output matched "200" - 337 bytes in 0.034 second response t
+xampp-apache        API citas                  OK        HTTP OK: Status line output matched "200" - 338 bytes in 0.021 second response t
+xampp-apache        API clinica                OK        HTTP OK: Status line output matched "200" - 340 bytes in 0.033 second response t
+xampp-apache        API documentos             OK        HTTP OK: Status line output matched "200" - 343 bytes in 0.019 second response t
+xampp-apache        API inventario             OK        HTTP OK: Status line output matched "200" - 343 bytes in 0.022 second response t
+xampp-apache        API pacientes              OK        HTTP OK: Status line output matched "200" - 342 bytes in 0.037 second response t
+xampp-apache        Dependencias del frontend  OK        HTTP OK: Status line output matched "200" - 444 bytes in 0.291 second response t
+xampp-apache        Login web                  OK        HTTP OK: Status line output matched "200" - 2250 bytes in 0.029 second response 

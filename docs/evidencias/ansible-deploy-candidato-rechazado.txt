@@ -1,0 +1,68 @@
+﻿
+PLAY [Desplegar ControlVet] ****************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [equipo-local]
+
+TASK [Exigir versión y entorno] ************************************************
+ok: [equipo-local] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Preparación y verificaciones del equipo] *********************************
+included: /mnt/c/xampp/htdocs/controlvet/infra/ansible/playbooks/tasks/preparar.yml for equipo-local
+
+TASK [Validar el entorno solicitado] *******************************************
+ok: [equipo-local] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Fijar datos del entorno produccion] **************************************
+ok: [equipo-local]
+
+TASK [Verificar la interoperabilidad WSL -> Windows] ***************************
+ok: [equipo-local]
+
+TASK [Verificar que Apache de XAMPP responde en el puerto 80] ******************
+ok: [equipo-local]
+
+TASK [Verificar la instancia MariaDB de ControlVet (127.0.0.1:3307)] ***********
+ok: [equipo-local]
+
+TASK [Exigir la base de datos activa] ******************************************
+ok: [equipo-local] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Crear directorios de operación] ******************************************
+ok: [equipo-local] => (item=/mnt/c/controlvet/artefactos)
+ok: [equipo-local] => (item=/mnt/c/controlvet/releases/produccion)
+ok: [equipo-local] => (item=/mnt/c/controlvet/estado/produccion)
+ok: [equipo-local] => (item=/mnt/c/controlvet/respaldos)
+
+TASK [Leer la versión activa del entorno] **************************************
+ok: [equipo-local]
+
+TASK [Registrar la versión activa] *********************************************
+ok: [equipo-local]
+
+TASK [Ubicar el artefacto de la versión 1.1.7] *********************************
+ok: [equipo-local]
+
+TASK [Leer el estado de promoción del artefacto] *******************************
+ok: [equipo-local]
+
+TASK [Exigir artefacto publicado para producción] ******************************
+fatal: [equipo-local]: FAILED! => {
+    "assertion": "cv_entorno != 'produccion' or (estado_artefacto.content | b64decode).strip() == 'publicado'",
+    "changed": false,
+    "evaluated_to": false,
+    "msg": "La versión 1.1.7 está en estado 'candidato': solo se despliegan en producción versiones publicadas"
+}
+
+PLAY RECAP *********************************************************************
+equipo-local               : ok=14   changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+

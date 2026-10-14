@@ -20,6 +20,18 @@
         artefacto: "{{ cv_artefactos }}/{{ cv_version }}/controlvet-{{ cv_version }}.zip"
         release_dir: "{{ cv_releases }}/{{ cv_entorno }}/{{ cv_version }}"
 
+    - name: Leer el estado de promoción del artefacto
+      ansible.builtin.slurp:
+        src: "{{ cv_artefactos }}/{{ cv_version }}/ESTADO"
+      register: estado_artefacto
+
+    # Control de promoción: a producción solo llegan versiones que superaron
+    # staging y fueron publicadas por Jenkins (staging acepta candidatos).
+    - name: Exigir artefacto publicado para producción
+      ansible.builtin.assert:
+        that: cv_entorno != 'produccion' or (estado_artefacto.content | b64decode).strip() == 'publicado'
+        fail_msg: "La versión {{ cv_version }} está en estado '{{ (estado_artefacto.content | b64decode).strip() }}': solo se despliegan en producción versiones publicadas"
+
     - name: Verificar la integridad del artefacto (SHA-256)
       ansible.builtin.shell: cd {{ cv_artefactos }}/{{ cv_version }} && sha256sum -c controlvet-{{ cv_version }}.zip.sha256
       changed_when: false

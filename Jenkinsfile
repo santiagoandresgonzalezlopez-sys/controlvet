@@ -55,7 +55,8 @@ pipeline {
                     currentBuild.displayName = "#${env.BUILD_NUMBER} · v${env.CV_VERSION}"
                     currentBuild.description = "commit ${env.GIT_SHA}"
                 }
-                powershell 'New-Item -ItemType Directory -Force reports, dist | Out-Null'
+                // Espacio limpio: solo se archivan los artefactos y reportes de ESTE build.
+                powershell 'Remove-Item reports, dist -Recurse -Force -ErrorAction SilentlyContinue; New-Item -ItemType Directory -Force reports, dist | Out-Null'
             }
         }
 
