@@ -61,33 +61,8 @@ pipeline {
 
         stage('Validar') {
             steps {
-                powershell '''
-                    $ErrorActionPreference = 'Stop'
-                    Write-Host '== Sintaxis PHP (php -l) =='
-                    $archivos = Get-ChildItem libs, services, web, tests, infra -Recurse -Filter *.php |
-                        Where-Object { $_.FullName -notmatch '\\\\vendor\\\\' }
-                    $errores = 0
-                    foreach ($f in $archivos) {
-                        $r = & $env:PHP -l $f.FullName 2>&1
-                        if ($LASTEXITCODE -ne 0) { $errores++; Write-Host $r }
-                    }
-                    "$($archivos.Count) archivos revisados, $errores con errores" | Tee-Object reports\\php-lint.txt
-                    if ($errores -gt 0) { throw 'Errores de sintaxis PHP' }
-
-                    Write-Host '== composer validate =='
-                    foreach ($c in 'libs/kernel','services/auth','services/pacientes','services/citas','services/clinica','services/inventario','services/documentos','tests/e2e') {
-                        composer validate --no-check-publish --no-interaction -d $c
-                        if ($LASTEXITCODE -ne 0) { throw "composer.json inválido en $c" }
-                    }
-
-                    Write-Host '== Control de secretos versionados =='
-                    $versionados = git ls-files
-                    $prohibidos = $versionados | Where-Object { $_ -match '(^|/)(\\.env|servicio\\.php|web\\.php|bd-root\\.env|monitor\\.env)$' }
-                    if ($prohibidos) { throw "Archivos de secretos versionados: $prohibidos" }
-                    $hallazgos = git grep -nE "BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|(JWT_SECRET|DB_PASSWORD|DB_ROOT_PASSWORD)['\\"]?\\s*(=|=>)\\s*['\\"]?[A-Za-z0-9_-]{20,}" -- . ':!*.example'
-                    if ($LASTEXITCODE -eq 0) { Write-Host $hallazgos; throw 'Posible secreto en el repositorio' }
-                    'Sin secretos detectados'
-                '''
+                // Sintaxis PHP, composer.json válidos y control de secretos versionados.
+                powershell '.\\infra\\ci\\validar.ps1 -Php $env:PHP -Reporte reports\\php-lint.txt'
             }
         }
 

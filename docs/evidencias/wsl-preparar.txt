@@ -1,0 +1,93 @@
+﻿/mnt/c/xampp/htdocs/controlvet/infra/wsl/preparar.sh: Bourne-Again shell script, Unicode text, UTF-8 text executable
+[controlvet] Instalando Ansible y utilidades...
+ansible [core 2.16.3]
+[controlvet] Configurando Nagios con Ansible...
+
+PLAY [Configurar la supervisión de ControlVet con Nagios] **********************
+
+TASK [Gathering Facts] *********************************************************
+ok: [equipo-local]
+
+TASK [Paquetes de Nagios, plugins estándar y Apache (WSL)] *********************
+changed: [equipo-local]
+
+TASK [IP de Windows vista desde WSL (puerta de enlace por defecto)] ************
+ok: [equipo-local]
+
+TASK [Directorios de configuración de ControlVet] ******************************
+changed: [equipo-local] => (item={'path': '/etc/nagios4/conf.d/controlvet', 'group': 'root', 'mode': '0755'})
+changed: [equipo-local] => (item={'path': '/etc/nagios4/controlvet', 'group': 'nagios', 'mode': '0750'})
+changed: [equipo-local] => (item={'path': '/usr/local/lib/controlvet-nagios', 'group': 'root', 'mode': '0755'})
+
+TASK [Comandos y contactos de ControlVet] **************************************
+changed: [equipo-local] => (item=commands.cfg)
+changed: [equipo-local] => (item=contacts.cfg)
+
+TASK [Hosts y servicios supervisados (entorno produccion)] *********************
+changed: [equipo-local]
+
+TASK [Plugin de conexión a MariaDB] ********************************************
+changed: [equipo-local]
+
+TASK [Leer la clave del usuario de monitoreo (generada por instalar.php, fuera de htdocs)] ***
+ok: [equipo-local]
+
+TASK [Archivo de opciones del cliente MySQL para Nagios] ***********************
+changed: [equipo-local]
+
+TASK [Registro de alertas de ControlVet] ***************************************
+changed: [equipo-local]
+
+TASK [Clave del administrador web de Nagios (persistente, fuera del repositorio)] ***
+ok: [equipo-local]
+
+TASK [Usuario nagiosadmin para la interfaz web] ********************************
+changed: [equipo-local]
+
+TASK [Permisos del archivo de usuarios web] ************************************
+changed: [equipo-local]
+
+TASK [Interfaz web de Nagios con autenticación básica] *************************
+changed: [equipo-local]
+
+TASK [Activar módulos de Apache necesarios] ************************************
+changed: [equipo-local]
+
+TASK [Activar la configuración de Nagios en Apache] ****************************
+ok: [equipo-local]
+
+TASK [Apache de WSL en el puerto 8092] *****************************************
+changed: [equipo-local]
+
+TASK [Sitio por defecto en 8092] ***********************************************
+changed: [equipo-local]
+
+TASK [Usar la autenticación de Apache en los CGI de Nagios] ********************
+changed: [equipo-local]
+
+TASK [Validar la configuración de Nagios (nagios4 -v)] *************************
+ok: [equipo-local]
+
+TASK [Resultado de la validación] **********************************************
+ok: [equipo-local] => {
+    "msg": [
+        "Total Warnings: 0",
+        "Total Errors:   0",
+        "Things look okay - No serious problems were detected during the pre-flight check"
+    ]
+}
+
+TASK [Servicios habilitados al arrancar WSL] ***********************************
+changed: [equipo-local] => (item=nagios4)
+ok: [equipo-local] => (item=apache2)
+
+RUNNING HANDLER [Reiniciar nagios] *********************************************
+changed: [equipo-local]
+
+RUNNING HANDLER [Reiniciar apache] *********************************************
+changed: [equipo-local]
+
+PLAY RECAP *********************************************************************
+equipo-local               : ok=24   changed=17   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+[controlvet] Listo. Nagios: http://localhost:8092/nagios4 (usuario nagiosadmin; clave en C:\xampp\controlvet-secretos\nagios_admin)
