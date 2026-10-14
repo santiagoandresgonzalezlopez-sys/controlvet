@@ -17,7 +17,7 @@
 
     - name: IP de Windows vista desde WSL (puerta de enlace por defecto)
       ansible.builtin.shell: ip route show default | awk '{print $3; exit}'
-      register: windows_ip
+      register: ip_windows
       changed_when: false
 
     - name: Directorios de configuración de ControlVet
@@ -47,7 +47,7 @@
         mode: "0644"
       vars:
         ruta: "{{ cv_entornos[cv_entorno].ruta }}"
-        windows_ip: "{{ windows_ip.stdout }}"
+        windows_ip: "{{ ip_windows.stdout }}"
         servicios: "{{ cv_servicios }}"
         db_puerto: "{{ cv_db_puerto }}"
       notify: Reiniciar nagios

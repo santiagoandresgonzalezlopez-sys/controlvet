@@ -15,6 +15,8 @@ cv_releases: "{{ cv_raiz }}/releases"
 cv_estado: "{{ cv_raiz }}/estado"
 cv_respaldos: "{{ cv_raiz }}/respaldos"
 cv_htdocs: /mnt/c/xampp/htdocs
+# Ruta Windows de htdocs para los enlaces (wslpath resolvería el enlace hasta su destino).
+cv_htdocs_win: 'C:\xampp\htdocs'
 cv_secretos: /mnt/c/xampp/controlvet-secretos
 cv_bd_script: /mnt/c/xampp/htdocs/controlvet/infra/xampp/bd.ps1
 

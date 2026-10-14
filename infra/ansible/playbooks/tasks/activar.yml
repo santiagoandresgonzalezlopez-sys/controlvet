@@ -9,11 +9,12 @@
   register: destino_win
   changed_when: false
 
+# La ruta del enlace se construye (no con wslpath, que lo resolvería hasta la
+# versión a la que apunta y lo confundiría con un directorio real).
 - name: Ruta Windows del enlace publicado
-  ansible.builtin.command:
-    argv: [wslpath, -w, "{{ cv_enlace }}"]
-  register: enlace_win
-  changed_when: false
+  ansible.builtin.set_fact:
+    enlace_win:
+      stdout: "{{ cv_htdocs_win }}\\{{ ent.ruta }}"
 
 - name: Comprobar que el enlace no es un directorio real (no se borran datos)
   ansible.builtin.command:

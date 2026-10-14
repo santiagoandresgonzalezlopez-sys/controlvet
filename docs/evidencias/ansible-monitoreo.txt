@@ -1,0 +1,85 @@
+﻿
+PLAY [Configurar la supervisión de ControlVet con Nagios] **********************
+
+TASK [Gathering Facts] *********************************************************
+ok: [equipo-local]
+
+TASK [Paquetes de Nagios, plugins estándar y Apache (WSL)] *********************
+ok: [equipo-local]
+
+TASK [IP de Windows vista desde WSL (puerta de enlace por defecto)] ************
+ok: [equipo-local]
+
+TASK [Directorios de configuración de ControlVet] ******************************
+ok: [equipo-local] => (item={'path': '/etc/nagios4/conf.d/controlvet', 'group': 'root', 'mode': '0755'})
+ok: [equipo-local] => (item={'path': '/etc/nagios4/controlvet', 'group': 'nagios', 'mode': '0750'})
+ok: [equipo-local] => (item={'path': '/usr/local/lib/controlvet-nagios', 'group': 'root', 'mode': '0755'})
+
+TASK [Comandos y contactos de ControlVet] **************************************
+ok: [equipo-local] => (item=commands.cfg)
+ok: [equipo-local] => (item=contacts.cfg)
+
+TASK [Hosts y servicios supervisados (entorno produccion)] *********************
+changed: [equipo-local]
+
+TASK [Plugin de conexión a MariaDB] ********************************************
+changed: [equipo-local]
+
+TASK [Leer la clave del usuario de monitoreo (generada por instalar.php, fuera de htdocs)] ***
+ok: [equipo-local]
+
+TASK [Archivo de opciones del cliente MySQL para Nagios] ***********************
+ok: [equipo-local]
+
+TASK [Registro de alertas de ControlVet] ***************************************
+ok: [equipo-local]
+
+TASK [Clave del administrador web de Nagios (persistente, fuera del repositorio)] ***
+ok: [equipo-local]
+
+TASK [Usuario nagiosadmin para la interfaz web] ********************************
+changed: [equipo-local]
+
+TASK [Permisos del archivo de usuarios web] ************************************
+ok: [equipo-local]
+
+TASK [Interfaz web de Nagios con autenticación básica] *************************
+ok: [equipo-local]
+
+TASK [Activar módulos de Apache necesarios] ************************************
+ok: [equipo-local]
+
+TASK [Activar la configuración de Nagios en Apache] ****************************
+ok: [equipo-local]
+
+TASK [Apache de WSL en el puerto 8092] *****************************************
+ok: [equipo-local]
+
+TASK [Sitio por defecto en 8092] ***********************************************
+ok: [equipo-local]
+
+TASK [Usar la autenticación de Apache en los CGI de Nagios] ********************
+ok: [equipo-local]
+
+TASK [Validar la configuración de Nagios (nagios4 -v)] *************************
+ok: [equipo-local]
+
+TASK [Resultado de la validación] **********************************************
+ok: [equipo-local] => {
+    "msg": [
+        "Total Warnings: 0",
+        "Total Errors:   0",
+        "Things look okay - No serious problems were detected during the pre-flight check"
+    ]
+}
+
+TASK [Servicios habilitados al arrancar WSL] ***********************************
+ok: [equipo-local] => (item=nagios4)
+ok: [equipo-local] => (item=apache2)
+
+RUNNING HANDLER [Reiniciar nagios] *********************************************
+changed: [equipo-local]
+
+PLAY RECAP *********************************************************************
+equipo-local               : ok=23   changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
