@@ -19,7 +19,7 @@
     state: directory
     mode: "{{ item.mode }}"
   loop:
-    - { path: "{{ cv_ops_dir }}", mode: "0750" }
+    - { path: "{{ cv_ops_dir }}", mode: "0751" }  # 0751: Nagios puede atravesarlo hasta monitor/ (sin listar)
     - { path: "{{ cv_ops_dir }}/secrets", mode: "0700" }
     - { path: "{{ cv_ops_dir }}/releases", mode: "0750" }
     - { path: "{{ cv_ops_dir }}/logs", mode: "0750" }

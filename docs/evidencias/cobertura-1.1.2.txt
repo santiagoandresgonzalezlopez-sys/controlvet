@@ -1,0 +1,14 @@
+reports/coverage-auth.txt
+  Lines:   42.21% (65/154)
+reports/coverage-citas.txt
+  Lines:   45.86% (72/157)
+reports/coverage-clinica.txt
+  Lines:   44.03% (59/134)
+reports/coverage-documentos.txt
+  Lines:   80.34% (143/178)
+reports/coverage-inventario.txt
+  Lines:   44.44% (44/99)
+reports/coverage-kernel.txt
+  Lines:   37.86% (106/280)
+reports/coverage-pacientes.txt
+  Lines:   29.67% (54/182)

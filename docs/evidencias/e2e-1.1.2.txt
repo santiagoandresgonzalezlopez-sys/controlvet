@@ -1,0 +1,118 @@
+PHPUnit 10.5.66 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.34
+Configuration: /e2e/phpunit.xml
+
+................................................................. 65 / 87 ( 74%)
+......................                                            87 / 87 (100%)
+
+Time: 00:01.835, Memory: 8.00 MB
+
+Aislamiento Base Datos (ControlVet\E2E\AislamientoBaseDatos)
+ ✔ Servicio lee solo su esquema with data set #0
+ ✔ Servicio lee solo su esquema with data set #1
+ ✔ Servicio lee solo su esquema with data set #2
+ ✔ Servicio lee solo su esquema with data set #3
+ ✔ Servicio lee solo su esquema with data set #4
+ ✔ Servicio lee solo su esquema with data set #5
+ ✔ Usuarios de servicio no pueden alterar esquema
+ ✔ Historia clinica se almacena con copia del propietario
+
+Aislamiento Datos (ControlVet\E2E\AislamientoDatos)
+ ✔ Cliente solo recibe sus mascotas aunque filtre por otro propietario
+ ✔ Cliente no accede a mascota ajena por id
+ ✔ Cliente solo ve sus citas
+ ✔ Cliente solo ve su historial clinico
+ ✔ Cliente no genera documentos de otros propietarios
+ ✔ Cliente genera su comprobante y solo lista sus documentos
+
+Auth Api (ControlVet\E2E\AuthApi)
+ ✔ Login devuelve token y usuario sin hash
+ ✔ Credenciales incorrectas retornan 401
+ ✔ Login sin datos retorna 422 con errores por campo
+ ✔ Me identifica al usuario del token
+ ✔ Cada servicio rechaza peticiones sin token
+ ✔ Token manipulado es rechazado
+
+Autorizacion (ControlVet\E2E\Autorizacion)
+ ✔ Permiso with data set "cliente no lista usuarios"
+ ✔ Permiso with data set "recepción no lista usuarios"
+ ✔ Permiso with data set "admin lista usuarios"
+ ✔ Permiso with data set "recepción no ve inventario"
+ ✔ Permiso with data set "veterinario no ve inventario"
+ ✔ Permiso with data set "admin ve inventario"
+ ✔ Permiso with data set "cliente no lista propietarios"
+ ✔ Permiso with data set "veterinario no lista propietarios"
+ ✔ Permiso with data set "veterinario ve pacientes"
+ ✔ Permiso with data set "veterinario no agenda citas"
+ ✔ Permiso with data set "cliente no agenda citas"
+ ✔ Permiso with data set "recepción no registra consultas"
+ ✔ Permiso with data set "admin no registra consultas"
+ ✔ Permiso with data set "cliente no crea mascotas"
+ ✔ Permiso with data set "veterinario no edita mascotas"
+ ✔ Permiso with data set "recepción no cambia peso"
+
+Citas Api (ControlVet\E2E\CitasApi)
+ ✔ Recepcion agenda cita con validacion entre servicios
+ ✔ No se agenda con mascota o veterinario inexistentes
+ ✔ Veterinario solo marca atendidas sus citas
+ ✔ Veterinario ve solo su agenda
+ ✔ Estado invalido es rechazado
+
+Clinica Documentos Api (ControlVet\E2E\ClinicaDocumentosApi)
+ ✔ Consulta actualiza peso y genera resumen y formula
+ ✔ Historia es inmutable
+ ✔ Consulta sin diagnostico es rechazada
+ ✔ Documento de referencia inexistente retorna 404
+
+Health (ControlVet\E2E\Health)
+ ✔ Servicio saludable con base de datos with data set #0
+ ✔ Servicio saludable con base de datos with data set #1
+ ✔ Servicio saludable con base de datos with data set #2
+ ✔ Servicio saludable con base de datos with data set #3
+ ✔ Servicio saludable con base de datos with data set #4
+ ✔ Servicio saludable con base de datos with data set #5
+ ✔ Frontend reporta todas las dependencias disponibles
+ ✔ Pagina de login disponible
+
+Inventario Api (ControlVet\E2E\InventarioApi)
+ ✔ Crear producto actualizar stock y desactivar
+ ✔ Cantidad negativa es rechazada
+
+Pacientes Api (ControlVet\E2E\PacientesApi)
+ ✔ Flujo propietario mascota y desactivacion
+ ✔ Mascota sin propietario es rechazada
+ ✔ Mascota con propietario inexistente es rechazada
+ ✔ Busqueda de mascotas por nombre de propietario
+
+Regresion Web (ControlVet\E2E\RegresionWeb)
+ ✔ Pantalla por rol with data set #0
+ ✔ Pantalla por rol with data set #1
+ ✔ Pantalla por rol with data set #2
+ ✔ Pantalla por rol with data set #3
+ ✔ Pantalla por rol with data set #4
+ ✔ Pantalla por rol with data set #5
+ ✔ Pantalla por rol with data set #6
+ ✔ Pantalla por rol with data set #7
+ ✔ Pantalla por rol with data set #8
+ ✔ Pantalla por rol with data set #9
+ ✔ Pantalla por rol with data set #10
+ ✔ Pantalla por rol with data set #11
+ ✔ Pantalla por rol with data set #12
+ ✔ Pantalla por rol with data set #13
+ ✔ Pantalla por rol with data set #14
+ ✔ Pantalla por rol with data set #15
+ ✔ Pantalla por rol with data set #16
+ ✔ Pantalla por rol with data set #17
+ ✔ Pantalla por rol with data set #18
+ ✔ Pantalla por rol with data set #19
+ ✔ Pantalla por rol with data set #20
+ ✔ Pantalla por rol with data set #21
+ ✔ Pantalla por rol with data set #22
+ ✔ Ruta protegida sin sesion redirige al login
+ ✔ Login con contrasena incorrecta muestra mensaje
+ ✔ Accion sin token csrf es rechazada
+ ✔ Comprobante pdf desde el frontend
+ ✔ Crear propietario desde formulario con errores del servicio
+
+OK (87 tests, 243 assertions)
