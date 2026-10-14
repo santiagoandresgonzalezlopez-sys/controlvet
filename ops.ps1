@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Ejecuta un playbook de Ansible de ControlVet desde Windows.
 

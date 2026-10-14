@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Mantiene activa la distribución WSL de ControlVet (Nagios y Ansible).
 

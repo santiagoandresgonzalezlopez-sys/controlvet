@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Instancia MariaDB dedicada de ControlVet (sin Docker), con los binarios de XAMPP.
 

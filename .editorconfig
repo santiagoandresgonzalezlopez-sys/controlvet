@@ -10,3 +10,7 @@ trim_trailing_whitespace = true
 
 [*.{yml,yaml,json}]
 indent_size = 2
+
+# PowerShell 5.1 necesita BOM para leer UTF-8 en los .ps1
+[*.ps1]
+charset = utf-8-bom

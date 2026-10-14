@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   BUILD de ControlVet sin contenedores: genera el artefacto versionado
   dist\controlvet-<versión>.zip (+ .sha256) listo para desplegar en XAMPP.

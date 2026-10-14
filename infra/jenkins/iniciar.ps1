@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Instala (si hace falta) e inicia Jenkins NATIVO en Windows para ControlVet.
 

@@ -126,27 +126,8 @@ pipeline {
 
         stage('Release') {
             steps {
-                powershell '''
-                    $ErrorActionPreference = 'Stop'
-                    $destino = Join-Path $env:CV_ARTEFACTOS $env:CV_VERSION
-                    $base = $env:GIT_PREVIOUS_SUCCESSFUL_COMMIT
-                    $cambios = if ($base -and (git cat-file -e $base 2>$null; $LASTEXITCODE -eq 0)) {
-                        git log --no-merges --pretty='- %s (%an, %h)' "$base..HEAD"
-                    } else { git log --no-merges --pretty='- %s (%an, %h)' -n 20 }
-                    $sha = (Get-Content "dist\\controlvet-$env:CV_VERSION.zip.sha256").Split(' ')[0]
-                    $notas = @(
-                        "# ControlVet v$env:CV_VERSION", '',
-                        "- Fecha: $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))",
-                        "- Commit: $env:GIT_SHA", "- Build Jenkins: $env:BUILD_URL",
-                        "- Artefacto: controlvet-$env:CV_VERSION.zip (SHA-256 $sha)", '',
-                        '## Cambios incluidos') + $cambios + @('', '## Verificación',
-                        '- Pruebas unitarias y de integración/regresión en staging: superadas')
-                    $notas | Set-Content "dist\\RELEASE_NOTES-$env:CV_VERSION.md" -Encoding utf8
-                    Copy-Item "dist\\RELEASE_NOTES-$env:CV_VERSION.md" $destino -Force
-                    # Promoción: el candidato pasó staging y queda publicado.
-                    Set-Content (Join-Path $destino 'ESTADO') 'publicado' -Encoding ascii
-                    Add-Content (Join-Path $env:CV_ARTEFACTOS 'registro.log') "$((Get-Date).ToUniversalTime().ToString('s'))Z PUBLICADO $env:CV_VERSION commit=$env:GIT_SHA build=$env:BUILD_NUMBER sha256=$sha"
-                '''
+                // Promoción candidato -> publicado (verifica SHA-256) y notas de versión.
+                powershell '.\\infra\\ci\\publicar.ps1 -Version $env:CV_VERSION -Commit $env:GIT_SHA -BuildUrl $env:BUILD_URL -CommitBase "$env:GIT_PREVIOUS_SUCCESSFUL_COMMIT" -Artefactos $env:CV_ARTEFACTOS'
                 archiveArtifacts artifacts: 'dist/*, reports/*.txt, reports/*.xml', fingerprint: true
             }
         }

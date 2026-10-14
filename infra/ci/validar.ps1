@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Etapa "Validar" del pipeline: sintaxis PHP, composer.json válidos y control
   de secretos versionados. Se puede ejecutar igual en local o en Jenkins.

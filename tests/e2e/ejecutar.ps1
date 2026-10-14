@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Ejecuta las pruebas de integración, API, aislamiento y regresión contra los
   microservicios publicados en XAMPP (sin Docker).
