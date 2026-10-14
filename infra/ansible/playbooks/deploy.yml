@@ -1,0 +1,70 @@
+# Despliegue de una versión publicada por Jenkins, con verificación posterior
+# y ROLLBACK AUTOMÁTICO a la versión anterior si la verificación falla.
+#   ansible-playbook playbooks/deploy.yml -e cv_version=1.1.7
+- name: Desplegar ControlVet
+  hosts: docker_hosts
+  gather_facts: true
+  vars:
+    cv_version_esperada: "{{ cv_version }}"
+  pre_tasks:
+    - name: Exigir la versión a desplegar
+      ansible.builtin.assert:
+        that: cv_version is defined and cv_version | length > 0
+        fail_msg: "Indique la versión: -e cv_version=X.Y.Z"
+  tasks:
+    - name: Preparación común
+      ansible.builtin.include_tasks: tasks/preparar.yml
+
+    - name: Desplegar y verificar
+      block:
+        - name: Actualizar contenedores a {{ cv_version }}
+          ansible.builtin.include_tasks: tasks/compose_up.yml
+
+        - name: Verificación posterior al despliegue
+          ansible.builtin.include_tasks: tasks/verificar.yml
+
+        - name: Registrar la versión desplegada
+          ansible.builtin.copy:
+            dest: "{{ item.dest }}"
+            content: "{{ item.content }}\n"
+            mode: "0640"
+          loop:
+            - { dest: "{{ cv_ops_dir }}/releases/current", content: "{{ cv_version }}" }
+            - { dest: "{{ cv_ops_dir }}/releases/previous", content: "{{ cv_version_actual | default('', true) }}" }
+
+        - name: Anotar en el historial de despliegues
+          ansible.builtin.lineinfile:
+            path: "{{ cv_ops_dir }}/releases/history.log"
+            line: "{{ ansible_date_time.iso8601 }} DEPLOY {{ cv_version }} OK (anterior: {{ cv_version_actual | default('ninguna', true) }})"
+            create: true
+            mode: "0640"
+
+      rescue:
+        - name: Anotar el fallo en el historial
+          ansible.builtin.lineinfile:
+            path: "{{ cv_ops_dir }}/releases/history.log"
+            line: "{{ ansible_date_time.iso8601 }} DEPLOY {{ cv_version }} FALLIDO -> rollback a {{ cv_version_actual | default('ninguna', true) }}"
+            create: true
+            mode: "0640"
+
+        - name: Rollback automático a la versión anterior
+          when: cv_version_actual | default('', true) | length > 0 and cv_version_actual != cv_version
+          block:
+            - name: Restaurar {{ cv_version_actual }}
+              ansible.builtin.include_tasks: tasks/compose_up.yml
+              vars:
+                cv_version: "{{ cv_version_actual }}"
+
+            - name: Verificar la versión restaurada
+              ansible.builtin.include_tasks: tasks/verificar.yml
+              vars:
+                cv_version_esperada: "{{ cv_version_actual }}"
+
+        - name: Informar el fallo del despliegue
+          ansible.builtin.fail:
+            msg: >-
+              El despliegue de {{ cv_version }} no pasó la verificación.
+              {{ 'Se restauró la versión ' ~ cv_version_actual ~ '.' if (cv_version_actual | default('', true)) else 'No había versión anterior para restaurar.' }}
+
+    - name: Conectar Nagios a la red interna (si la plataforma de monitoreo está activa)
+      ansible.builtin.include_tasks: tasks/conectar_nagios.yml

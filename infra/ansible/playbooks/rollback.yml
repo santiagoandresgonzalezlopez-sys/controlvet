@@ -1,0 +1,50 @@
+# Reversión manual a una versión publicada (por defecto, la anterior).
+#   ansible-playbook playbooks/rollback.yml                    -> versión anterior
+#   ansible-playbook playbooks/rollback.yml -e cv_version=1.1.5 -> versión concreta
+- name: Revertir ControlVet a una versión anterior
+  hosts: docker_hosts
+  gather_facts: true
+  tasks:
+    - name: Preparación común
+      ansible.builtin.include_tasks: tasks/preparar.yml
+
+    - name: Leer la versión anterior registrada
+      ansible.builtin.slurp:
+        src: "{{ cv_ops_dir }}/releases/previous"
+      register: previa_raw
+      failed_when: false
+
+    - name: Determinar la versión destino
+      ansible.builtin.set_fact:
+        cv_destino: "{{ cv_version | default((previa_raw.content | default('') | b64decode).strip(), true) }}"
+
+    - name: Validar que existe una versión destino
+      ansible.builtin.assert:
+        that: cv_destino | length > 0
+        fail_msg: "No hay versión anterior registrada; indique -e cv_version=X.Y.Z"
+
+    - name: Desplegar {{ cv_destino }}
+      ansible.builtin.include_tasks: tasks/compose_up.yml
+      vars:
+        cv_version: "{{ cv_destino }}"
+
+    - name: Verificar la versión restaurada
+      ansible.builtin.include_tasks: tasks/verificar.yml
+      vars:
+        cv_version_esperada: "{{ cv_destino }}"
+
+    - name: Registrar la reversión
+      ansible.builtin.copy:
+        dest: "{{ item.dest }}"
+        content: "{{ item.content }}\n"
+        mode: "0640"
+      loop:
+        - { dest: "{{ cv_ops_dir }}/releases/current", content: "{{ cv_destino }}" }
+        - { dest: "{{ cv_ops_dir }}/releases/previous", content: "{{ cv_version_actual }}" }
+
+    - name: Anotar en el historial
+      ansible.builtin.lineinfile:
+        path: "{{ cv_ops_dir }}/releases/history.log"
+        line: "{{ ansible_date_time.iso8601 }} ROLLBACK {{ cv_version_actual }} -> {{ cv_destino }} OK"
+        create: true
+        mode: "0640"

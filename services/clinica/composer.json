@@ -1,0 +1,30 @@
+{
+    "name": "controlvet/clinica-service",
+    "description": "Microservicio de historia clínica y fórmulas médicas de ControlVet.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "controlvet/kernel": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "repositories": [
+        { "type": "path", "url": "../../libs/kernel", "options": { "symlink": false } }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ControlVet\\Clinica\\Controller\\": "controller/",
+            "ControlVet\\Clinica\\Validador\\": "validador/",
+            "ControlVet\\Clinica\\Microservicio\\": "microservicio/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { "ControlVet\\Clinica\\Tests\\": "tests/" }
+    },
+    "config": {
+        "platform": { "php": "8.2.12" },
+        "sort-packages": true
+    }
+}

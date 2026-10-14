@@ -1,0 +1,23 @@
+# Arranca/actualiza el stack con la versión {{ cv_version }} (sin reconstruir:
+# usa las imágenes publicadas por Jenkins en el registro).
+- name: Renderizar el entorno para la versión {{ cv_version }}
+  ansible.builtin.template:
+    src: templates/controlvet.env.j2
+    dest: "{{ cv_env_file }}"
+    mode: "0600"
+  vars:
+    cv_version_env: "{{ cv_version }}"
+  no_log: true
+
+- name: Descargar imágenes de la versión {{ cv_version }} desde el registro
+  ansible.builtin.command: >-
+    docker compose -p {{ cv_project }} -f {{ cv_compose_file }} --env-file {{ cv_env_file }} pull --quiet
+  register: pull
+  changed_when: false
+
+- name: Desplegar contenedores (docker compose up --wait)
+  ansible.builtin.command: >-
+    docker compose -p {{ cv_project }} -f {{ cv_compose_file }} --env-file {{ cv_env_file }}
+    up -d --no-build --remove-orphans --wait --wait-timeout {{ cv_wait_timeout }}
+  register: up
+  changed_when: "'Recreate' in up.stderr or 'Started' in up.stderr or 'Created' in up.stderr"

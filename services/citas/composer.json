@@ -1,0 +1,30 @@
+{
+    "name": "controlvet/citas-service",
+    "description": "Microservicio de agenda de citas de ControlVet.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "controlvet/kernel": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "repositories": [
+        { "type": "path", "url": "../../libs/kernel", "options": { "symlink": false } }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ControlVet\\Citas\\Controller\\": "controller/",
+            "ControlVet\\Citas\\Validador\\": "validador/",
+            "ControlVet\\Citas\\Microservicio\\": "microservicio/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { "ControlVet\\Citas\\Tests\\": "tests/" }
+    },
+    "config": {
+        "platform": { "php": "8.2.12" },
+        "sort-packages": true
+    }
+}

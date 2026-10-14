@@ -1,0 +1,26 @@
+# Secretos y configuración local: NUNCA se versionan.
+.env
+*.env.local
+infra/secrets/
+
+# Dependencias y artefactos de build
+vendor/
+**/vendor/
+build/
+dist/
+*.tar.gz
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+
+# Respaldos generados por Ansible
+backups/
+
+# IDE / SO
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+
+# Secretos de la plataforma (Jenkins/Nagios)
+infra/.env.platform

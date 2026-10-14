@@ -1,0 +1,49 @@
+# Jenkins Configuration as Code de ControlVet.
+# Los secretos llegan por variables de entorno del contenedor (infra/.env.platform),
+# nunca escritos en este archivo.
+jenkins:
+  systemMessage: "ControlVet · Pipeline DevOps (RELEASE). Responsables: Santiago Gonzalez y Sebastian Gomez."
+  numExecutors: 2
+  mode: NORMAL
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_USER:-admin}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: CV_REGISTRY
+            value: "${CV_REGISTRY:-localhost:5000}"
+
+unclassified:
+  location:
+    url: "${JENKINS_URL:-http://localhost:8081/}"
+
+jobs:
+  - script: >
+      pipelineJob('controlvet-pipeline') {
+        displayName('ControlVet · build, test, release y deploy')
+        description('Pipeline declarativo definido en el Jenkinsfile del repositorio. GitHub se usa solo como origen del código (consulta por polling, sin GitHub Actions).')
+        logRotator { numToKeep(30); artifactNumToKeep(10) }
+        properties {
+          disableConcurrentBuilds()
+          pipelineTriggers { triggers { pollSCM { scmpoll_spec('H/5 * * * *') } } }
+        }
+        definition {
+          cpsScm {
+            lightweight(false)
+            scriptPath('Jenkinsfile')
+            scm {
+              git {
+                remote { url('${CONTROLVET_GIT_URL:-file:///repo}') }
+                branch('*/main')
+              }
+            }
+          }
+        }
+      }

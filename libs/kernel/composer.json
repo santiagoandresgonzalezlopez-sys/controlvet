@@ -1,0 +1,25 @@
+{
+    "name": "controlvet/kernel",
+    "description": "Infraestructura transversal de los microservicios ControlVet (HTTP, JWT, logging, salud). No contiene lógica de negocio ni conexiones compartidas.",
+    "type": "library",
+    "version": "1.1.0",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "ext-json": "*",
+        "ext-pdo": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": { "ControlVet\\Kernel\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "ControlVet\\Kernel\\Tests\\": "tests/" }
+    },
+    "config": {
+        "platform": { "php": "8.2.12" },
+        "sort-packages": true
+    }
+}

@@ -1,0 +1,24 @@
+# Preparación del equipo de despliegue: verifica Docker/Compose, crea la
+# estructura de operación y genera (una sola vez) los secretos del entorno.
+#   ansible-playbook playbooks/site.yml
+- name: Preparar el equipo de despliegue de ControlVet
+  hosts: docker_hosts
+  gather_facts: true
+  tasks:
+    - name: Preparación común
+      ansible.builtin.include_tasks: tasks/preparar.yml
+
+    - name: Verificar que el registro de artefactos responde
+      ansible.builtin.uri:
+        url: "http://{{ cv_registry | replace('localhost', 'host.docker.internal') }}/v2/_catalog"
+        return_content: true
+      register: catalogo
+      failed_when: false
+
+    - name: Resumen de preparación
+      ansible.builtin.debug:
+        msg:
+          - "Directorio de operación: {{ cv_ops_dir }}"
+          - "Archivo de entorno: {{ cv_env_file }} (permisos 0600, secretos persistentes)"
+          - "Versión desplegada actualmente: {{ cv_version_actual | default('ninguna', true) }}"
+          - "Registro {{ cv_registry }}: {{ (catalogo.json.repositories | default([])) | length }} repositorios"

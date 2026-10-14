@@ -1,0 +1,5 @@
+# Todo el texto se normaliza a LF: los scripts se ejecutan dentro de contenedores Linux.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary

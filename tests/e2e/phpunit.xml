@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="default"
+         failOnWarning="true">
+    <testsuites>
+        <testsuite name="smoke">
+            <file>src/HealthTest.php</file>
+        </testsuite>
+        <testsuite name="api">
+            <file>src/AuthApiTest.php</file>
+            <file>src/AutorizacionTest.php</file>
+            <file>src/AislamientoDatosTest.php</file>
+            <file>src/PacientesApiTest.php</file>
+            <file>src/CitasApiTest.php</file>
+            <file>src/ClinicaDocumentosApiTest.php</file>
+            <file>src/InventarioApiTest.php</file>
+        </testsuite>
+        <testsuite name="integracion-db">
+            <file>src/AislamientoBaseDatosTest.php</file>
+        </testsuite>
+        <testsuite name="regresion">
+            <file>src/RegresionWebTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

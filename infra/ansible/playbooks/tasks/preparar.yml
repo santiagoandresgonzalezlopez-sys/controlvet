@@ -1,0 +1,45 @@
+# Preparación del equipo de despliegue (idempotente).
+- name: Verificar que el motor Docker está disponible
+  ansible.builtin.command: docker info --format '{{ "{{" }}.ServerVersion{{ "}}" }} {{ "{{" }}.OperatingSystem{{ "}}" }}'
+  register: docker_info
+  changed_when: false
+
+- name: Mostrar motor Docker detectado
+  ansible.builtin.debug:
+    msg: "Docker {{ docker_info.stdout }}"
+
+- name: Verificar Docker Compose v2
+  ansible.builtin.command: docker compose version --short
+  register: compose_version
+  changed_when: false
+
+- name: Crear directorios de operación
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: "{{ cv_ops_dir }}", mode: "0750" }
+    - { path: "{{ cv_ops_dir }}/secrets", mode: "0700" }
+    - { path: "{{ cv_ops_dir }}/releases", mode: "0750" }
+    - { path: "{{ cv_ops_dir }}/logs", mode: "0750" }
+    - { path: "{{ cv_backup_dir }}", mode: "0750" }
+
+- name: Leer la versión desplegada actualmente
+  ansible.builtin.slurp:
+    src: "{{ cv_ops_dir }}/releases/current"
+  register: version_actual_raw
+  failed_when: false
+
+- name: Registrar versión actual
+  ansible.builtin.set_fact:
+    cv_version_actual: "{{ (version_actual_raw.content | default('') | b64decode).strip() }}"
+
+- name: Generar archivo de entorno con secretos persistentes
+  ansible.builtin.template:
+    src: templates/controlvet.env.j2
+    dest: "{{ cv_env_file }}"
+    mode: "0600"
+  vars:
+    cv_version_env: "{{ cv_version | default(cv_version_actual, true) | default('dev', true) }}"
+  no_log: true

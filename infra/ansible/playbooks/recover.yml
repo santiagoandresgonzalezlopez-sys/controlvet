@@ -1,0 +1,39 @@
+# Recuperación de servicios: detecta contenedores detenidos o no saludables
+# (p. ej. tras una alerta de Nagios), los reinicia y verifica el entorno.
+#   ansible-playbook playbooks/recover.yml
+- name: Recuperar servicios de ControlVet
+  hosts: docker_hosts
+  gather_facts: true
+  tasks:
+    - name: Inspeccionar el estado de cada contenedor
+      ansible.builtin.command: >-
+        docker inspect -f '{{ "{{" }}.State.Status{{ "}}" }}/{{ "{{" }}if .State.Health{{ "}}" }}{{ "{{" }}.State.Health.Status{{ "}}" }}{{ "{{" }}end{{ "}}" }}'
+        {{ cv_project }}-{{ item }}-1
+      register: estados
+      changed_when: false
+      failed_when: false
+      loop: "{{ cv_contenedores }}"
+
+    - name: Determinar contenedores a recuperar
+      ansible.builtin.set_fact:
+        caidos: "{{ estados.results | rejectattr('stdout', 'equalto', 'running/healthy') | map(attribute='item') | list }}"
+
+    - name: Diagnóstico
+      ansible.builtin.debug:
+        msg: "{{ 'Todos los servicios están sanos' if not caidos else 'A recuperar: ' ~ (caidos | join(', ')) }}"
+
+    - name: Reiniciar contenedores afectados
+      ansible.builtin.command: docker restart {{ cv_project }}-{{ item }}-1
+      loop: "{{ caidos }}"
+      changed_when: true
+
+    - name: Verificar el entorno tras la recuperación
+      ansible.builtin.include_tasks: tasks/verificar.yml
+
+    - name: Registrar la acción correctiva
+      ansible.builtin.lineinfile:
+        path: "{{ cv_ops_dir }}/releases/history.log"
+        line: "{{ ansible_date_time.iso8601 }} RECOVER reiniciados=[{{ caidos | join(',') }}] OK"
+        create: true
+        mode: "0640"
+      when: caidos | length > 0

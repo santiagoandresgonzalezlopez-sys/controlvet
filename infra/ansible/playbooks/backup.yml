@@ -1,0 +1,54 @@
+# Respaldo lógico de los esquemas de todos los microservicios.
+#   ansible-playbook playbooks/backup.yml [-e cv_backup_dir=/backups]
+- name: Respaldar las bases de datos de ControlVet
+  hosts: docker_hosts
+  gather_facts: true
+  vars:
+    archivo: "{{ cv_backup_dir }}/controlvet-{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}.sql.gz"
+  tasks:
+    - name: Crear el directorio de respaldos
+      ansible.builtin.file:
+        path: "{{ cv_backup_dir }}"
+        state: directory
+        mode: "0750"
+
+    - name: Generar volcado consistente (mariadb-dump --single-transaction)
+      ansible.builtin.shell: >-
+        set -o pipefail &&
+        docker exec {{ cv_project }}-db-1 sh -c
+        'exec mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" --single-transaction --routines --triggers
+        --databases {{ cv_esquemas | join(" ") }}'
+        | gzip -9 > {{ archivo }}
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Validar que el respaldo contiene todos los esquemas
+      ansible.builtin.shell: set -o pipefail && gunzip -c {{ archivo }} | grep -c '^CREATE DATABASE'
+      args:
+        executable: /bin/bash
+      register: esquemas
+      changed_when: false
+      failed_when: esquemas.stdout | int != cv_esquemas | length
+
+    - name: Aplicar retención (conservar los {{ cv_backup_retention }} más recientes)
+      ansible.builtin.shell: >-
+        ls -1t {{ cv_backup_dir }}/controlvet-*.sql.gz | tail -n +{{ cv_backup_retention + 1 }} | xargs -r rm -v
+      register: retencion
+      changed_when: retencion.stdout | length > 0
+
+    - name: Tamaño del respaldo
+      ansible.builtin.stat:
+        path: "{{ archivo }}"
+      register: info
+
+    - name: Resultado
+      ansible.builtin.debug:
+        msg: "Respaldo {{ archivo }} ({{ info.stat.size }} bytes, {{ esquemas.stdout }} esquemas)"
+
+    - name: Anotar en el historial de operación
+      ansible.builtin.lineinfile:
+        path: "{{ cv_ops_dir }}/releases/history.log"
+        line: "{{ ansible_date_time.iso8601 }} BACKUP {{ archivo | basename }} ({{ info.stat.size }} bytes)"
+        create: true
+        mode: "0640"

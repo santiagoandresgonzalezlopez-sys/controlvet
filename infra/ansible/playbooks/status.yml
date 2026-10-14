@@ -1,0 +1,31 @@
+# Estado operativo: versión, contenedores, salud y últimos eventos.
+#   ansible-playbook playbooks/status.yml
+- name: Estado de ControlVet
+  hosts: docker_hosts
+  gather_facts: false
+  tasks:
+    - name: Versión desplegada
+      ansible.builtin.command: cat {{ cv_ops_dir }}/releases/current
+      register: actual
+      changed_when: false
+      failed_when: false
+
+    - name: Contenedores del proyecto
+      ansible.builtin.command: >-
+        docker ps -a --filter label=com.docker.compose.project={{ cv_project }}
+        --format '{{ "{{" }}.Names{{ "}}" }}  {{ "{{" }}.Image{{ "}}" }}  {{ "{{" }}.Status{{ "}}" }}'
+      register: ps
+      changed_when: false
+
+    - name: Últimos eventos de operación
+      ansible.builtin.command: tail -n 10 {{ cv_ops_dir }}/releases/history.log
+      register: historial
+      changed_when: false
+      failed_when: false
+
+    - name: Resumen
+      ansible.builtin.debug:
+        msg:
+          - "Versión actual: {{ actual.stdout | default('ninguna', true) }}"
+          - "{{ ps.stdout_lines }}"
+          - "{{ historial.stdout_lines }}"

@@ -1,0 +1,44 @@
+# Verificación posterior al despliegue: contenedores sanos, salud de cada
+# servicio (incluida su base de datos) y versión esperada.
+- name: Esperar a que cada contenedor reporte estado healthy
+  ansible.builtin.command: >-
+    docker inspect -f '{{ "{{" }}.State.Status{{ "}}" }}/{{ "{{" }}if .State.Health{{ "}}" }}{{ "{{" }}.State.Health.Status{{ "}}" }}{{ "{{" }}end{{ "}}" }}'
+    {{ cv_project }}-{{ item }}-1
+  register: estado
+  until: estado.stdout == 'running/healthy'
+  retries: 30
+  delay: 3
+  changed_when: false
+  loop: "{{ cv_contenedores }}"
+
+- name: Consultar salud agregada desde el frontend (red interna)
+  ansible.builtin.command: docker exec {{ cv_project }}-web-1 curl -fsS http://localhost/health.php
+  register: salud_web
+  changed_when: false
+  retries: 5
+  delay: 3
+  until: salud_web.rc == 0
+
+- name: Consultar /health de cada microservicio
+  ansible.builtin.command: docker exec {{ cv_project }}-web-1 curl -fsS http://{{ item }}/health
+  register: salud_servicios
+  changed_when: false
+  loop: "{{ cv_servicios }}"
+
+- name: Validar estado y versión de cada microservicio
+  ansible.builtin.assert:
+    that:
+      - (item.stdout | from_json).status == 'ok'
+      - (item.stdout | from_json).checks.database == 'ok'
+      - cv_version_esperada is not defined or (item.stdout | from_json).version == cv_version_esperada
+    fail_msg: "{{ item.item }} no está sano o no corre la versión {{ cv_version_esperada | default('?') }}: {{ item.stdout }}"
+    success_msg: "{{ item.item }} OK · versión {{ (item.stdout | from_json).version }}"
+    quiet: false
+  loop: "{{ salud_servicios.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+
+- name: Validar que el frontend alcanza todas sus dependencias
+  ansible.builtin.assert:
+    that: (salud_web.stdout | from_json).status == 'ok'
+    success_msg: "Frontend OK · dependencias: {{ (salud_web.stdout | from_json).dependencies }}"

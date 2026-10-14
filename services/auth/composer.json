@@ -1,0 +1,30 @@
+{
+    "name": "controlvet/auth-service",
+    "description": "Microservicio de autenticación, usuarios y roles de ControlVet. Emite los JWT.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "controlvet/kernel": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "repositories": [
+        { "type": "path", "url": "../../libs/kernel", "options": { "symlink": false } }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ControlVet\\Auth\\Controller\\": "controller/",
+            "ControlVet\\Auth\\Validador\\": "validador/",
+            "ControlVet\\Auth\\Microservicio\\": "microservicio/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": { "ControlVet\\Auth\\Tests\\": "tests/" }
+    },
+    "config": {
+        "platform": { "php": "8.2.12" },
+        "sort-packages": true
+    }
+}

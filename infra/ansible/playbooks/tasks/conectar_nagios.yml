@@ -1,0 +1,14 @@
+# Nagios corre en la plataforma (infra/compose.platform.yaml) y necesita la
+# red interna "backend" para supervisar los microservicios no publicados.
+- name: Comprobar si el contenedor de Nagios existe
+  ansible.builtin.command: docker inspect -f '{{ "{{" }}json .NetworkSettings.Networks{{ "}}" }}' controlvet-nagios
+  register: nagios_redes
+  changed_when: false
+  failed_when: false
+
+- name: Conectar Nagios a {{ cv_project }}_backend
+  ansible.builtin.command: docker network connect {{ cv_project }}_backend controlvet-nagios
+  when:
+    - nagios_redes.rc == 0
+    - (cv_project ~ '_backend') not in nagios_redes.stdout
+  changed_when: true
