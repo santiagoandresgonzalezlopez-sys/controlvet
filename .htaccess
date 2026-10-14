@@ -1,9 +1,11 @@
 # =====================================================================
 # ControlVet en XAMPP (Apache) · microservicios sin Docker
 #
-#   http://localhost/controlvet/                 -> frontend (web/)
-#   http://localhost/controlvet/api/<servicio>/  -> endpoints REST del microservicio
+#   http://localhost/<instalación>/                 -> frontend (web/)
+#   http://localhost/<instalación>/api/<servicio>/  -> endpoints REST del microservicio
 #
+# <instalación> = controlvet (desarrollo), cv-staging o cv (producción).
+# Sin RewriteBase fijo: el mismo paquete funciona en cualquier ruta.
 # Cada microservicio tiene su propio punto de entrada, configuración,
 # esquema de base de datos y usuario MySQL (ver docs/endpoints.md).
 # =====================================================================
@@ -13,13 +15,12 @@ DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /controlvet/
 
     # 1) Endpoints de los microservicios: /api/<servicio>/... -> services/<servicio>/public/index.php
     RewriteRule ^api/(auth|pacientes|citas|clinica|inventario|documentos)(/.*)?$ services/$1/public/index.php [QSA,L]
 
     # 2) Raíz -> frontend
-    RewriteRule ^$ web/ [R=302,L]
+    RewriteRule ^$ %{REQUEST_URI}web/ [R=302,L]
 
     # 3) Acceso directo a código interno, configuración, respaldos y documentación: prohibido.
     #    (Solo peticiones originales; las reescritas internamente por la regla 1 sí pasan.)

@@ -1,18 +1,27 @@
 // =====================================================================
-// ControlVet · Pipeline declarativo (fase RELEASE, orquestado por Jenkins)
+// ControlVet · Pipeline declarativo (RELEASE) para Jenkins en Windows.
+// Sin contenedores: los microservicios se ejecutan en XAMPP y la
+// operación se automatiza con Ansible en WSL2.
 //
-//  Checkout (GitHub/origen Git) → Validar → Dependencias (Composer) →
-//  Pruebas unitarias (PHPUnit) → Build de imágenes (Docker) →
-//  Integración y regresión (stack efímero) → Release (registro + notas) →
-//  Deploy (Ansible + Docker Compose) con verificación y rollback automático.
+//  Checkout → Validar → Dependencias (Composer) → Pruebas unitarias (PHPUnit)
+//  → Empaquetado (artefacto versionado) → Staging + integración/regresión
+//  → Release (promoción del artefacto) → Deploy a producción (Ansible)
 //
 // Cualquier etapa obligatoria que falle detiene la publicación.
-// GitHub solo aporta el código: no se usan GitHub Actions.
+// GitHub solo aporta el código (consulta por polling, sin GitHub Actions).
 // =====================================================================
 
 def COMPONENTES = ['libs/kernel', 'services/auth', 'services/pacientes', 'services/citas',
-                   'services/clinica', 'services/inventario', 'services/documentos']
-def IMAGENES = ['db', 'auth', 'pacientes', 'citas', 'clinica', 'inventario', 'documentos', 'web']
+                   'services/clinica', 'services/inventario', 'services/documentos', 'tests/e2e']
+
+// Ejecuta un playbook de Ansible en WSL (Ansible no corre nativo en Windows).
+def ansible(String playbook, String extra) {
+    def ws = powershell(returnStdout: true, script: "wsl -d ${env.CV_WSL_DISTRO} -u root -- wslpath -a '${env.WORKSPACE}'").trim()
+    powershell """
+        wsl -d ${env.CV_WSL_DISTRO} -u root -- bash -lc "cd '${ws}/infra/ansible' && ANSIBLE_FORCE_COLOR=0 ansible-playbook -i inventarios/local.yml playbooks/${playbook} ${extra}"
+        if (\$LASTEXITCODE -ne 0) { throw 'ansible-playbook ${playbook} falló' }
+    """
+}
 
 pipeline {
     agent any
@@ -20,18 +29,19 @@ pipeline {
     options {
         timestamps()
         disableConcurrentBuilds()
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 45, unit: 'MINUTES')
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '10'))
     }
 
     parameters {
-        booleanParam(name: 'DESPLEGAR', defaultValue: true,
-                     description: 'Desplegar con Ansible en el entorno local cuando todas las etapas pasen.')
+        booleanParam(name: 'DESPLEGAR_PRODUCCION', defaultValue: true,
+                     description: 'Promover y desplegar en producción (/cv) si staging pasa todas las pruebas.')
     }
 
     environment {
-        CV_REGISTRY = "${env.CV_REGISTRY ?: 'localhost:5000'}"
-        CI_PROJECT  = "cv-ci-${env.BUILD_NUMBER}"
+        PHP = 'C:\\xampp\\php\\php.exe'
+        CV_WSL_DISTRO = 'Ubuntu-24.04'
+        CV_ARTEFACTOS = 'C:\\controlvet\\artefactos'
     }
 
     stages {
@@ -39,182 +49,142 @@ pipeline {
             steps {
                 checkout scm
                 script {
-                    env.GIT_SHA = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    env.GIT_SHA = powershell(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                     env.CV_VERSION = "${readFile('VERSION').trim()}.${env.BUILD_NUMBER}"
                     currentBuild.displayName = "#${env.BUILD_NUMBER} · v${env.CV_VERSION}"
                     currentBuild.description = "commit ${env.GIT_SHA}"
                 }
-                sh 'mkdir -p reports dist'
+                powershell 'New-Item -ItemType Directory -Force reports, dist | Out-Null'
             }
         }
 
         stage('Validar') {
-            agent { dockerfile { filename 'php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
             steps {
-                sh '''
-                    set -e
-                    echo "== Sintaxis PHP (php -l) =="
-                    find libs services web tests -name '*.php' -not -path '*/vendor/*' -print0 \
-                      | xargs -0 -n1 php -l > reports/php-lint.txt
-                    echo "$(wc -l < reports/php-lint.txt) archivos sin errores de sintaxis"
+                powershell '''
+                    $ErrorActionPreference = 'Stop'
+                    Write-Host '== Sintaxis PHP (php -l) =='
+                    $archivos = Get-ChildItem libs, services, web, tests, infra -Recurse -Filter *.php |
+                        Where-Object { $_.FullName -notmatch '\\\\vendor\\\\' }
+                    $errores = 0
+                    foreach ($f in $archivos) {
+                        $r = & $env:PHP -l $f.FullName 2>&1
+                        if ($LASTEXITCODE -ne 0) { $errores++; Write-Host $r }
+                    }
+                    "$($archivos.Count) archivos revisados, $errores con errores" | Tee-Object reports\\php-lint.txt
+                    if ($errores -gt 0) { throw 'Errores de sintaxis PHP' }
 
-                    echo "== composer validate =="
-                    for c in libs/kernel services/* tests/e2e; do composer validate --no-check-publish --no-interaction -d "$c"; done
-                '''
-                sh '''
-                    set -e
-                    echo "== Control de secretos versionados =="
-                    if git ls-files | grep -E '(^|/)\\.env$'; then echo "ERROR: hay archivos .env versionados"; exit 1; fi
-                    if git grep -nE 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|JWT_SECRET=[A-Za-z0-9_-]{32,}' -- . ':!*.example'; then
-                        echo "ERROR: posible secreto en el repositorio"; exit 1
-                    fi
-                    echo "Sin secretos detectados"
+                    Write-Host '== composer validate =='
+                    foreach ($c in 'libs/kernel','services/auth','services/pacientes','services/citas','services/clinica','services/inventario','services/documentos','tests/e2e') {
+                        composer validate --no-check-publish --no-interaction -d $c
+                        if ($LASTEXITCODE -ne 0) { throw "composer.json inválido en $c" }
+                    }
+
+                    Write-Host '== Control de secretos versionados =='
+                    $versionados = git ls-files
+                    $prohibidos = $versionados | Where-Object { $_ -match '(^|/)(\\.env|servicio\\.php|web\\.php|bd-root\\.env|monitor\\.env)$' }
+                    if ($prohibidos) { throw "Archivos de secretos versionados: $prohibidos" }
+                    $hallazgos = git grep -nE "BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|(JWT_SECRET|DB_PASSWORD|DB_ROOT_PASSWORD)['\\"]?\\s*(=|=>)\\s*['\\"]?[A-Za-z0-9_-]{20,}" -- . ':!*.example'
+                    if ($LASTEXITCODE -eq 0) { Write-Host $hallazgos; throw 'Posible secreto en el repositorio' }
+                    'Sin secretos detectados'
                 '''
             }
         }
 
         stage('Dependencias (Composer)') {
-            agent { dockerfile { filename 'php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
             steps {
                 script {
                     for (c in COMPONENTES) {
-                        sh "composer install --no-progress --prefer-dist -d ${c}"
+                        powershell "composer install --no-progress --no-interaction --prefer-dist -d ${c}; if (\$LASTEXITCODE -ne 0) { throw 'composer install falló en ${c}' }"
                     }
                 }
             }
         }
 
         stage('Pruebas unitarias (PHPUnit)') {
-            agent { dockerfile { filename 'php.Dockerfile'; dir 'infra/ci'; reuseNode true } }
             steps {
                 script {
-                    for (c in COMPONENTES) {
+                    for (c in COMPONENTES.findAll { it != 'tests/e2e' }) {
                         def nombre = c.tokenize('/').last()
-                        sh """
-                            cd ${c}
-                            php vendor/bin/phpunit --log-junit ${env.WORKSPACE}/reports/junit-unit-${nombre}.xml \
-                                --coverage-text=${env.WORKSPACE}/reports/coverage-${nombre}.txt \
-                                --coverage-html ${env.WORKSPACE}/reports/coverage/${nombre}
+                        powershell """
+                            Push-Location ${c}
+                            & \$env:PHP vendor/bin/phpunit --log-junit '${env.WORKSPACE}\\reports\\junit-unit-${nombre}.xml'
+                            \$codigo = \$LASTEXITCODE
+                            Pop-Location
+                            if (\$codigo -ne 0) { throw 'Pruebas unitarias fallidas en ${c}' }
                         """
                     }
                 }
-                sh 'for f in reports/coverage-*.txt; do echo "$f"; grep -m1 -E "^\\s*Lines:" "$f" || true; done | tee reports/coverage-resumen.txt'
             }
             post {
-                always {
-                    junit testResults: 'reports/junit-unit-*.xml', allowEmptyResults: false
-                    publishHTML(target: [reportName: 'Cobertura PHPUnit', reportDir: 'reports/coverage',
-                                         reportFiles: 'auth/index.html', keepAll: true, allowMissing: true, alwaysLinkToLastBuild: true])
-                }
+                always { junit testResults: 'reports/junit-unit-*.xml', allowEmptyResults: false }
             }
         }
 
-        stage('Build de imágenes (Docker)') {
+        stage('Empaquetado (artefacto)') {
             steps {
-                sh '''
-                    set -e
-                    ./infra/ci/generar-env.sh "$CI_PROJECT" "$CV_VERSION" "$CV_REGISTRY" > ci.env
-                    docker compose --env-file ci.env build --pull=false
-                    docker build -t controlvet/e2e:$CV_VERSION tests/e2e
-                    docker build -f infra/ansible/Dockerfile --build-arg APP_VERSION=$CV_VERSION \
-                        -t $CV_REGISTRY/controlvet/ops:$CV_VERSION .
-                    docker image ls --filter "reference=$CV_REGISTRY/controlvet/*:$CV_VERSION" \
-                        --format '{{.Repository}}:{{.Tag}} {{.Size}}' | tee reports/imagenes.txt
+                powershell '.\\infra\\ci\\empaquetar.ps1 -Version $env:CV_VERSION -Salida dist'
+                // Se publica como CANDIDATO: aún no está promovido a producción.
+                powershell '''
+                    $destino = Join-Path $env:CV_ARTEFACTOS $env:CV_VERSION
+                    New-Item -ItemType Directory -Force $destino | Out-Null
+                    Copy-Item "dist\\controlvet-$env:CV_VERSION.zip*" $destino -Force
+                    Set-Content (Join-Path $destino 'ESTADO') 'candidato' -Encoding ascii
+                    "Candidato publicado en $destino"
                 '''
             }
         }
 
-        stage('Integración y regresión') {
+        stage('Staging + integración y regresión') {
             steps {
-                sh '''
-                    set -e
-                    docker compose -p "$CI_PROJECT" --env-file ci.env up -d --no-build --wait --wait-timeout 180
-                    # Sin traza (set +x): cargar ci.env no debe imprimir los secretos en el log.
-                    set +x; set -a; . ./ci.env; set +a; set -x
-                    docker run --name "$CI_PROJECT-e2e" --network "${CI_PROJECT}_backend" \
-                        -e EXPECTED_VERSION="$CV_VERSION" \
-                        -e AUTH_DB_PASSWORD -e PACIENTES_DB_PASSWORD -e CITAS_DB_PASSWORD \
-                        -e CLINICA_DB_PASSWORD -e INVENTARIO_DB_PASSWORD -e DOCUMENTOS_DB_PASSWORD \
-                        controlvet/e2e:$CV_VERSION --log-junit /e2e/reports/junit-e2e.xml --testdox \
-                      | tee reports/e2e.txt
+                script { ansible('deploy.yml', "-e cv_entorno=staging -e cv_version=${env.CV_VERSION}") }
+                powershell '''
+                    .\\tests\\e2e\\ejecutar.ps1 -BaseUrl http://localhost/cv-staging -Raiz "C:\\controlvet\\releases\\staging\\$env:CV_VERSION" -Junit "$env:WORKSPACE\\reports\\junit-e2e.xml" |
+                        Tee-Object reports\\e2e.txt
+                    if ($LASTEXITCODE -ne 0) { throw 'Pruebas de integración/regresión fallidas en staging' }
                 '''
             }
             post {
-                always {
-                    sh '''
-                        docker cp "$CI_PROJECT-e2e:/e2e/reports/junit-e2e.xml" reports/junit-e2e.xml || true
-                        docker rm -f "$CI_PROJECT-e2e" || true
-                        docker compose -p "$CI_PROJECT" --env-file ci.env logs --no-color > reports/ci-stack.log 2>&1 || true
-                        docker compose -p "$CI_PROJECT" --env-file ci.env down -v --remove-orphans || true
-                    '''
-                    junit testResults: 'reports/junit-e2e.xml', allowEmptyResults: true
-                }
+                always { junit testResults: 'reports/junit-e2e.xml', allowEmptyResults: true }
             }
         }
 
         stage('Release') {
             steps {
-                script {
-                    for (img in IMAGENES + ['ops']) {
-                        sh "docker push ${env.CV_REGISTRY}/controlvet/${img}:${env.CV_VERSION}"
-                    }
-                }
-                sh '''
-                    set -e
-                    BASE="${GIT_PREVIOUS_SUCCESSFUL_COMMIT:-}"
-                    {
-                      echo "# ControlVet v$CV_VERSION"
-                      echo
-                      echo "- Fecha: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-                      echo "- Commit: $GIT_SHA"
-                      echo "- Build Jenkins: $BUILD_URL"
-                      echo
-                      echo "## Cambios incluidos"
-                      if [ -n "$BASE" ] && git cat-file -e "$BASE" 2>/dev/null; then
-                        git log --no-merges --pretty='- %s (%an, %h)' "$BASE"..HEAD
-                      else
-                        git log --no-merges --pretty='- %s (%an, %h)' -n 20
-                      fi
-                      echo
-                      echo "## Imágenes publicadas"
-                      sed 's/^/- /' reports/imagenes.txt
-                      echo
-                      echo "## Cobertura de pruebas unitarias"
-                      sed 's/^/    /' reports/coverage-resumen.txt
-                    } > dist/RELEASE_NOTES-$CV_VERSION.md
-
-                    printf '{"version":"%s","commit":"%s","build":%s,"registry":"%s","fecha":"%s"}\n' \
-                        "$CV_VERSION" "$GIT_SHA" "$BUILD_NUMBER" "$CV_REGISTRY" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-                        > dist/release-$CV_VERSION.json
-                    git archive --format=tar.gz --prefix=controlvet-$CV_VERSION/ -o dist/controlvet-$CV_VERSION-src.tar.gz HEAD
+                powershell '''
+                    $ErrorActionPreference = 'Stop'
+                    $destino = Join-Path $env:CV_ARTEFACTOS $env:CV_VERSION
+                    $base = $env:GIT_PREVIOUS_SUCCESSFUL_COMMIT
+                    $cambios = if ($base -and (git cat-file -e $base 2>$null; $LASTEXITCODE -eq 0)) {
+                        git log --no-merges --pretty='- %s (%an, %h)' "$base..HEAD"
+                    } else { git log --no-merges --pretty='- %s (%an, %h)' -n 20 }
+                    $sha = (Get-Content "dist\\controlvet-$env:CV_VERSION.zip.sha256").Split(' ')[0]
+                    $notas = @(
+                        "# ControlVet v$env:CV_VERSION", '',
+                        "- Fecha: $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))",
+                        "- Commit: $env:GIT_SHA", "- Build Jenkins: $env:BUILD_URL",
+                        "- Artefacto: controlvet-$env:CV_VERSION.zip (SHA-256 $sha)", '',
+                        '## Cambios incluidos') + $cambios + @('', '## Verificación',
+                        '- Pruebas unitarias y de integración/regresión en staging: superadas')
+                    $notas | Set-Content "dist\\RELEASE_NOTES-$env:CV_VERSION.md" -Encoding utf8
+                    Copy-Item "dist\\RELEASE_NOTES-$env:CV_VERSION.md" $destino -Force
+                    # Promoción: el candidato pasó staging y queda publicado.
+                    Set-Content (Join-Path $destino 'ESTADO') 'publicado' -Encoding ascii
+                    Add-Content (Join-Path $env:CV_ARTEFACTOS 'registro.log') "$((Get-Date).ToUniversalTime().ToString('s'))Z PUBLICADO $env:CV_VERSION commit=$env:GIT_SHA build=$env:BUILD_NUMBER sha256=$sha"
                 '''
                 archiveArtifacts artifacts: 'dist/*, reports/*.txt, reports/*.xml', fingerprint: true
             }
         }
 
-        stage('Deploy (Ansible + Docker)') {
-            when { expression { params.DESPLEGAR } }
+        stage('Deploy a producción (Ansible)') {
+            when { expression { params.DESPLEGAR_PRODUCCION } }
             steps {
-                sh '''
-                    docker run --rm \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v controlvet_ops:/opt/controlvet \
-                        $CV_REGISTRY/controlvet/ops:$CV_VERSION \
-                        ansible-playbook playbooks/deploy.yml -e cv_version=$CV_VERSION -e cv_registry=$CV_REGISTRY
-                '''
+                script { ansible('deploy.yml', "-e cv_entorno=produccion -e cv_version=${env.CV_VERSION}") }
             }
         }
     }
 
     post {
-        always {
-            sh 'rm -f ci.env'
-        }
-        success {
-            echo "Versión ${env.CV_VERSION} publicada${params.DESPLEGAR ? ' y desplegada' : ''}."
-        }
-        failure {
-            echo 'Pipeline fallido: la versión NO se publicó/desplegó. Revisar la etapa en rojo y reports/.'
-        }
+        success { echo "Versión ${env.CV_VERSION} publicada${params.DESPLEGAR_PRODUCCION ? ' y desplegada en producción' : ''}." }
+        failure { echo 'Pipeline fallido: la versión NO se promovió ni se desplegó en producción. Revise la etapa en rojo.' }
     }
 }

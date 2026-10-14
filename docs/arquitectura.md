@@ -6,31 +6,40 @@
 
 La versión 1.0.0 (etiqueta Git `v1.0.0-monolito`) era un monolito PHP 8.2 con patrón MVVM ejecutado en XAMPP: un `index.php` frontal, 9 modelos con SQL directo sobre una base `controlvet` compartida y JOIN entre todas las tablas. No contenía código Java.
 
-## 2. Vista general
+## 2. Vista general (sin contenedores)
+
+Los microservicios **no usan Docker**: cada uno es una aplicación PHP con su propio punto de entrada, configuración, esquema y usuario de base de datos, publicada por el Apache de XAMPP bajo `/<instalación>/api/<servicio>/` (ver `docs/endpoints.md`).
 
 ```mermaid
 flowchart LR
-    U[Navegador] -->|HTTP :8090| WEB[web<br/>vistas + ViewModels<br/>composición de API]
-    subgraph backend [red Docker interna 'backend' — sin puertos publicados]
-        WEB --> AUTH[auth]
-        WEB --> PAC[pacientes]
-        WEB --> CIT[citas]
-        WEB --> CLI[clinica]
-        WEB --> INV[inventario]
-        WEB --> DOC[documentos]
+    U[Navegador] -->|HTTP :80| WEB[web<br/>vistas + ViewModels<br/>composición de API]
+    subgraph apache [Apache de XAMPP — un punto de entrada por servicio]
+        WEB -->|/api/auth| AUTH[auth]
+        WEB -->|/api/pacientes| PAC[pacientes]
+        WEB -->|/api/citas| CIT[citas]
+        WEB -->|/api/clinica| CLI[clinica]
+        WEB -->|/api/inventario| INV[inventario]
+        WEB -->|/api/documentos| DOC[documentos]
         CIT -->|mascota| PAC
         CIT -->|veterinario| AUTH
         CLI -->|mascota, peso| PAC
         DOC --> CIT & CLI & PAC & AUTH
-        AUTH --- DB[(MariaDB<br/>cv_auth · cv_pacientes · cv_citas<br/>cv_clinica · cv_inventario · cv_documentos)]
-        PAC --- DB
-        CIT --- DB
-        CLI --- DB
-        INV --- DB
-        DOC --- DB
     end
-    NAG[Nagios] -.supervisa.-> backend
+    AUTH & PAC & CIT & CLI & INV & DOC --- DB[(MariaDB dedicada 127.0.0.1:3307<br/>un esquema y un usuario por servicio)]
+    subgraph wsl [WSL2 Ubuntu]
+        ANS[Ansible] -.despliega/opera.-> apache
+        NAG[Nagios 4] -.supervisa.-> apache
+    end
+    JEN[Jenkins nativo :8091] -->|pipeline| ANS
 ```
+
+| Entorno | URL | Prefijo de esquemas | Gestionado por |
+|---|---|---|---|
+| Desarrollo | `http://localhost/controlvet/` (copia de trabajo) | `cv_` | Desarrolladores (`infra/xampp/instalar.php`) |
+| Staging | `http://localhost/cv-staging/` | `cvstg_` (datos reiniciados en cada build) | Jenkins + Ansible |
+| Producción | `http://localhost/cv/` | `cvprod_` | Jenkins + Ansible; supervisado por Nagios |
+
+Cada versión de staging/producción se extrae en `C:\controlvet\releases\<entorno>\<versión>` y se activa cambiando el enlace (*junction*) `htdocs\cv` o `htdocs\cv-staging`; el rollback reactiva la versión anterior.
 
 ## 3. Límites de responsabilidad y propiedad de datos
 
@@ -53,18 +62,20 @@ services/<servicio>/
 ├── controller/      rutas HTTP, autorización por rol, respuestas JSON
 ├── validador/       validación de entrada en el servidor (422 con errores por campo)
 ├── microservicio/   reglas de negocio (Service), puertos (interfaces) y adaptadores (PDO, HTTP)
-├── public/index.php punto de entrada (Apache FallbackResource)
+├── public/index.php punto de entrada (el .htaccess raíz enruta /api/<servicio>/ aquí)
+├── config/          servicio.php generado por el instalador (conexión propia, no versionado)
 ├── database/        esquema y datos semilla propios
 ├── tests/Unit       PHPUnit con dobles en memoria
-├── Dockerfile       imagen propia (multi-etapa: Composer → php:8.2-apache)
 └── composer.json    dependencias propias + composer.lock
 ```
 
-`libs/kernel` es una librería **transversal** versionada (router, petición/respuesta, JWT, logger JSON, validador base, `/health`). No contiene lógica de negocio ni conexiones: cada servicio crea la suya con sus propias variables `DB_*`.
+`libs/kernel` es una librería **transversal** versionada (router, petición/respuesta, JWT, configuración, logger JSON, validador base, `/health`). No contiene lógica de negocio ni conexiones: cada servicio crea la suya con su propia configuración.
+
+**Aislamiento de configuración en Apache:** en Windows, Apache ejecuta todos los servicios en un único proceso con hilos. Por eso la configuración de cada servicio se guarda en memoria **de la petición** (`Env::get`) y nunca con `putenv()`, que es global al proceso y mezclaba la base de datos y el prefijo de rutas entre servicios que atendían peticiones a la vez (defecto detectado por las pruebas e2e, ADR-010).
 
 ## 5. Comunicación
 
-- **Síncrona HTTP/JSON** dentro de la red `backend`. Los nombres de servicio de Docker son las direcciones (`http://pacientes`).
+- **Síncrona HTTP/JSON** a través de los endpoints publicados por Apache (`http://localhost/<instalación>/api/<servicio>`), configurados en `config/servicio.php`.
 - **Propagación de identidad:** cada llamada reenvía el JWT del usuario; el servicio destino aplica sus propias reglas (no hay cuentas de servicio con privilegios globales).
 - **Correlación:** cabecera `X-Request-Id` registrada en los logs JSON de cada servicio.
 - **Fallos:** un servicio dependiente caído se traduce en 503 controlado; el frontend muestra "Servicio temporalmente no disponible".
@@ -73,14 +84,14 @@ services/<servicio>/
 
 | Control | Implementación |
 |---|---|
-| Autenticación | JWT HS256 emitido por `auth`; secreto por variable de entorno (≥ 32 caracteres), verificación de `alg` e `iss` |
+| Autenticación | JWT HS256 emitido por `auth`; secreto aleatorio por entorno (≥ 32 caracteres), verificación de `alg` e `iss` |
 | Autorización | Rol verificado en el frontend **y** en cada servicio |
 | Aislamiento de datos | Claim `propietario_id` del cliente aplicado en pacientes, citas, clinica y documentos |
-| Aislamiento de persistencia | Un usuario MariaDB por servicio, solo DML sobre su esquema (probado en `AislamientoBaseDatosTest`) |
-| Red | Solo `web` publica puerto; `backend` es `internal: true` |
+| Aislamiento de persistencia | Un usuario MariaDB por servicio con DML **solo sobre las tablas de su esquema** (probado en `AislamientoBaseDatosTest`); instancia dedicada en 127.0.0.1:3307 |
+| Exposición web | `.htaccess`: solo `/api/<servicio>/` y `web/`; código interno, configuración, SQL, `.git` y `composer.*` responden 403 |
 | CSRF | Token por sesión en formularios y enlaces que modifican datos |
-| Secretos | Nada en Git: `.env` generado por Ansible (0600), `.env.example` como plantilla, control en el pipeline |
-| Errores | Sin detalles internos en respuestas; logs estructurados con datos sensibles enmascarados |
+| Secretos | Nada en Git. Configuración de cada servicio como PHP (`config/servicio.php`, no se muestra aunque se pida por URL); claves root, de monitoreo, de Jenkins y de cada entorno en `C:\xampp\controlvet-secretos` (fuera de htdocs). El pipeline bloquea secretos versionados |
+| Errores | `display_errors` desactivado por cada servicio; logs estructurados con datos sensibles enmascarados |
 
 ## 7. Conservación de funcionalidades
 

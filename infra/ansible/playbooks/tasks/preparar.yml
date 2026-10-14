@@ -1,67 +1,56 @@
-# Preparación del equipo de despliegue (idempotente).
-- name: Verificar que el motor Docker está disponible
-  ansible.builtin.command: docker info --format '{{ "{{" }}.ServerVersion{{ "}}" }} {{ "{{" }}.OperatingSystem{{ "}}" }}'
-  register: docker_info
+# Preparación y verificación del equipo de despliegue (idempotente).
+- name: Validar el entorno solicitado
+  ansible.builtin.assert:
+    that: cv_entorno in cv_entornos
+    fail_msg: "Entorno desconocido '{{ cv_entorno }}'. Use: {{ cv_entornos.keys() | join(', ') }}"
+
+- name: Fijar datos del entorno {{ cv_entorno }}
+  ansible.builtin.set_fact:
+    ent: "{{ cv_entornos[cv_entorno] }}"
+    cv_enlace: "{{ cv_htdocs }}/{{ cv_entornos[cv_entorno].ruta }}"
+    cv_url: "{{ cv_url_base }}/{{ cv_entornos[cv_entorno].ruta }}"
+    cv_estado_dir: "{{ cv_estado }}/{{ cv_entorno }}"
+
+- name: Verificar la interoperabilidad WSL -> Windows
+  ansible.builtin.command: "{{ cv_cmd }} /c ver"
+  register: ver_windows
   changed_when: false
 
-- name: Mostrar motor Docker detectado
-  ansible.builtin.debug:
-    msg: "Docker {{ docker_info.stdout }}"
-
-- name: Verificar Docker Compose v2
-  ansible.builtin.command: docker compose version --short
-  register: compose_version
+- name: Verificar que Apache de XAMPP responde en el puerto 80
+  ansible.builtin.command: "{{ cv_curl }} -s -o NUL -w %{http_code} {{ cv_url_base }}/"
+  register: apache
   changed_when: false
+  failed_when: apache.stdout | length == 0 or apache.stdout == '000'
+
+- name: Verificar la instancia MariaDB de ControlVet (127.0.0.1:{{ cv_db_puerto }})
+  ansible.builtin.command: >-
+    {{ cv_powershell }} -NoProfile -Command
+    "if (Get-NetTCPConnection -State Listen -LocalPort {{ cv_db_puerto }} -ErrorAction SilentlyContinue) { 'ACTIVA' } else { 'DETENIDA' }"
+  register: bd
+  changed_when: false
+
+- name: Exigir la base de datos activa
+  ansible.builtin.assert:
+    that: "'ACTIVA' in bd.stdout"
+    fail_msg: "La instancia MariaDB está detenida: ejecute recover.yml o infra\\xampp\\bd.ps1 iniciar"
 
 - name: Crear directorios de operación
   ansible.builtin.file:
-    path: "{{ item.path }}"
+    path: "{{ item }}"
     state: directory
-    owner: "0"
-    group: "{{ item.group | default('0') }}"
-    mode: "{{ item.mode }}"
+    mode: "0755"
   loop:
-    - { path: "{{ cv_ops_dir }}", mode: "0750", group: "{{ cv_nagios_gid }}" }  # grupo nagios: solo atraviesa hasta monitor/
-    - { path: "{{ cv_ops_dir }}/secrets", mode: "0700" }
-    - { path: "{{ cv_ops_dir }}/releases", mode: "0750" }
-    - { path: "{{ cv_ops_dir }}/logs", mode: "0750" }
-    - { path: "{{ cv_backup_dir }}", mode: "0750" }
+    - "{{ cv_artefactos }}"
+    - "{{ cv_releases }}/{{ cv_entorno }}"
+    - "{{ cv_estado_dir }}"
+    - "{{ cv_respaldos }}"
 
-- name: Leer la versión desplegada actualmente
+- name: Leer la versión activa del entorno
   ansible.builtin.slurp:
-    src: "{{ cv_ops_dir }}/releases/current"
-  register: version_actual_raw
+    src: "{{ cv_estado_dir }}/current"
+  register: actual_raw
   failed_when: false
 
-- name: Registrar versión actual
+- name: Registrar la versión activa
   ansible.builtin.set_fact:
-    cv_version_actual: "{{ (version_actual_raw.content | default('') | b64decode).strip() }}"
-
-# Solo el grupo de Nagios (GID {{ cv_nagios_gid }} en la imagen manios/nagios)
-# puede leer la clave. Además nagios_mon solo tiene privilegio USAGE
-# (conectarse, sin acceso a datos).
-- name: Crear directorio de credenciales de monitoreo
-  ansible.builtin.file:
-    path: "{{ cv_ops_dir }}/monitor"
-    state: directory
-    owner: "0"
-    group: "{{ cv_nagios_gid }}"
-    mode: "0750"
-
-- name: Publicar la clave del usuario de monitoreo para Nagios
-  ansible.builtin.copy:
-    dest: "{{ cv_ops_dir }}/monitor/mysql.pass"
-    content: "{{ lookup('ansible.builtin.password', cv_ops_dir ~ '/secrets/db_monitor', length=28, chars=['ascii_letters', 'digits']) }}"
-    owner: "0"
-    group: "{{ cv_nagios_gid }}"
-    mode: "0640"
-  no_log: true
-
-- name: Generar archivo de entorno con secretos persistentes
-  ansible.builtin.template:
-    src: templates/controlvet.env.j2
-    dest: "{{ cv_env_file }}"
-    mode: "0600"
-  vars:
-    cv_version_env: "{{ cv_version | default(cv_version_actual, true) | default('dev', true) }}"
-  no_log: true
+    cv_version_actual: "{{ (actual_raw.content | default('') | b64decode).strip() }}"

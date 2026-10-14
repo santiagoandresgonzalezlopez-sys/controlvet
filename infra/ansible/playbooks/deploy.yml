@@ -1,59 +1,97 @@
-# Despliegue de una versión publicada por Jenkins, con verificación posterior
-# y ROLLBACK AUTOMÁTICO a la versión anterior si la verificación falla.
-#   ansible-playbook playbooks/deploy.yml -e cv_version=1.1.7
+# Despliegue de una versión publicada por Jenkins en un entorno (staging o
+# produccion) de XAMPP, con verificación posterior y ROLLBACK AUTOMÁTICO.
+#   ansible-playbook -i inventarios/local.yml playbooks/deploy.yml -e cv_entorno=produccion -e cv_version=1.1.7
 - name: Desplegar ControlVet
-  hosts: docker_hosts
+  hosts: windows_xampp
   gather_facts: true
-  vars:
-    cv_version_esperada: "{{ cv_version }}"
   pre_tasks:
-    - name: Exigir la versión a desplegar
+    - name: Exigir versión y entorno
       ansible.builtin.assert:
-        that: cv_version is defined and cv_version | length > 0
-        fail_msg: "Indique la versión: -e cv_version=X.Y.Z"
+        that:
+          - cv_version is defined and cv_version | length > 0
+          - cv_entorno is defined
+        fail_msg: "Indique -e cv_entorno=staging|produccion -e cv_version=X.Y.Z"
   tasks:
-    - name: Preparación común
+    - name: Preparación y verificaciones del equipo
       ansible.builtin.include_tasks: tasks/preparar.yml
 
-    - name: Desplegar y verificar
+    - name: Ubicar el artefacto de la versión {{ cv_version }}
+      ansible.builtin.set_fact:
+        artefacto: "{{ cv_artefactos }}/{{ cv_version }}/controlvet-{{ cv_version }}.zip"
+        release_dir: "{{ cv_releases }}/{{ cv_entorno }}/{{ cv_version }}"
+
+    - name: Verificar la integridad del artefacto (SHA-256)
+      ansible.builtin.shell: cd {{ cv_artefactos }}/{{ cv_version }} && sha256sum -c controlvet-{{ cv_version }}.zip.sha256
+      changed_when: false
+
+    - name: Crear el directorio de la versión
+      ansible.builtin.file:
+        path: "{{ release_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Extraer la versión en {{ release_dir }}
+      ansible.builtin.unarchive:
+        src: "{{ artefacto }}"
+        dest: "{{ release_dir }}"
+        remote_src: true
+        creates: "{{ release_dir }}/VERSION"
+
+    - name: Ruta Windows del instalador de la versión
+      ansible.builtin.command: wslpath -w {{ release_dir }}/infra/xampp/instalar.php
+      register: instalador
+      changed_when: false
+
+    - name: Configurar la versión (esquemas, usuarios por servicio y config/servicio.php)
+      ansible.builtin.command: >-
+        {{ cv_php }} {{ instalador.stdout }}
+        --prefijo={{ ent.prefijo }} --base-url={{ cv_url }} --app-env={{ ent.app_env }}
+        {{ '--reiniciar-datos' if ent.reiniciar_datos else '' }}
+      register: instalacion
+      changed_when: true
+
+    - name: Activar y verificar
       block:
-        - name: Actualizar contenedores a {{ cv_version }}
-          ansible.builtin.include_tasks: tasks/compose_up.yml
+        - name: Activar {{ cv_version }}
+          ansible.builtin.include_tasks: tasks/activar.yml
           vars:
             cv_version_objetivo: "{{ cv_version }}"
 
         - name: Verificación posterior al despliegue
           ansible.builtin.include_tasks: tasks/verificar.yml
+          vars:
+            cv_version_esperada: "{{ cv_version }}"
 
-        - name: Registrar la versión desplegada
+        - name: Registrar la versión activa y la anterior
           ansible.builtin.copy:
             dest: "{{ item.dest }}"
             content: "{{ item.content }}\n"
-            mode: "0640"
+            mode: "0644"
           loop:
-            - { dest: "{{ cv_ops_dir }}/releases/current", content: "{{ cv_version }}" }
-            - { dest: "{{ cv_ops_dir }}/releases/previous", content: "{{ cv_version_actual | default('', true) }}" }
+            - { dest: "{{ cv_estado_dir }}/current", content: "{{ cv_version }}" }
+            - { dest: "{{ cv_estado_dir }}/previous", content: "{{ cv_version_actual if cv_version_actual != cv_version else '' }}" }
+          when: cv_version_actual != cv_version
 
-        - name: Anotar en el historial de despliegues
+        - name: Historial de despliegues
           ansible.builtin.lineinfile:
-            path: "{{ cv_ops_dir }}/releases/history.log"
-            line: "{{ ansible_date_time.iso8601 }} DEPLOY {{ cv_version }} OK (anterior: {{ cv_version_actual | default('ninguna', true) }})"
+            path: "{{ cv_estado_dir }}/history.log"
+            line: "{{ ansible_date_time.iso8601 }} DEPLOY {{ cv_entorno }} {{ cv_version }} OK (anterior: {{ cv_version_actual | default('ninguna', true) }})"
             create: true
-            mode: "0640"
+            mode: "0644"
 
       rescue:
-        - name: Anotar el fallo en el historial
+        - name: Historial del fallo
           ansible.builtin.lineinfile:
-            path: "{{ cv_ops_dir }}/releases/history.log"
-            line: "{{ ansible_date_time.iso8601 }} DEPLOY {{ cv_version }} FALLIDO -> rollback a {{ cv_version_actual | default('ninguna', true) }}"
+            path: "{{ cv_estado_dir }}/history.log"
+            line: "{{ ansible_date_time.iso8601 }} DEPLOY {{ cv_entorno }} {{ cv_version }} FALLIDO -> rollback a {{ cv_version_actual | default('ninguna', true) }}"
             create: true
-            mode: "0640"
+            mode: "0644"
 
-        - name: Rollback automático a la versión anterior
-          when: cv_version_actual | default('', true) | length > 0 and cv_version_actual != cv_version
+        - name: Rollback automático
+          when: cv_version_actual | length > 0 and cv_version_actual != cv_version
           block:
-            - name: Restaurar {{ cv_version_actual }}
-              ansible.builtin.include_tasks: tasks/compose_up.yml
+            - name: Reactivar {{ cv_version_actual }}
+              ansible.builtin.include_tasks: tasks/activar.yml
               vars:
                 cv_version_objetivo: "{{ cv_version_actual }}"
 
@@ -62,11 +100,8 @@
               vars:
                 cv_version_esperada: "{{ cv_version_actual }}"
 
-        - name: Informar el fallo del despliegue
+        - name: Informar el fallo
           ansible.builtin.fail:
             msg: >-
-              El despliegue de {{ cv_version }} no pasó la verificación.
-              {{ 'Se restauró la versión ' ~ cv_version_actual ~ '.' if (cv_version_actual | default('', true)) else 'No había versión anterior para restaurar.' }}
-
-    - name: Conectar Nagios a la red interna (si la plataforma de monitoreo está activa)
-      ansible.builtin.include_tasks: tasks/conectar_nagios.yml
+              El despliegue de {{ cv_version }} en {{ cv_entorno }} no pasó la verificación.
+              {{ 'Se restauró ' ~ cv_version_actual ~ '.' if cv_version_actual else 'No había versión anterior.' }}

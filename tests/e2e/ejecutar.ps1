@@ -22,8 +22,8 @@ foreach ($s in $servicios) {
     # Credenciales de BD de cada servicio (para la prueba de aislamiento de esquemas).
     $config = Join-Path $Raiz "services\$s\config\servicio.php"
     foreach ($l in Get-Content $config) {
-        if ($l -match "^\s*'(DB_PASSWORD|DB_HOST|DB_PORT)'\s*=>\s*'([^']*)'") {
-            $nombre = if ($Matches[1] -eq 'DB_PASSWORD') { $s.ToUpper() + '_DB_PASSWORD' } else { $Matches[1] }
+        if ($l -match "^\s*'(DB_PASSWORD|DB_USER|DB_NAME|DB_HOST|DB_PORT)'\s*=>\s*'([^']*)'") {
+            $nombre = if ($Matches[1] -in 'DB_PASSWORD', 'DB_USER', 'DB_NAME') { $s.ToUpper() + '_' + $Matches[1] } else { $Matches[1] }
             [Environment]::SetEnvironmentVariable($nombre, $Matches[2])
         }
     }

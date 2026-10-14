@@ -122,13 +122,20 @@ try {
 }
 paso('Conectado a ' . $pdo->query('SELECT VERSION()')->fetchColumn());
 
+// Secretos persistentes POR ENTORNO (fuera de htdocs): todas las versiones
+// instaladas de un mismo entorno comparten claves, lo que permite cambiar de
+// versión o hacer rollback sin romper las conexiones a la base de datos.
+@mkdir($secretos, 0700, true);
+$secretosEntorno = "$secretos/entorno-" . rtrim($prefijo, '_') . '.php';
+$estado = leerConfig($secretosEntorno);
+$estado['JWT_SECRET'] ??= secreto(36);
+$jwt = $estado['JWT_SECRET'];
 $webEnvFile = $raiz . '/web/config/web.php';
-$jwt = leerConfig($webEnvFile)['JWT_SECRET'] ?? secreto(36);
 $hosts = ['localhost', '127.0.0.1'];
 
 foreach ($servicios as $svc => $dependencias) {
     $envFile = "$raiz/services/$svc/config/servicio.php";
-    $pass = leerConfig($envFile)['DB_PASSWORD'] ?? secreto();
+    $pass = $estado['DB_' . strtoupper($svc)] ??= secreto();
     $esquema = $prefijo . $svc;
     // Usuario de BD: <servicio>_svc en el entorno base (cv_); <prefijo><servicio> en los demás (ej. cvstg_citas).
     $usuario = $prefijo === 'cv_' ? "{$svc}_svc" : $prefijo . $svc;
@@ -178,7 +185,8 @@ foreach ($servicios as $svc => $dependencias) {
     paso("  generado services/$svc/config/servicio.php");
 }
 
-@mkdir($secretos, 0700, true);
+escribirEnv($secretosEntorno, "Secretos del entorno $prefijo (NO versionar)", $estado);
+
 $monitorFile = $secretos . '/monitor.env';
 $monitorPass = leerEnv($monitorFile)['MONITOR_DB_PASSWORD'] ?? secreto();
 foreach ($hosts as $h) {

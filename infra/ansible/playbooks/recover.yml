@@ -1,30 +1,64 @@
-# Recuperación de servicios: detecta contenedores detenidos o no saludables
-# (p. ej. tras una alerta de Nagios), los reinicia y verifica el entorno.
-#   ansible-playbook playbooks/recover.yml
-- name: Recuperar servicios de ControlVet
-  hosts: docker_hosts
+# Recuperación de servicios (respuesta a alertas de Nagios). Diagnostica y
+# corrige las dos causas de caída en XAMPP: Apache detenido o la instancia
+# MariaDB de ControlVet detenida. Los 6 microservicios y el frontend corren
+# dentro de Apache, por eso se recuperan al recuperar Apache.
+#   ansible-playbook -i inventarios/local.yml playbooks/recover.yml -e cv_entorno=produccion
+- name: Recuperar ControlVet
+  hosts: windows_xampp
   gather_facts: true
   tasks:
-    - name: Inspeccionar el estado de cada contenedor
-      ansible.builtin.command: >-
-        docker inspect -f '{{ "{{" }}.State.Status{{ "}}" }}/{{ "{{" }}if .State.Health{{ "}}" }}{{ "{{" }}.State.Health.Status{{ "}}" }}{{ "{{" }}end{{ "}}" }}'
-        {{ cv_project }}-{{ item }}-1
-      register: estados
+    - name: Fijar datos del entorno
+      ansible.builtin.set_fact:
+        ent: "{{ cv_entornos[cv_entorno] }}"
+        cv_url: "{{ cv_url_base }}/{{ cv_entornos[cv_entorno].ruta }}"
+        cv_estado_dir: "{{ cv_estado }}/{{ cv_entorno }}"
+
+    - name: Diagnóstico - Apache (puerto 80)
+      ansible.builtin.command: "{{ cv_curl }} -s -o NUL -w %{http_code} --max-time 5 {{ cv_url_base }}/"
+      register: apache
       changed_when: false
       failed_when: false
-      loop: "{{ cv_contenedores }}"
 
-    - name: Determinar contenedores a recuperar
+    - name: Diagnóstico - instancia MariaDB de ControlVet
+      ansible.builtin.command: >-
+        {{ cv_powershell }} -NoProfile -Command
+        "if (Get-NetTCPConnection -State Listen -LocalPort {{ cv_db_puerto }} -ErrorAction SilentlyContinue) { 'ACTIVA' } else { 'DETENIDA' }"
+      register: bd
+      changed_when: false
+
+    - name: Diagnóstico - salud de cada microservicio
+      ansible.builtin.command: "{{ cv_curl }} -s --max-time 10 {{ cv_url }}/api/{{ item }}/health"
+      register: salud
+      changed_when: false
+      failed_when: false
+      loop: "{{ cv_servicios }}"
+
+    - name: Resumen del diagnóstico
       ansible.builtin.set_fact:
-        caidos: "{{ estados.results | rejectattr('stdout', 'equalto', 'running/healthy') | map(attribute='item') | list }}"
+        apache_caido: "{{ apache.stdout in ['', '000'] }}"
+        bd_caida: "{{ 'DETENIDA' in bd.stdout }}"
+        servicios_mal: "{{ salud.results | rejectattr('stdout', 'search', '\"status\":\"ok\"') | map(attribute='item') | list }}"
 
-    - name: Diagnóstico
+    - name: Mostrar diagnóstico
       ansible.builtin.debug:
-        msg: "{{ 'Todos los servicios están sanos' if not caidos else 'A recuperar: ' ~ (caidos | join(', ')) }}"
+        msg: "Apache caído={{ apache_caido }} · BD caída={{ bd_caida }} · servicios con fallo={{ servicios_mal }}"
 
-    - name: Reiniciar contenedores afectados
-      ansible.builtin.command: docker restart {{ cv_project }}-{{ item }}-1
-      loop: "{{ caidos }}"
+    - name: Ruta Windows del script de la base de datos
+      ansible.builtin.command: wslpath -w {{ cv_bd_script }}
+      register: bd_script
+      changed_when: false
+      when: bd_caida
+
+    - name: Iniciar la instancia MariaDB de ControlVet
+      ansible.builtin.command: "{{ cv_powershell }} -NoProfile -ExecutionPolicy Bypass -File {{ bd_script.stdout }} iniciar"
+      when: bd_caida
+      changed_when: true
+
+    - name: Iniciar Apache de XAMPP (proceso desacoplado)
+      ansible.builtin.command: >-
+        {{ cv_powershell }} -NoProfile -Command
+        "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = 'C:\xampp\apache\bin\httpd.exe'; CurrentDirectory = 'C:\xampp\apache\bin' } | Out-Null"
+      when: apache_caido
       changed_when: true
 
     - name: Verificar el entorno tras la recuperación
@@ -32,8 +66,7 @@
 
     - name: Registrar la acción correctiva
       ansible.builtin.lineinfile:
-        path: "{{ cv_ops_dir }}/releases/history.log"
-        line: "{{ ansible_date_time.iso8601 }} RECOVER reiniciados=[{{ caidos | join(',') }}] OK"
+        path: "{{ cv_estado_dir }}/history.log"
+        line: "{{ ansible_date_time.iso8601 }} RECOVER {{ cv_entorno }} apache={{ 'reiniciado' if apache_caido else 'ok' }} bd={{ 'reiniciada' if bd_caida else 'ok' }} servicios_afectados=[{{ servicios_mal | join(',') }}] OK"
         create: true
-        mode: "0640"
-      when: caidos | length > 0
+        mode: "0644"

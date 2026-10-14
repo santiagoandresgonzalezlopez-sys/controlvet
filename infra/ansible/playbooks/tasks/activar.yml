@@ -1,0 +1,25 @@
+# Activa la versión cv_version_objetivo en el entorno: cambia el enlace
+# (junction de NTFS) htdocs\<ruta> -> C:\controlvet\releases\<entorno>\<versión>.
+# El cambio es casi instantáneo y reversible.
+- name: Ruta Windows de la versión {{ cv_version_objetivo }}
+  ansible.builtin.command: wslpath -w {{ cv_releases }}/{{ cv_entorno }}/{{ cv_version_objetivo }}
+  register: destino_win
+  changed_when: false
+
+- name: Ruta Windows del enlace publicado
+  ansible.builtin.command: wslpath -w {{ cv_enlace }}
+  register: enlace_win
+  changed_when: false
+
+- name: Comprobar que el enlace no es un directorio real (no se borran datos)
+  ansible.builtin.command: >-
+    {{ cv_powershell }} -NoProfile -Command
+    "$i = Get-Item '{{ enlace_win.stdout }}' -ErrorAction SilentlyContinue; if ($null -eq $i) { 'NO_EXISTE' } elseif ($i.LinkType) { 'ENLACE' } else { 'DIRECTORIO' }"
+  register: tipo_enlace
+  changed_when: false
+  failed_when: "'DIRECTORIO' in tipo_enlace.stdout"
+
+- name: Apuntar {{ cv_enlace }} a la versión {{ cv_version_objetivo }}
+  ansible.builtin.command: >-
+    {{ cv_cmd }} /c "{{ 'rmdir ' ~ enlace_win.stdout ~ ' && ' if 'ENLACE' in tipo_enlace.stdout else '' }}mklink /J {{ enlace_win.stdout }} {{ destino_win.stdout }}"
+  changed_when: true

@@ -1,31 +1,15 @@
-# Verificación posterior al despliegue: contenedores sanos, salud de cada
-# servicio (incluida su base de datos) y versión esperada.
-- name: Esperar a que cada contenedor reporte estado healthy
-  ansible.builtin.command: >-
-    docker inspect -f '{{ "{{" }}.State.Status{{ "}}" }}/{{ "{{" }}if .State.Health{{ "}}" }}{{ "{{" }}.State.Health.Status{{ "}}" }}{{ "{{" }}end{{ "}}" }}'
-    {{ cv_project }}-{{ item }}-1
-  register: estado
-  until: estado.stdout == 'running/healthy'
-  retries: 30
-  delay: 3
-  changed_when: false
-  loop: "{{ cv_contenedores }}"
-
-- name: Consultar salud agregada desde el frontend (red interna)
-  ansible.builtin.command: docker exec {{ cv_project }}-web-1 curl -fsS http://localhost/health.php
-  register: salud_web
+# Verificación posterior: /health de cada microservicio (incluida su base de
+# datos) con la versión esperada, salud agregada del frontend y login.
+- name: Consultar /health de cada microservicio
+  ansible.builtin.command: "{{ cv_curl }} -s --max-time 10 {{ cv_url }}/api/{{ item }}/health"
+  register: salud
   changed_when: false
   retries: 5
-  delay: 3
-  until: salud_web.rc == 0
-
-- name: Consultar /health de cada microservicio
-  ansible.builtin.command: docker exec {{ cv_project }}-web-1 curl -fsS http://{{ item }}/health
-  register: salud_servicios
-  changed_when: false
+  delay: 2
+  until: salud.stdout is search('"status":"ok"')
   loop: "{{ cv_servicios }}"
 
-- name: Validar estado y versión de cada microservicio
+- name: Validar estado, base de datos y versión
   ansible.builtin.assert:
     that:
       - (item.stdout | from_json).status == 'ok'
@@ -34,11 +18,18 @@
     fail_msg: "{{ item.item }} no está sano o no corre la versión {{ cv_version_esperada | default('?') }}: {{ item.stdout }}"
     success_msg: "{{ item.item }} OK · versión {{ (item.stdout | from_json).version }}"
     quiet: false
-  loop: "{{ salud_servicios.results }}"
+  loop: "{{ salud.results }}"
   loop_control:
     label: "{{ item.item }}"
 
-- name: Validar que el frontend alcanza todas sus dependencias
-  ansible.builtin.assert:
-    that: (salud_web.stdout | from_json).status == 'ok'
-    success_msg: "Frontend OK · dependencias: {{ (salud_web.stdout | from_json).dependencies }}"
+- name: Salud agregada del frontend
+  ansible.builtin.command: "{{ cv_curl }} -s --max-time 15 {{ cv_url }}/web/health.php"
+  register: salud_web
+  changed_when: false
+  failed_when: (salud_web.stdout | from_json).status != 'ok'
+
+- name: Página de login del frontend
+  ansible.builtin.command: "{{ cv_curl }} -s -o NUL -w %{http_code} {{ cv_url }}/web/index.php?route=login"
+  register: login
+  changed_when: false
+  failed_when: login.stdout != '200'

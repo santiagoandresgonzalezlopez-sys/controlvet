@@ -1,50 +1,57 @@
-# Reversión manual a una versión publicada (por defecto, la anterior).
-#   ansible-playbook playbooks/rollback.yml                    -> versión anterior
-#   ansible-playbook playbooks/rollback.yml -e cv_version=1.1.5 -> versión concreta
-- name: Revertir ControlVet a una versión anterior
-  hosts: docker_hosts
+# Reversión a la versión anterior del entorno (o a una concreta).
+#   ansible-playbook -i inventarios/local.yml playbooks/rollback.yml -e cv_entorno=produccion [-e cv_destino=1.1.5]
+- name: Revertir ControlVet
+  hosts: windows_xampp
   gather_facts: true
   tasks:
-    - name: Preparación común
+    - name: Preparación y verificaciones del equipo
       ansible.builtin.include_tasks: tasks/preparar.yml
 
     - name: Leer la versión anterior registrada
       ansible.builtin.slurp:
-        src: "{{ cv_ops_dir }}/releases/previous"
+        src: "{{ cv_estado_dir }}/previous"
       register: previa_raw
       failed_when: false
 
     - name: Determinar la versión destino
       ansible.builtin.set_fact:
-        cv_destino: "{{ cv_version | default((previa_raw.content | default('') | b64decode).strip(), true) }}"
+        destino: "{{ cv_destino | default((previa_raw.content | default('') | b64decode).strip(), true) }}"
 
-    - name: Validar que existe una versión destino
+    - name: Validar la versión destino
       ansible.builtin.assert:
-        that: cv_destino | length > 0
-        fail_msg: "No hay versión anterior registrada; indique -e cv_version=X.Y.Z"
+        that:
+          - destino | length > 0
+          - destino != cv_version_actual
+        fail_msg: "No hay una versión anterior distinta de {{ cv_version_actual }}; indique -e cv_destino=X.Y.Z"
 
-    - name: Desplegar {{ cv_destino }}
-      ansible.builtin.include_tasks: tasks/compose_up.yml
+    - name: Comprobar que la versión destino está instalada
+      ansible.builtin.stat:
+        path: "{{ cv_releases }}/{{ cv_entorno }}/{{ destino }}/VERSION"
+      register: instalada
+      failed_when: not instalada.stat.exists
+
+    - name: Activar {{ destino }}
+      ansible.builtin.include_tasks: tasks/activar.yml
       vars:
-        cv_version_objetivo: "{{ cv_destino }}"
+        cv_version_objetivo: "{{ destino }}"
 
     - name: Verificar la versión restaurada
       ansible.builtin.include_tasks: tasks/verificar.yml
       vars:
-        cv_version_esperada: "{{ cv_destino }}"
+        cv_version_esperada: "{{ destino }}"
 
     - name: Registrar la reversión
       ansible.builtin.copy:
         dest: "{{ item.dest }}"
         content: "{{ item.content }}\n"
-        mode: "0640"
+        mode: "0644"
       loop:
-        - { dest: "{{ cv_ops_dir }}/releases/current", content: "{{ cv_destino }}" }
-        - { dest: "{{ cv_ops_dir }}/releases/previous", content: "{{ cv_version_actual }}" }
+        - { dest: "{{ cv_estado_dir }}/current", content: "{{ destino }}" }
+        - { dest: "{{ cv_estado_dir }}/previous", content: "{{ cv_version_actual }}" }
 
-    - name: Anotar en el historial
+    - name: Historial
       ansible.builtin.lineinfile:
-        path: "{{ cv_ops_dir }}/releases/history.log"
-        line: "{{ ansible_date_time.iso8601 }} ROLLBACK {{ cv_version_actual }} -> {{ cv_destino }} OK"
+        path: "{{ cv_estado_dir }}/history.log"
+        line: "{{ ansible_date_time.iso8601 }} ROLLBACK {{ cv_entorno }} {{ cv_version_actual }} -> {{ destino }} OK"
         create: true
-        mode: "0640"
+        mode: "0644"

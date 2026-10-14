@@ -1,9 +1,9 @@
-# Jenkins Configuration as Code de ControlVet.
-# Los secretos llegan por variables de entorno del contenedor (infra/.env.platform),
-# nunca escritos en este archivo.
+# Jenkins Configuration as Code de ControlVet (Jenkins nativo en Windows).
+# Los secretos llegan por variables de entorno que define infra/jenkins/iniciar.ps1
+# desde C:\xampp\controlvet-secretos\jenkins.env (fuera del repositorio y de htdocs).
 jenkins:
-  systemMessage: "ControlVet · Pipeline DevOps (RELEASE). Responsables: Santiago Gonzalez y Sebastian Gomez."
-  numExecutors: 2
+  systemMessage: "ControlVet · Pipeline DevOps (RELEASE) sin contenedores. Responsables: Santiago Gonzalez y Sebastian Gomez."
+  numExecutors: 1
   mode: NORMAL
   securityRealm:
     local:
@@ -14,21 +14,16 @@ jenkins:
   authorizationStrategy:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
-  globalNodeProperties:
-    - envVars:
-        env:
-          - key: CV_REGISTRY
-            value: "${CV_REGISTRY:-localhost:5000}"
 
 unclassified:
   location:
-    url: "${JENKINS_URL:-http://localhost:8081/}"
+    url: "http://localhost:8091/"
 
 jobs:
   - script: >
       pipelineJob('controlvet-pipeline') {
         displayName('ControlVet · build, test, release y deploy')
-        description('Pipeline declarativo definido en el Jenkinsfile del repositorio. GitHub se usa solo como origen del código (consulta por polling, sin GitHub Actions).')
+        description('Pipeline declarativo del Jenkinsfile del repositorio. GitHub se usa solo como origen del código (consulta por polling, sin GitHub Actions).')
         logRotator { numToKeep(30); artifactNumToKeep(10) }
         properties {
           disableConcurrentBuilds()
@@ -40,7 +35,7 @@ jobs:
             scriptPath('Jenkinsfile')
             scm {
               git {
-                remote { url('${CONTROLVET_GIT_URL:-file:///repo}') }
+                remote { url('${CONTROLVET_GIT_URL}') }
                 branch('*/main')
               }
             }

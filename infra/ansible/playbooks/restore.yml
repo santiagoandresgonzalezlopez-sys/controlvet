@@ -1,17 +1,19 @@
-# Recuperación de datos desde un respaldo.
-#   ansible-playbook playbooks/restore.yml -e archivo=/backups/controlvet-AAAA-MM-DD_HHMMSS.sql.gz
-# Sin "archivo" se usa el respaldo más reciente de cv_backup_dir.
-- name: Restaurar las bases de datos de ControlVet
-  hosts: docker_hosts
+# Restauración de un respaldo del entorno (por defecto, el más reciente).
+#   ansible-playbook -i inventarios/local.yml playbooks/restore.yml -e cv_entorno=produccion [-e archivo=/mnt/c/controlvet/respaldos/...]
+- name: Restaurar ControlVet
+  hosts: windows_xampp
   gather_facts: true
   tasks:
-    - name: Ubicar el respaldo más reciente
-      ansible.builtin.shell: ls -1t {{ cv_backup_dir }}/controlvet-*.sql.gz | head -n1
+    - name: Preparación y verificaciones del equipo
+      ansible.builtin.include_tasks: tasks/preparar.yml
+
+    - name: Ubicar el respaldo más reciente del entorno
+      ansible.builtin.shell: ls -1t {{ cv_respaldos }}/{{ cv_entorno }}-*.sql.gz | head -n1
       register: ultimo
       changed_when: false
       when: archivo is not defined
 
-    - name: Fijar el archivo a restaurar
+    - name: Fijar el respaldo a restaurar
       ansible.builtin.set_fact:
         respaldo: "{{ archivo | default(ultimo.stdout) }}"
 
@@ -21,29 +23,48 @@
       register: st
       failed_when: not st.stat.exists
 
-    - name: Detener los microservicios (evita escrituras durante la restauración)
-      ansible.builtin.command: docker stop {{ (cv_servicios + ['web']) | map('regex_replace', '^(.*)$', cv_project ~ '-\1-1') | join(' ') }}
-      changed_when: true
+    - name: Leer la clave root de la instancia (fuera de htdocs)
+      ansible.builtin.slurp:
+        src: "{{ cv_secretos }}/bd-root.env"
+      register: root_env
+      no_log: true
+
+    - name: Crear archivo de opciones temporal para mysql
+      ansible.builtin.copy:
+        dest: "{{ cv_secretos }}/respaldo.cnf"
+        content: |
+          [client]
+          user=root
+          password={{ (root_env.content | b64decode).splitlines() | select('match', '^DB_ROOT_PASSWORD=') | first | regex_replace('^DB_ROOT_PASSWORD=', '') }}
+          host=127.0.0.1
+          port={{ cv_db_puerto }}
+        mode: "0600"
+      no_log: true
+
+    - name: Ruta Windows del archivo de opciones
+      ansible.builtin.command: wslpath -w {{ cv_secretos }}/respaldo.cnf
+      register: cnf_win
+      changed_when: false
 
     - name: Restaurar el volcado
       ansible.builtin.shell: >-
         set -o pipefail &&
-        gunzip -c {{ respaldo }} |
-        docker exec -i {{ cv_project }}-db-1 sh -c 'exec mariadb -uroot -p"$MARIADB_ROOT_PASSWORD"'
+        gunzip -c {{ respaldo }} | {{ cv_mysql }} --defaults-extra-file="{{ cnf_win.stdout }}"
       args:
         executable: /bin/bash
       changed_when: true
 
-    - name: Volver a iniciar los microservicios
-      ansible.builtin.command: docker start {{ (cv_servicios + ['web']) | map('regex_replace', '^(.*)$', cv_project ~ '-\1-1') | join(' ') }}
-      changed_when: true
+    - name: Eliminar el archivo de opciones temporal
+      ansible.builtin.file:
+        path: "{{ cv_secretos }}/respaldo.cnf"
+        state: absent
 
     - name: Verificar el entorno restaurado
       ansible.builtin.include_tasks: tasks/verificar.yml
 
-    - name: Anotar en el historial
+    - name: Historial
       ansible.builtin.lineinfile:
-        path: "{{ cv_ops_dir }}/releases/history.log"
-        line: "{{ ansible_date_time.iso8601 }} RESTORE {{ respaldo | basename }} OK"
+        path: "{{ cv_estado_dir }}/history.log"
+        line: "{{ ansible_date_time.iso8601 }} RESTORE {{ cv_entorno }} {{ respaldo | basename }} OK"
         create: true
-        mode: "0640"
+        mode: "0644"

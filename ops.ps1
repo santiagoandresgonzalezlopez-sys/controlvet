@@ -3,47 +3,34 @@
   Ejecuta un playbook de Ansible de ControlVet desde Windows.
 
 .DESCRIPTION
-  Ansible no corre de forma nativa en Windows: este script lanza el
-  controlador Ansible en el contenedor Linux "ops" de la versión indicada
-  (por defecto, la desplegada actualmente) y monta la carpeta backups\.
+  Ansible no corre de forma nativa en Windows: este script lo ejecuta en
+  WSL2 (Ubuntu-24.04), que administra XAMPP mediante /mnt/c y los
+  ejecutables de Windows.
 
 .EXAMPLE
-  .\ops.ps1 status
-  .\ops.ps1 backup
-  .\ops.ps1 recover
-  .\ops.ps1 rollback
-  .\ops.ps1 deploy -Version 1.1.3
+  .\ops.ps1 status   -Entorno produccion
+  .\ops.ps1 backup   -Entorno produccion
+  .\ops.ps1 recover  -Entorno produccion
+  .\ops.ps1 rollback -Entorno produccion
+  .\ops.ps1 deploy   -Entorno produccion -Version 1.1.7
+  .\ops.ps1 monitoreo
 #>
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('site', 'deploy', 'rollback', 'backup', 'restore', 'recover', 'status')]
+    [ValidateSet('deploy', 'rollback', 'backup', 'restore', 'recover', 'status', 'monitoreo')]
     [string]$Playbook,
+    [ValidateSet('staging', 'produccion')][string]$Entorno = 'produccion',
     [string]$Version,
-    [string]$Registry = 'localhost:5000',
+    [string]$Distro = 'Ubuntu-24.04',
     [string[]]$ExtraVars = @()
 )
 
-$ErrorActionPreference = 'Stop'
-$backups = Join-Path $PSScriptRoot 'backups'
-New-Item -ItemType Directory -Force $backups | Out-Null
+$env:WSL_UTF8 = '1'
+$repo = (wsl -d $Distro -u root -- wslpath -a "$PSScriptRoot").Trim()
 
-$opsVersion = $Version
-if (-not $opsVersion) {
-    $opsVersion = (docker run --rm -v controlvet_ops:/opt/controlvet alpine:3.20 cat /opt/controlvet/releases/current 2>$null)
-    if (-not $opsVersion) { throw 'No hay versión desplegada registrada; indique -Version.' }
-    $opsVersion = $opsVersion.Trim()
-}
+$vars = "-e cv_entorno=$Entorno"
+if ($Version) { $vars += " -e cv_version=$Version" }
+foreach ($v in $ExtraVars) { $vars += " -e $v" }
 
-$vars = @('-e', 'cv_backup_dir=/backups', '-e', "cv_registry=$Registry")
-if ($Version) { $vars += @('-e', "cv_version=$Version") }
-foreach ($v in $ExtraVars) { $vars += @('-e', $v) }
-
-# Ansible escribe avisos en stderr: no deben interrumpir el script.
-$ErrorActionPreference = 'Continue'
-docker run --rm `
-    -v /var/run/docker.sock:/var/run/docker.sock `
-    -v controlvet_ops:/opt/controlvet `
-    -v "${backups}:/backups" `
-    "$Registry/controlvet/ops:$opsVersion" `
-    ansible-playbook "playbooks/$Playbook.yml" @vars
+wsl -d $Distro -u root -- bash -lc "cd '$repo/infra/ansible' && ansible-playbook -i inventarios/local.yml playbooks/$Playbook.yml $vars"
 exit $LASTEXITCODE

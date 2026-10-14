@@ -1,24 +1,29 @@
-# Estado operativo: versión, contenedores, salud y últimos eventos.
-#   ansible-playbook playbooks/status.yml
+# Estado operativo de un entorno: versión activa, salud de los servicios e historial.
+#   ansible-playbook -i inventarios/local.yml playbooks/status.yml -e cv_entorno=produccion
 - name: Estado de ControlVet
-  hosts: docker_hosts
+  hosts: windows_xampp
   gather_facts: false
   tasks:
-    - name: Versión desplegada
-      ansible.builtin.command: cat {{ cv_ops_dir }}/releases/current
+    - name: Fijar datos del entorno
+      ansible.builtin.set_fact:
+        cv_url: "{{ cv_url_base }}/{{ cv_entornos[cv_entorno].ruta }}"
+        cv_estado_dir: "{{ cv_estado }}/{{ cv_entorno }}"
+
+    - name: Versión activa
+      ansible.builtin.command: cat {{ cv_estado_dir }}/current
       register: actual
       changed_when: false
       failed_when: false
 
-    - name: Contenedores del proyecto
-      ansible.builtin.command: >-
-        docker ps -a --filter label=com.docker.compose.project={{ cv_project }}
-        --format '{{ "{{" }}.Names{{ "}}" }}  {{ "{{" }}.Image{{ "}}" }}  {{ "{{" }}.Status{{ "}}" }}'
-      register: ps
+    - name: Salud de los microservicios
+      ansible.builtin.command: "{{ cv_curl }} -s --max-time 10 {{ cv_url }}/api/{{ item }}/health"
+      register: salud
       changed_when: false
+      failed_when: false
+      loop: "{{ cv_servicios }}"
 
-    - name: Últimos eventos de operación
-      ansible.builtin.command: tail -n 10 {{ cv_ops_dir }}/releases/history.log
+    - name: Últimos eventos
+      ansible.builtin.command: tail -n 10 {{ cv_estado_dir }}/history.log
       register: historial
       changed_when: false
       failed_when: false
@@ -26,6 +31,6 @@
     - name: Resumen
       ansible.builtin.debug:
         msg:
-          - "Versión actual: {{ actual.stdout | default('ninguna', true) }}"
-          - "{{ ps.stdout_lines }}"
+          - "Entorno {{ cv_entorno }} · URL {{ cv_url }} · versión {{ actual.stdout | default('ninguna', true) }}"
+          - "{{ salud.results | map(attribute='item') | zip(salud.results | map(attribute='stdout')) | map('join', ' -> ') | list }}"
           - "{{ historial.stdout_lines }}"

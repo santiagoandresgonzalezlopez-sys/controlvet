@@ -1,0 +1,11 @@
+# Inventario LOCAL. El controlador Ansible corre en WSL2 (Ubuntu 24.04) del
+# mismo equipo y administra Windows/XAMPP mediante la interoperabilidad de
+# WSL: rutas /mnt/c y ejecutables de Windows (php.exe, curl.exe, cmd.exe).
+# Ansible no se ejecuta de forma nativa en Windows.
+all:
+  children:
+    windows_xampp:
+      hosts:
+        equipo-local:
+          ansible_connection: local
+          ansible_python_interpreter: /usr/bin/python3

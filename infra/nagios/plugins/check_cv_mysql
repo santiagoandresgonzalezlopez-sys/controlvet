@@ -1,10 +1,23 @@
 #!/bin/sh
-# Comprueba la conexión a MariaDB con el usuario de monitoreo nagios_mon
-# (privilegio USAGE: puede conectarse pero no leer datos). La clave la genera
-# Ansible en el volumen de operación, montado en solo lectura.
-CNF=/opt/controlvet/monitor/mysql.pass
+# Plugin de Nagios: conexión a la instancia MariaDB de ControlVet.
+# La instancia escucha solo en 127.0.0.1 de Windows, así que se usa
+# mysqladmin.exe de XAMPP mediante la interoperabilidad de WSL, con el
+# usuario nagios_mon (privilegio USAGE: conectarse, sin acceso a datos).
+CNF=/etc/nagios4/controlvet/monitor.cnf
+MYSQLADMIN=/mnt/c/xampp/mysql/bin/mysqladmin.exe
+
 if [ ! -r "$CNF" ]; then
-    echo "UNKNOWN - no se encuentra la clave de monitoreo ($CNF). Ejecute el despliegue con Ansible."
+    echo "UNKNOWN - falta $CNF (ejecute playbooks/monitoreo.yml)"
     exit 3
 fi
-exec /opt/nagios/libexec/check_mysql -H "$1" -u nagios_mon -p "$(cat "$CNF")"
+CNF_WIN=$(wslpath -w "$CNF")
+INICIO=$(date +%s%N)
+SALIDA=$("$MYSQLADMIN" --defaults-extra-file="$CNF_WIN" ping 2>&1 | tr -d '\r')
+MS=$(( ($(date +%s%N) - INICIO) / 1000000 ))
+
+if echo "$SALIDA" | grep -q "is alive"; then
+    echo "MYSQL OK - MariaDB de ControlVet responde ($MS ms) | tiempo=${MS}ms"
+    exit 0
+fi
+echo "MYSQL CRITICAL - sin conexion a MariaDB de ControlVet: $SALIDA"
+exit 2

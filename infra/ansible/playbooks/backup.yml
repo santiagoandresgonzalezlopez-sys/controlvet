@@ -1,39 +1,66 @@
-# Respaldo lógico de los esquemas de todos los microservicios.
-#   ansible-playbook playbooks/backup.yml [-e cv_backup_dir=/backups]
-- name: Respaldar las bases de datos de ControlVet
-  hosts: docker_hosts
+# Respaldo lógico consistente de los esquemas de un entorno.
+#   ansible-playbook -i inventarios/local.yml playbooks/backup.yml -e cv_entorno=produccion
+- name: Respaldar ControlVet
+  hosts: windows_xampp
   gather_facts: true
-  vars:
-    archivo: "{{ cv_backup_dir }}/controlvet-{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}.sql.gz"
   tasks:
-    - name: Crear el directorio de respaldos
-      ansible.builtin.file:
-        path: "{{ cv_backup_dir }}"
-        state: directory
-        mode: "0750"
+    - name: Preparación y verificaciones del equipo
+      ansible.builtin.include_tasks: tasks/preparar.yml
 
-    - name: Generar volcado consistente (mariadb-dump --single-transaction)
+    - name: Datos del respaldo
+      ansible.builtin.set_fact:
+        esquemas: "{{ cv_servicios | map('regex_replace', '^', ent.prefijo) | list }}"
+        archivo: "{{ cv_respaldos }}/{{ cv_entorno }}-{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}.sql.gz"
+
+    - name: Leer la clave root de la instancia (fuera de htdocs)
+      ansible.builtin.slurp:
+        src: "{{ cv_secretos }}/bd-root.env"
+      register: root_env
+      no_log: true
+
+    # Archivo de opciones con la clave: no aparece en la línea de comandos ni en el log.
+    - name: Crear archivo de opciones temporal para mysqldump
+      ansible.builtin.copy:
+        dest: "{{ cv_secretos }}/respaldo.cnf"
+        content: |
+          [client]
+          user=root
+          password={{ (root_env.content | b64decode).splitlines() | select('match', '^DB_ROOT_PASSWORD=') | first | regex_replace('^DB_ROOT_PASSWORD=', '') }}
+          host=127.0.0.1
+          port={{ cv_db_puerto }}
+        mode: "0600"
+      no_log: true
+
+    - name: Ruta Windows del archivo de opciones
+      ansible.builtin.command: wslpath -w {{ cv_secretos }}/respaldo.cnf
+      register: cnf_win
+      changed_when: false
+
+    - name: Volcado consistente (mysqldump --single-transaction) comprimido
       ansible.builtin.shell: >-
         set -o pipefail &&
-        docker exec {{ cv_project }}-db-1 sh -c
-        'exec mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" --single-transaction --routines --triggers
-        --databases {{ cv_esquemas | join(" ") }}'
-        | gzip -9 > {{ archivo }}
+        {{ cv_mysqldump }} --defaults-extra-file="{{ cnf_win.stdout }}" --single-transaction --routines --triggers
+        --databases {{ esquemas | join(' ') }} | gzip -9 > {{ archivo }}
       args:
         executable: /bin/bash
       changed_when: true
+
+    - name: Eliminar el archivo de opciones temporal
+      ansible.builtin.file:
+        path: "{{ cv_secretos }}/respaldo.cnf"
+        state: absent
 
     - name: Validar que el respaldo contiene todos los esquemas
       ansible.builtin.shell: set -o pipefail && gunzip -c {{ archivo }} | grep -c '^CREATE DATABASE'
       args:
         executable: /bin/bash
-      register: esquemas
+      register: conteo
       changed_when: false
-      failed_when: esquemas.stdout | int != cv_esquemas | length
+      failed_when: conteo.stdout | int != esquemas | length
 
-    - name: Aplicar retención (conservar los {{ cv_backup_retention }} más recientes)
+    - name: Retención (conservar los {{ cv_respaldo_retencion }} más recientes del entorno)
       ansible.builtin.shell: >-
-        ls -1t {{ cv_backup_dir }}/controlvet-*.sql.gz | tail -n +{{ cv_backup_retention + 1 }} | xargs -r rm -v
+        ls -1t {{ cv_respaldos }}/{{ cv_entorno }}-*.sql.gz | tail -n +{{ cv_respaldo_retencion + 1 }} | xargs -r rm -v
       register: retencion
       changed_when: retencion.stdout | length > 0
 
@@ -44,11 +71,11 @@
 
     - name: Resultado
       ansible.builtin.debug:
-        msg: "Respaldo {{ archivo }} ({{ info.stat.size }} bytes, {{ esquemas.stdout }} esquemas)"
+        msg: "Respaldo {{ archivo }} ({{ info.stat.size }} bytes, {{ conteo.stdout }} esquemas)"
 
-    - name: Anotar en el historial de operación
+    - name: Historial
       ansible.builtin.lineinfile:
-        path: "{{ cv_ops_dir }}/releases/history.log"
-        line: "{{ ansible_date_time.iso8601 }} BACKUP {{ archivo | basename }} ({{ info.stat.size }} bytes)"
+        path: "{{ cv_estado_dir }}/history.log"
+        line: "{{ ansible_date_time.iso8601 }} BACKUP {{ cv_entorno }} {{ archivo | basename }} ({{ info.stat.size }} bytes)"
         create: true
-        mode: "0640"
+        mode: "0644"

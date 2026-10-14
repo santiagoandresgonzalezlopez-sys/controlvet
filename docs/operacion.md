@@ -1,58 +1,55 @@
-# OPERATE · Runbook de operación con Ansible
+# OPERATE · Runbook de operación con Ansible (sin contenedores)
 
 > Página de Confluence: **ControlVet › Operate › Runbook**. Responsable: Santiago Gonzalez (suplente: Sebastian Gomez).
 
-## Cómo se ejecuta Ansible en este equipo
+## Componentes del entorno
 
-El equipo es Windows 11 + Docker Desktop. **Ansible no se ejecuta de forma nativa en Windows** y no hay una distribución WSL con Ansible instalada. Por eso el controlador Ansible corre en la imagen Linux `controlvet/ops` (Alpine + ansible-core 2.17 + docker CLI), que:
+| Componente | Dónde corre | Cómo se inicia |
+|---|---|---|
+| Frontend y 6 microservicios | Apache de XAMPP (Windows), puerto 80 | Panel de XAMPP o `recover.yml` |
+| MariaDB de ControlVet | Binarios de XAMPP, `127.0.0.1:3307`, datos en `C:\xampp\controlvet-db` | `.\infra\xampp\bd.ps1 iniciar` |
+| Jenkins (Release) | Java 21 portable en `C:\jenkins`, `http://localhost:8091` | `.\infra\jenkins\iniciar.ps1` |
+| Ansible (Operate) y Nagios (Monitor) | WSL2 Ubuntu 24.04 | `.\infra\wsl\iniciar.ps1` |
 
-- se construye y publica en cada release (`localhost:5000/controlvet/ops:<versión>`),
-- administra el motor Docker del equipo por `/var/run/docker.sock` (inventario `local`, conexión `local`),
-- guarda su estado en el volumen `controlvet_ops` (`/opt/controlvet`): secretos (0600), `controlvet.env`, versión actual/anterior, historial y respaldos.
+**Ansible no se ejecuta de forma nativa en Windows.** Corre en WSL2 y administra Windows/XAMPP mediante la interoperabilidad de WSL: rutas `/mnt/c/...` y ejecutables de Windows (`php.exe`, `curl.exe`, `cmd.exe`, `mysqldump.exe`). Los procesos de Windows (MariaDB, Apache, Jenkins) se inician **desacoplados** (WMI), porque un cierre brusco daña las tablas Aria de MariaDB.
 
-El inventario `inventories/lab` deja preparado el uso contra una VM Linux por SSH (**planificado, no ejecutado**).
+Preparación inicial de WSL (una vez): `wsl -d Ubuntu-24.04 -u root -- bash /mnt/c/xampp/htdocs/controlvet/infra/wsl/preparar.sh`.
 
-## Ejecución manual
+## Ejecución
 
-```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v controlvet_ops:/opt/controlvet localhost:5000/controlvet/ops:<versión> ansible-playbook playbooks/<playbook>.yml [-e var=valor]
-```
-
-Para dejar los respaldos en la carpeta `backups/` del proyecto se añade `-v "$PWD/backups:/backups"` y `-e cv_backup_dir=/backups`.
+Desde Windows: `.\ops.ps1 <playbook> -Entorno staging|produccion [-Version X.Y.Z]`.
 
 | Playbook | Para qué | Variables |
 |---|---|---|
-| `site.yml` | Verificar Docker/Compose, crear `/opt/controlvet`, generar secretos persistentes y `controlvet.env` | — |
-| `deploy.yml` | Desplegar una versión publicada; verifica contenedores healthy, `/health` (con BD) y versión; **rollback automático** si falla | `cv_version` (obligatoria) |
-| `rollback.yml` | Volver a la versión anterior (o a una concreta) y verificar | `cv_version` (opcional) |
-| `backup.yml` | Volcado consistente de los 6 esquemas, comprimido, con validación y retención (7) | `cv_backup_dir` |
-| `restore.yml` | Detener servicios, restaurar un volcado, reiniciar y verificar | `archivo` (opcional: el más reciente) |
-| `recover.yml` | Detectar contenedores detenidos o *unhealthy*, reiniciarlos y verificar | — |
-| `status.yml` | Versión, contenedores e historial de operación | — |
+| `deploy.yml` | Verifica SHA-256 del artefacto, lo extrae en `C:\controlvet\releases\<entorno>\<versión>`, configura esquemas y usuarios, **cambia el enlace** `htdocs\cv` (o `cv-staging`), verifica `/health` de los 6 servicios (versión y BD), frontend y login. **Rollback automático** si falla | `cv_entorno`, `cv_version` |
+| `rollback.yml` | Reactiva la versión anterior (o `cv_destino`) y la verifica | `cv_entorno`, `cv_destino` opcional |
+| `backup.yml` | `mysqldump --single-transaction` de los 6 esquemas del entorno, comprimido, validado, con retención de 7 | `cv_entorno` |
+| `restore.yml` | Restaura un respaldo (por defecto el último) y verifica | `cv_entorno`, `archivo` opcional |
+| `recover.yml` | Diagnostica Apache, MariaDB y cada servicio; reinicia lo caído y verifica | `cv_entorno` |
+| `status.yml` | Versión activa, salud de cada servicio e historial | `cv_entorno` |
+| `monitoreo.yml` | Instala y configura Nagios en WSL y valida su configuración | — |
 
-Todos registran sus acciones en `/opt/controlvet/releases/history.log` y Ansible en `/opt/controlvet/logs/ansible.log`.
+Estado operativo: `C:\controlvet\estado\<entorno>\` (`current`, `previous`, `history.log`). Artefactos: `C:\controlvet\artefactos\<versión>\` (`ESTADO` = candidato/publicado). Respaldos: `C:\controlvet\respaldos\`.
 
 ## Procedimientos
 
-### Despliegue normal
-Lo ejecuta Jenkins en la etapa *Deploy* con la imagen `ops` de la misma versión. Resultado esperado: `failed=0` y la línea `DEPLOY <versión> OK` en el historial.
+### Despliegue
+Lo ejecuta Jenkins: staging con datos reiniciados → pruebas e2e → promoción → producción. Manual: `.\ops.ps1 deploy -Entorno produccion -Version 1.1.N`.
 
 ### Reversión
-1. `ansible-playbook playbooks/rollback.yml` (anterior) o `-e cv_version=1.1.N`.
-2. Comprobar en Nagios que todos los servicios vuelven a OK.
+1. `.\ops.ps1 rollback -Entorno produccion` (o `-ExtraVars cv_destino=1.1.N`).
+2. Confirmar en Nagios que todos los servicios vuelven a OK.
 3. Registrar el motivo en Jira (incidencia tipo Bug).
 
 ### Respaldo y recuperación de datos
-1. Respaldo diario: `backup.yml` (se puede programar en el Programador de tareas de Windows con el comando `docker run` anterior).
-2. Restauración: `restore.yml -e archivo=/opt/controlvet/backups/<archivo>.sql.gz`. Los servicios se detienen durante la restauración para evitar escrituras.
+1. `.\ops.ps1 backup -Entorno produccion` (programable con el Programador de tareas de Windows).
+2. `.\ops.ps1 restore -Entorno produccion [-ExtraVars archivo=/mnt/c/controlvet/respaldos/<archivo>]`.
 
-### Reinicio y recuperación de servicios (respuesta a alertas)
+### Respuesta a alertas (reinicio y recuperación)
 1. Nagios registra `PROBLEM` (ver `docs/monitoreo.md`).
-2. Ejecutar `recover.yml`: identifica los contenedores afectados, los reinicia y verifica salud y dependencias.
-3. Confirmar el `RECOVERY` en Nagios y registrar la acción correctiva.
+2. `.\ops.ps1 recover -Entorno produccion`: detecta si cayó Apache o la base de datos, la reinicia y verifica salud y dependencias.
+3. Confirmar el `RECOVERY` en Nagios y registrar la acción en Jira.
 
 ## Secretos
 
-- Se generan una sola vez con `lookup('password')` en `/opt/controlvet/secrets` (aleatorios, 28–48 caracteres) y nunca se versionan.
-- El `.env` de la raíz del repositorio es solo para desarrollo manual (`docker compose up`); el entorno gestionado por Ansible usa `/opt/controlvet/controlvet.env`.
-- Si el volumen de datos se creó con otros secretos, los usuarios de BD no coincidirán: en ese caso respaldar, recrear el volumen y restaurar.
+Todos fuera del repositorio y de htdocs, en `C:\xampp\controlvet-secretos`: `bd-root.env` (root de la instancia), `entorno-<prefijo>.php` (claves de BD y JWT de cada entorno, compartidas por todas sus versiones para permitir el rollback), `monitor.env` (usuario `nagios_mon`, solo USAGE), `jenkins.env` y `nagios_admin`. La configuración generada en cada versión (`config/servicio.php`) es PHP: aunque se solicite por URL no muestra su contenido y además el `.htaccess` responde 403.

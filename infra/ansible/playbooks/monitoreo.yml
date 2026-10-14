@@ -1,0 +1,192 @@
+# Instala y configura Nagios 4 en WSL2 (Ubuntu) para supervisar ControlVet.
+#   ansible-playbook -i inventarios/local.yml playbooks/monitoreo.yml [-e cv_entorno=produccion]
+- name: Configurar la supervisión de ControlVet con Nagios
+  hosts: windows_xampp
+  gather_facts: true
+  vars:
+    cv_entorno: produccion
+    nagios_dir: /etc/nagios4/conf.d/controlvet
+    repo_nagios: "{{ playbook_dir }}/../../nagios"
+  tasks:
+    - name: Paquetes de Nagios, plugins estándar y Apache (WSL)
+      ansible.builtin.apt:
+        name: [nagios4, monitoring-plugins, apache2, apache2-utils]
+        state: present
+        update_cache: true
+        cache_valid_time: 86400
+
+    - name: IP de Windows vista desde WSL (puerta de enlace por defecto)
+      ansible.builtin.shell: ip route show default | awk '{print $3; exit}'
+      register: windows_ip
+      changed_when: false
+
+    - name: Directorios de configuración de ControlVet
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: root
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "{{ nagios_dir }}", group: root, mode: "0755" }
+        - { path: /etc/nagios4/controlvet, group: nagios, mode: "0750" }
+        - { path: /usr/local/lib/controlvet-nagios, group: root, mode: "0755" }
+
+    - name: Comandos y contactos de ControlVet
+      ansible.builtin.copy:
+        src: "{{ repo_nagios }}/controlvet/{{ item }}"
+        dest: "{{ nagios_dir }}/{{ item }}"
+        mode: "0644"
+      loop: [commands.cfg, contacts.cfg]
+      notify: Reiniciar nagios
+
+    - name: Hosts y servicios supervisados (entorno {{ cv_entorno }})
+      ansible.builtin.template:
+        src: "{{ repo_nagios }}/controlvet/controlvet.cfg.j2"
+        dest: "{{ nagios_dir }}/controlvet.cfg"
+        mode: "0644"
+      vars:
+        ruta: "{{ cv_entornos[cv_entorno].ruta }}"
+        windows_ip: "{{ windows_ip.stdout }}"
+        servicios: "{{ cv_servicios }}"
+        db_puerto: "{{ cv_db_puerto }}"
+      notify: Reiniciar nagios
+
+    - name: Plugin de conexión a MariaDB
+      ansible.builtin.copy:
+        src: "{{ repo_nagios }}/plugins/check_cv_mysql"
+        dest: /usr/local/lib/controlvet-nagios/check_cv_mysql
+        mode: "0755"
+
+    - name: Leer la clave del usuario de monitoreo (generada por instalar.php, fuera de htdocs)
+      ansible.builtin.slurp:
+        src: "{{ cv_secretos }}/monitor.env"
+      register: monitor_env
+      no_log: true
+
+    # Solo el grupo nagios puede leerla; nagios_mon solo tiene privilegio USAGE.
+    - name: Archivo de opciones del cliente MySQL para Nagios
+      ansible.builtin.copy:
+        dest: /etc/nagios4/controlvet/monitor.cnf
+        content: |
+          [client]
+          user=nagios_mon
+          password={{ (monitor_env.content | b64decode).splitlines() | select('match', '^MONITOR_DB_PASSWORD=') | first | regex_replace('^MONITOR_DB_PASSWORD=', '') }}
+          host=127.0.0.1
+          port={{ cv_db_puerto }}
+        owner: root
+        group: nagios
+        mode: "0640"
+      no_log: true
+
+    - name: Registro de alertas de ControlVet
+      ansible.builtin.file:
+        path: /var/log/nagios4/controlvet-alertas.log
+        state: touch
+        owner: nagios
+        group: nagios
+        mode: "0644"
+        modification_time: preserve
+        access_time: preserve
+
+    - name: Clave del administrador web de Nagios (persistente, fuera del repositorio)
+      ansible.builtin.set_fact:
+        nagios_clave: "{{ lookup('ansible.builtin.password', cv_secretos ~ '/nagios_admin', length=20, chars=['ascii_letters', 'digits']) }}"
+      no_log: true
+
+    - name: Usuario nagiosadmin para la interfaz web
+      ansible.builtin.command: htpasswd -bc /etc/nagios4/htpasswd.users nagiosadmin {{ nagios_clave }}
+      changed_when: true
+      no_log: true
+
+    - name: Permisos del archivo de usuarios web
+      ansible.builtin.file:
+        path: /etc/nagios4/htpasswd.users
+        owner: root
+        group: www-data
+        mode: "0640"
+
+    - name: Interfaz web de Nagios con autenticación básica
+      ansible.builtin.copy:
+        dest: /etc/apache2/conf-available/nagios4-cgi.conf
+        content: |
+          # ControlVet: interfaz de Nagios protegida con usuario y clave.
+          ScriptAlias /cgi-bin/nagios4 /usr/lib/cgi-bin/nagios4
+          ScriptAlias /nagios4/cgi-bin /usr/lib/cgi-bin/nagios4
+          Alias /nagios4/stylesheets /etc/nagios4/stylesheets
+          Alias /nagios4 /usr/share/nagios4/htdocs
+          <DirectoryMatch (/usr/share/nagios4/htdocs|/usr/lib/cgi-bin/nagios4|/etc/nagios4/stylesheets)>
+              Options FollowSymLinks
+              DirectoryIndex index.php index.html
+              AllowOverride None
+              AuthName "Nagios ControlVet"
+              AuthType Basic
+              AuthUserFile /etc/nagios4/htpasswd.users
+              Require valid-user
+          </DirectoryMatch>
+          <Directory /usr/share/nagios4/htdocs>
+              Options +ExecCGI
+          </Directory>
+        mode: "0644"
+      notify: Reiniciar apache
+
+    - name: Activar módulos de Apache necesarios
+      ansible.builtin.command: a2enmod cgi auth_basic authn_file
+      register: a2enmod
+      changed_when: "'Enabling' in a2enmod.stdout"
+      notify: Reiniciar apache
+
+    - name: Activar la configuración de Nagios en Apache
+      ansible.builtin.command: a2enconf nagios4-cgi
+      register: a2enconf
+      changed_when: "'Enabling' in a2enconf.stdout"
+      notify: Reiniciar apache
+
+    # El puerto 80 lo usa XAMPP en Windows: Apache de WSL atiende en 8092.
+    - name: Apache de WSL en el puerto 8092
+      ansible.builtin.copy:
+        dest: /etc/apache2/ports.conf
+        content: "Listen 8092\n"
+        mode: "0644"
+      notify: Reiniciar apache
+
+    - name: Sitio por defecto en 8092
+      ansible.builtin.replace:
+        path: /etc/apache2/sites-available/000-default.conf
+        regexp: '<VirtualHost \*:80>'
+        replace: '<VirtualHost *:8092>'
+      notify: Reiniciar apache
+
+    - name: Usar la autenticación de Apache en los CGI de Nagios
+      ansible.builtin.lineinfile:
+        path: /etc/nagios4/cgi.cfg
+        regexp: '^use_authentication='
+        line: use_authentication=1
+      notify: Reiniciar nagios
+
+    - name: Validar la configuración de Nagios (nagios4 -v)
+      ansible.builtin.command: nagios4 -v /etc/nagios4/nagios.cfg
+      register: validacion
+      changed_when: false
+
+    - name: Resultado de la validación
+      ansible.builtin.debug:
+        msg: "{{ validacion.stdout_lines | select('search', 'Total|Things look okay') | list }}"
+
+    - name: Servicios habilitados al arrancar WSL
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      loop: [nagios4, apache2]
+
+  handlers:
+    - name: Reiniciar nagios
+      ansible.builtin.service:
+        name: nagios4
+        state: restarted
+
+    - name: Reiniciar apache
+      ansible.builtin.service:
+        name: apache2
+        state: restarted

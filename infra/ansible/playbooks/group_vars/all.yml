@@ -1,17 +1,38 @@
-# Variables comunes de operación de ControlVet.
-cv_project: controlvet
-cv_registry: localhost:5000
-cv_ops_dir: /opt/controlvet
-cv_compose_file: /ops/app/compose.yaml
-cv_env_file: "{{ cv_ops_dir }}/controlvet.env"
-cv_backup_dir: "{{ cv_ops_dir }}/backups"
-cv_backup_retention: 7
-cv_wait_timeout: 180
-cv_nagios_gid: "101"   # grupo nagios dentro de la imagen de Nagios
+# Variables de operación de ControlVet (XAMPP + WSL, sin contenedores).
 
-cv_app_env: prod
-cv_web_port: 8090
+# Ejecutables de Windows invocados desde WSL (interoperabilidad).
+cv_cmd: /mnt/c/Windows/System32/cmd.exe
+cv_curl: /mnt/c/Windows/System32/curl.exe
+cv_powershell: /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+cv_php: /mnt/c/xampp/php/php.exe
+cv_mysqldump: /mnt/c/xampp/mysql/bin/mysqldump.exe
+cv_mysql: /mnt/c/xampp/mysql/bin/mysql.exe
+
+# Rutas (vista WSL). Todo queda fuera del proyecto y de htdocs salvo los enlaces.
+cv_raiz: /mnt/c/controlvet
+cv_artefactos: "{{ cv_raiz }}/artefactos"
+cv_releases: "{{ cv_raiz }}/releases"
+cv_estado: "{{ cv_raiz }}/estado"
+cv_respaldos: "{{ cv_raiz }}/respaldos"
+cv_htdocs: /mnt/c/xampp/htdocs
+cv_secretos: /mnt/c/xampp/controlvet-secretos
+cv_bd_script: /mnt/c/xampp/htdocs/controlvet/infra/xampp/bd.ps1
+
+cv_url_base: http://localhost
+cv_db_puerto: 3307
+cv_respaldo_retencion: 7
 
 cv_servicios: [auth, pacientes, citas, clinica, inventario, documentos]
-cv_contenedores: "{{ ['db'] + cv_servicios + ['web'] }}"
-cv_esquemas: "{{ cv_servicios | map('regex_replace', '^', 'cv_') | list }}"
+
+# Entornos: misma instancia MariaDB, esquemas separados por prefijo.
+cv_entornos:
+  staging:
+    prefijo: cvstg_
+    ruta: cv-staging
+    app_env: prod
+    reiniciar_datos: true      # datos semilla limpios en cada build de Jenkins
+  produccion:
+    prefijo: cvprod_
+    ruta: cv
+    app_env: prod
+    reiniciar_datos: false

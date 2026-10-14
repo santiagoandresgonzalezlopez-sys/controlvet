@@ -2,8 +2,7 @@ configuration-as-code
 job-dsl
 workflow-aggregator
 git
-docker-workflow
 pipeline-stage-view
 junit
 timestamper
-htmlpublisher
+powershell

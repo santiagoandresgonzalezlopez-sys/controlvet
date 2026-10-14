@@ -32,9 +32,20 @@ final class AislamientoBaseDatosTest extends TestCase
             self::markTestSkipped('Credenciales de base de datos no disponibles en este entorno.');
         }
         $dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', getenv('DB_HOST') ?: '127.0.0.1', getenv('DB_PORT') ?: '3307');
-        return new PDO($dsn, "{$servicio}_svc", $pass, [
+        return new PDO($dsn, self::usuario($servicio), $pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]);
+    }
+
+    /** Esquema del servicio en el entorno probado (cv_, cvstg_, cvprod_...). */
+    private static function esquema(string $servicio): string
+    {
+        return getenv(strtoupper($servicio) . '_DB_NAME') ?: "cv_$servicio";
+    }
+
+    private static function usuario(string $servicio): string
+    {
+        return getenv(strtoupper($servicio) . '_DB_USER') ?: "{$servicio}_svc";
     }
 
     public static function servicios(): array
@@ -47,7 +58,7 @@ final class AislamientoBaseDatosTest extends TestCase
     {
         $pdo = self::conectar($servicio);
 
-        $propio = (int)$pdo->query("SELECT COUNT(*) FROM cv_{$servicio}." . self::TABLAS[$servicio])->fetchColumn();
+        $propio = (int)$pdo->query('SELECT COUNT(*) FROM ' . self::esquema($servicio) . '.' . self::TABLAS[$servicio])->fetchColumn();
         self::assertGreaterThanOrEqual(0, $propio);
 
         foreach (self::TABLAS as $otro => $tabla) {
@@ -55,8 +66,8 @@ final class AislamientoBaseDatosTest extends TestCase
                 continue;
             }
             try {
-                $pdo->query("SELECT COUNT(*) FROM cv_{$otro}.{$tabla}");
-                self::fail("{$servicio}_svc pudo leer cv_{$otro}.{$tabla}");
+                $pdo->query('SELECT COUNT(*) FROM ' . self::esquema($otro) . ".$tabla");
+                self::fail(self::usuario($servicio) . ' pudo leer ' . self::esquema($otro) . ".$tabla");
             } catch (PDOException $e) {
                 self::assertContains((int)($e->errorInfo[1] ?? 0), [1142, 1044], $e->getMessage());
             }
@@ -66,12 +77,12 @@ final class AislamientoBaseDatosTest extends TestCase
     public function testUsuariosDeServicioNoPuedenAlterarEsquema(): void
     {
         $this->expectException(PDOException::class);
-        self::conectar('inventario')->exec('DROP TABLE cv_inventario.productos');
+        self::conectar('inventario')->exec('DROP TABLE ' . self::esquema('inventario') . '.productos');
     }
 
     public function testHistoriaClinicaSeAlmacenaConCopiaDelPropietario(): void
     {
-        $row = self::conectar('clinica')->query('SELECT mascota_id, propietario_id FROM cv_clinica.historias_clinicas WHERE id = 1')->fetch(PDO::FETCH_ASSOC);
+        $row = self::conectar('clinica')->query('SELECT mascota_id, propietario_id FROM ' . self::esquema('clinica') . '.historias_clinicas WHERE id = 1')->fetch(PDO::FETCH_ASSOC);
         self::assertSame(['mascota_id' => 4, 'propietario_id' => 3], array_map('intval', $row));
     }
 }
