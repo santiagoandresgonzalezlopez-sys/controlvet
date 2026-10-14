@@ -115,7 +115,7 @@ pipeline {
                 script { ansible('deploy.yml', "-e cv_entorno=staging -e cv_version=${env.CV_VERSION}") }
                 powershell '''
                     .\\tests\\e2e\\ejecutar.ps1 -BaseUrl http://localhost/cv-staging -Raiz "C:\\controlvet\\releases\\staging\\$env:CV_VERSION" -Junit "$env:WORKSPACE\\reports\\junit-e2e.xml" |
-                        Tee-Object reports\\e2e.txt
+                        Tee-Object "$env:WORKSPACE\\reports\\e2e.txt"
                     if ($LASTEXITCODE -ne 0) { throw 'Pruebas de integración/regresión fallidas en staging' }
                 '''
             }
