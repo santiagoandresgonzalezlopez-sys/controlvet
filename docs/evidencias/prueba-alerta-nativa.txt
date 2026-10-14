@@ -1,0 +1,37 @@
+FALLO INYECTADO 2026-10-14T23:22:28Z: infra\xampp\bd.ps1 detener (instancia MariaDB de ControlVet)
+ACCION CORRECTIVA 2026-10-14T23:24:12Z: .\ops.ps1 recover -Entorno produccion
+RECUPERACION CONFIRMADA 2026-10-14T23:25:12Z
+Wed Oct 14 18:23:38 -05 2026 | HOST | PROBLEM | mariadb-controlvet | - | DOWN | MYSQL CRITICAL - sin conexion a MariaDB de ControlVet: mysqladmin.exe: connect to server at 127.0.0.1 failed | contacto=santiago.gonzalez
+Wed Oct 14 18:23:38 -05 2026 | HOST | PROBLEM | mariadb-controlvet | - | DOWN | MYSQL CRITICAL - sin conexion a MariaDB de ControlVet: mysqladmin.exe: connect to server at 127.0.0.1 failed | contacto=sebastian.gomez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API documentos | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API clinica | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API clinica | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API citas | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API citas | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API documentos | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API auth | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API inventario | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API auth | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:23:40 -05 2026 | SERVICE | PROBLEM | xampp-apache | API inventario | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:23:54 -05 2026 | SERVICE | PROBLEM | xampp-apache | Dependencias del frontend | CRITICAL | CRITICAL - Socket timeout after 10 seconds | contacto=sebastian.gomez
+Wed Oct 14 18:23:54 -05 2026 | SERVICE | PROBLEM | xampp-apache | Dependencias del frontend | CRITICAL | CRITICAL - Socket timeout after 10 seconds | contacto=santiago.gonzalez
+Wed Oct 14 18:24:18 -05 2026 | SERVICE | PROBLEM | xampp-apache | API pacientes | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:24:18 -05 2026 | SERVICE | PROBLEM | xampp-apache | API pacientes | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:24:38 -05 2026 | HOST | RECOVERY | mariadb-controlvet | - | UP | MYSQL OK - MariaDB de ControlVet responde (49 ms) | contacto=santiago.gonzalez
+Wed Oct 14 18:24:38 -05 2026 | HOST | RECOVERY | mariadb-controlvet | - | UP | MYSQL OK - MariaDB de ControlVet responde (49 ms) | contacto=sebastian.gomez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API citas | OK | HTTP OK: Status line output matched 200 - 338 bytes in 0.011 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API citas | OK | HTTP OK: Status line output matched 200 - 338 bytes in 0.011 second response time | contacto=santiago.gonzalez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API auth | OK | HTTP OK: Status line output matched 200 - 337 bytes in 0.011 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API auth | OK | HTTP OK: Status line output matched 200 - 337 bytes in 0.011 second response time | contacto=santiago.gonzalez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API clinica | OK | HTTP OK: Status line output matched 200 - 340 bytes in 0.031 second response time | contacto=santiago.gonzalez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API inventario | OK | HTTP OK: Status line output matched 200 - 343 bytes in 0.031 second response time | contacto=santiago.gonzalez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API clinica | OK | HTTP OK: Status line output matched 200 - 340 bytes in 0.031 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API inventario | OK | HTTP OK: Status line output matched 200 - 343 bytes in 0.031 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API documentos | OK | HTTP OK: Status line output matched 200 - 343 bytes in 0.033 second response time | contacto=santiago.gonzalez
+Wed Oct 14 18:24:40 -05 2026 | SERVICE | RECOVERY | xampp-apache | API documentos | OK | HTTP OK: Status line output matched 200 - 343 bytes in 0.033 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:24:55 -05 2026 | SERVICE | RECOVERY | xampp-apache | Dependencias del frontend | OK | HTTP OK: Status line output matched 200 - 444 bytes in 0.224 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:24:55 -05 2026 | SERVICE | RECOVERY | xampp-apache | Dependencias del frontend | OK | HTTP OK: Status line output matched 200 - 444 bytes in 0.224 second response time | contacto=santiago.gonzalez
+Wed Oct 14 18:24:18 -05 2026 | SERVICE | PROBLEM | xampp-apache | API pacientes | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=sebastian.gomez
+Wed Oct 14 18:24:18 -05 2026 | SERVICE | PROBLEM | xampp-apache | API pacientes | CRITICAL | HTTP CRITICAL - Invalid HTTP response received from host: HTTP/1.1 503 Service Unavailable | contacto=santiago.gonzalez
+Wed Oct 14 18:25:18 -05 2026 | SERVICE | RECOVERY | xampp-apache | API pacientes | OK | HTTP OK: Status line output matched 200 - 342 bytes in 0.012 second response time | contacto=sebastian.gomez
+Wed Oct 14 18:25:18 -05 2026 | SERVICE | RECOVERY | xampp-apache | API pacientes | OK | HTTP OK: Status line output matched 200 - 342 bytes in 0.012 second response time | contacto=santiago.gonzalez

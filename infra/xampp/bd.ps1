@@ -65,8 +65,11 @@ switch ($Accion) {
     }
     'detener' {
         $env:MYSQL_PWD = Get-RootPass
-        & "$bin\mysqladmin.exe" -uroot -h127.0.0.1 "-P$Puerto" shutdown
+        # Argumentos entre comillas: PowerShell parte "-h127.0.0.1" en el primer punto.
+        & "$bin\mysqladmin.exe" '--user=root' '--host=127.0.0.1' "--port=$Puerto" shutdown
         Remove-Item Env:MYSQL_PWD
+        for ($i = 0; $i -lt 30 -and (Test-Activa); $i++) { Start-Sleep -Milliseconds 500 }
+        if (Test-Activa) { throw "La instancia sigue activa en 127.0.0.1:$Puerto" }
         "Instancia detenida"
     }
     'estado' {

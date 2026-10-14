@@ -1,340 +1,407 @@
 ﻿
-PLAY [Revertir ControlVet a una versión anterior] ******************************
+PLAY [Revertir ControlVet] *****************************************************
 
 TASK [Gathering Facts] *********************************************************
-ok: [local]
+ok: [equipo-local]
 
-TASK [Preparación común] *******************************************************
-included: /ops/ansible/playbooks/tasks/preparar.yml for local
+TASK [Preparación y verificaciones del equipo] *********************************
+included: /mnt/c/xampp/htdocs/controlvet/infra/ansible/playbooks/tasks/preparar.yml for equipo-local
 
-TASK [Verificar que el motor Docker está disponible] ***************************
-ok: [local]
+TASK [Validar el entorno solicitado] *******************************************
+ok: [equipo-local] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
 
-TASK [Mostrar motor Docker detectado] ******************************************
-ok: [local] => 
-    msg: Docker 29.8.2 Docker Desktop (containerized)
+TASK [Fijar datos del entorno produccion] **************************************
+ok: [equipo-local]
 
-TASK [Verificar Docker Compose v2] *********************************************
-ok: [local]
+TASK [Verificar la interoperabilidad WSL -> Windows] ***************************
+ok: [equipo-local]
+
+TASK [Verificar que Apache de XAMPP responde en el puerto 80] ******************
+ok: [equipo-local]
+
+TASK [Verificar la instancia MariaDB de ControlVet (127.0.0.1:3307)] ***********
+ok: [equipo-local]
+
+TASK [Exigir la base de datos activa] ******************************************
+ok: [equipo-local] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
 
 TASK [Crear directorios de operación] ******************************************
-ok: [local] => (item={'path': '/opt/controlvet', 'mode': '0750', 'group': '101'})
-ok: [local] => (item={'path': '/opt/controlvet/secrets', 'mode': '0700'})
-ok: [local] => (item={'path': '/opt/controlvet/releases', 'mode': '0750'})
-ok: [local] => (item={'path': '/opt/controlvet/logs', 'mode': '0750'})
-ok: [local] => (item={'path': '/backups', 'mode': '0750'})
+ok: [equipo-local] => (item=/mnt/c/controlvet/artefactos)
+ok: [equipo-local] => (item=/mnt/c/controlvet/releases/produccion)
+ok: [equipo-local] => (item=/mnt/c/controlvet/estado/produccion)
+ok: [equipo-local] => (item=/mnt/c/controlvet/respaldos)
 
-TASK [Leer la versión desplegada actualmente] **********************************
-ok: [local]
+TASK [Leer la versión activa del entorno] **************************************
+ok: [equipo-local]
 
-TASK [Registrar versión actual] ************************************************
-ok: [local]
-
-TASK [Crear directorio de credenciales de monitoreo] ***************************
-ok: [local]
-
-TASK [Publicar la clave del usuario de monitoreo para Nagios] ******************
-ok: [local]
-
-TASK [Generar archivo de entorno con secretos persistentes] ********************
-changed: [local]
+TASK [Registrar la versión activa] *********************************************
+ok: [equipo-local]
 
 TASK [Leer la versión anterior registrada] *************************************
-ok: [local]
+ok: [equipo-local]
 
 TASK [Determinar la versión destino] *******************************************
-ok: [local]
+ok: [equipo-local]
 
-TASK [Validar que existe una versión destino] **********************************
-ok: [local] => 
-    changed: false
-    msg: All assertions passed
+TASK [Validar la versión destino] **********************************************
+ok: [equipo-local] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
 
-TASK [Desplegar 1.1.2] *********************************************************
-included: /ops/ansible/playbooks/tasks/compose_up.yml for local
+TASK [Comprobar que la versión destino está instalada] *************************
+ok: [equipo-local]
 
-TASK [Renderizar el entorno para la versión 1.1.2] *****************************
-changed: [local]
+TASK [Activar 1.1.8] ***********************************************************
+included: /mnt/c/xampp/htdocs/controlvet/infra/ansible/playbooks/tasks/activar.yml for equipo-local
 
-TASK [Descargar imágenes de la versión 1.1.2 desde el registro] ****************
-ok: [local]
+TASK [Ruta Windows de la versión 1.1.8] ****************************************
+ok: [equipo-local]
 
-TASK [Desplegar contenedores (docker compose up --wait)] ***********************
-changed: [local]
+TASK [Ruta Windows del enlace publicado] ***************************************
+ok: [equipo-local]
+
+TASK [Comprobar que el enlace no es un directorio real (no se borran datos)] ***
+ok: [equipo-local]
+
+TASK [Retirar el enlace anterior (solo el enlace; la versión queda intacta)] ***
+changed: [equipo-local]
+
+TASK [Apuntar /mnt/c/xampp/htdocs/cv a la versión 1.1.8] ***********************
+wsl : [DEPRECATION WARNING]: Module "ansible.builtin.command" returned non UTF-8 data
+En C:\xampp\htdocs\controlvet\ops.ps1: 36 Carácter: 1
++ wsl -d $Distro -u root -- bash -lc "cd '$repo/infra/ansible' && ansib ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([DEPRECATION WA... non UTF-8 data:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ in the JSON response. This will become an error in the future. This feature 
+will be removed in version 2.18. Deprecation warnings can be disabled by 
+setting deprecation_warnings=False in ansible.cfg.
+changed: [equipo-local]
 
 TASK [Verificar la versión restaurada] *****************************************
-included: /ops/ansible/playbooks/tasks/verificar.yml for local
-
-TASK [Esperar a que cada contenedor reporte estado healthy] ********************
-ok: [local] => (item=db)
-ok: [local] => (item=auth)
-ok: [local] => (item=pacientes)
-ok: [local] => (item=citas)
-ok: [local] => (item=clinica)
-ok: [local] => (item=inventario)
-ok: [local] => (item=documentos)
-ok: [local] => (item=web)
-
-TASK [Consultar salud agregada desde el frontend (red interna)] ****************
-ok: [local]
+included: /mnt/c/xampp/htdocs/controlvet/infra/ansible/playbooks/tasks/verificar.yml for equipo-local
 
 TASK [Consultar /health de cada microservicio] *********************************
-ok: [local] => (item=auth)
-ok: [local] => (item=pacientes)
-ok: [local] => (item=citas)
-ok: [local] => (item=clinica)
-ok: [local] => (item=inventario)
-ok: [local] => (item=documentos)
+ok: [equipo-local] => (item=auth)
+ok: [equipo-local] => (item=pacientes)
+ok: [equipo-local] => (item=citas)
+ok: [equipo-local] => (item=clinica)
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (40 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (39 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (38 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (37 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (36 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (35 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (34 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (33 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (32 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (31 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (30 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (29 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (28 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (27 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (26 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (25 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (24 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (23 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (22 retries left).
+FAILED - RETRYING: [equipo-local]: Consultar /health de cada microservicio (21 retries left).
+ok: [equipo-local] => (item=inventario)
+ok: [equipo-local] => (item=documentos)
 
-TASK [Validar estado y versión de cada microservicio] **************************
-ok: [local] => (item=auth) => 
-    ansible_loop_var: item
-    changed: false
-    item:
-        ansible_loop_var: item
-        changed: false
-        cmd:
-        - docker
-        - exec
-        - controlvet-web-1
-        - curl
-        - -fsS
-        - http://auth/health
-        delta: '0:00:00.106794'
-        end: '2026-10-14 13:01:02.534843'
-        failed: false
-        invocation:
-            module_args:
-                _raw_params: docker exec controlvet-web-1 curl -fsS http://auth/health
-                _uses_shell: false
-                argv: null
-                chdir: null
-                creates: null
-                executable: null
-                expand_argument_vars: true
-                removes: null
-                stdin: null
-                stdin_add_newline: true
-                strip_empty_ends: true
-        item: auth
-        msg: ''
-        rc: 0
-        start: '2026-10-14 13:01:02.428049'
-        stderr: ''
-        stderr_lines: []
-        stdout: '{"status":"ok","service":"auth","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
-        stdout_lines:
-        - '{"status":"ok","service":"auth","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
-    msg: auth OK · versión 1.1.2
-ok: [local] => (item=pacientes) => 
-    ansible_loop_var: item
-    changed: false
-    item:
-        ansible_loop_var: item
-        changed: false
-        cmd:
-        - docker
-        - exec
-        - controlvet-web-1
-        - curl
-        - -fsS
-        - http://pacientes/health
-        delta: '0:00:00.101587'
-        end: '2026-10-14 13:01:02.942382'
-        failed: false
-        invocation:
-            module_args:
-                _raw_params: docker exec controlvet-web-1 curl -fsS http://pacientes/health
-                _uses_shell: false
-                argv: null
-                chdir: null
-                creates: null
-                executable: null
-                expand_argument_vars: true
-                removes: null
-                stdin: null
-                stdin_add_newline: true
-                strip_empty_ends: true
-        item: pacientes
-        msg: ''
-        rc: 0
-        start: '2026-10-14 13:01:02.840795'
-        stderr: ''
-        stderr_lines: []
-        stdout: '{"status":"ok","service":"pacientes","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
-        stdout_lines:
-        - '{"status":"ok","service":"pacientes","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:02+00:00"}'
-    msg: pacientes OK · versión 1.1.2
-ok: [local] => (item=citas) => 
-    ansible_loop_var: item
-    changed: false
-    item:
-        ansible_loop_var: item
-        changed: false
-        cmd:
-        - docker
-        - exec
-        - controlvet-web-1
-        - curl
-        - -fsS
-        - http://citas/health
-        delta: '0:00:00.104628'
-        end: '2026-10-14 13:01:03.368166'
-        failed: false
-        invocation:
-            module_args:
-                _raw_params: docker exec controlvet-web-1 curl -fsS http://citas/health
-                _uses_shell: false
-                argv: null
-                chdir: null
-                creates: null
-                executable: null
-                expand_argument_vars: true
-                removes: null
-                stdin: null
-                stdin_add_newline: true
-                strip_empty_ends: true
-        item: citas
-        msg: ''
-        rc: 0
-        start: '2026-10-14 13:01:03.263538'
-        stderr: ''
-        stderr_lines: []
-        stdout: '{"status":"ok","service":"citas","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
-        stdout_lines:
-        - '{"status":"ok","service":"citas","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
-    msg: citas OK · versión 1.1.2
-ok: [local] => (item=clinica) => 
-    ansible_loop_var: item
-    changed: false
-    item:
-        ansible_loop_var: item
-        changed: false
-        cmd:
-        - docker
-        - exec
-        - controlvet-web-1
-        - curl
-        - -fsS
-        - http://clinica/health
-        delta: '0:00:00.103645'
-        end: '2026-10-14 13:01:03.771686'
-        failed: false
-        invocation:
-            module_args:
-                _raw_params: docker exec controlvet-web-1 curl -fsS http://clinica/health
-                _uses_shell: false
-                argv: null
-                chdir: null
-                creates: null
-                executable: null
-                expand_argument_vars: true
-                removes: null
-                stdin: null
-                stdin_add_newline: true
-                strip_empty_ends: true
-        item: clinica
-        msg: ''
-        rc: 0
-        start: '2026-10-14 13:01:03.668041'
-        stderr: ''
-        stderr_lines: []
-        stdout: '{"status":"ok","service":"clinica","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
-        stdout_lines:
-        - '{"status":"ok","service":"clinica","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:03+00:00"}'
-    msg: clinica OK · versión 1.1.2
-ok: [local] => (item=inventario) => 
-    ansible_loop_var: item
-    changed: false
-    item:
-        ansible_loop_var: item
-        changed: false
-        cmd:
-        - docker
-        - exec
-        - controlvet-web-1
-        - curl
-        - -fsS
-        - http://inventario/health
-        delta: '0:00:00.109034'
-        end: '2026-10-14 13:01:04.201483'
-        failed: false
-        invocation:
-            module_args:
-                _raw_params: docker exec controlvet-web-1 curl -fsS http://inventario/health
-                _uses_shell: false
-                argv: null
-                chdir: null
-                creates: null
-                executable: null
-                expand_argument_vars: true
-                removes: null
-                stdin: null
-                stdin_add_newline: true
-                strip_empty_ends: true
-        item: inventario
-        msg: ''
-        rc: 0
-        start: '2026-10-14 13:01:04.092449'
-        stderr: ''
-        stderr_lines: []
-        stdout: '{"status":"ok","service":"inventario","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
-        stdout_lines:
-        - '{"status":"ok","service":"inventario","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
-    msg: inventario OK · versión 1.1.2
-ok: [local] => (item=documentos) => 
-    ansible_loop_var: item
-    changed: false
-    item:
-        ansible_loop_var: item
-        changed: false
-        cmd:
-        - docker
-        - exec
-        - controlvet-web-1
-        - curl
-        - -fsS
-        - http://documentos/health
-        delta: '0:00:00.120575'
-        end: '2026-10-14 13:01:04.629358'
-        failed: false
-        invocation:
-            module_args:
-                _raw_params: docker exec controlvet-web-1 curl -fsS http://documentos/health
-                _uses_shell: false
-                argv: null
-                chdir: null
-                creates: null
-                executable: null
-                expand_argument_vars: true
-                removes: null
-                stdin: null
-                stdin_add_newline: true
-                strip_empty_ends: true
-        item: documentos
-        msg: ''
-        rc: 0
-        start: '2026-10-14 13:01:04.508783'
-        stderr: ''
-        stderr_lines: []
-        stdout: '{"status":"ok","service":"documentos","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
-        stdout_lines:
-        - '{"status":"ok","service":"documentos","version":"1.1.2","checks":{"database":"ok"},"time":"2026-10-14T18:01:04+00:00"}'
-    msg: documentos OK · versión 1.1.2
+TASK [Validar estado, base de datos y versión] *********************************
+ok: [equipo-local] => (item=auth) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "ansible_loop_var": "item",
+        "attempts": 1,
+        "changed": false,
+        "cmd": [
+            "/mnt/c/Windows/System32/curl.exe",
+            "-s",
+            "--max-time",
+            "10",
+            "http://localhost/cv/api/auth/health"
+        ],
+        "delta": "0:00:00.099979",
+        "end": "2026-10-14 18:19:43.091551",
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/auth/health",
+                "_uses_shell": false,
+                "argv": null,
+                "chdir": null,
+                "creates": null,
+                "executable": null,
+                "expand_argument_vars": true,
+                "removes": null,
+                "stdin": null,
+                "stdin_add_newline": true,
+                "strip_empty_ends": true
+            }
+        },
+        "item": "auth",
+        "msg": "",
+        "rc": 0,
+        "start": "2026-10-14 18:19:42.991572",
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "{\"status\":\"ok\",\"service\":\"auth\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:43+00:00\"}",
+        "stdout_lines": [
+            "{\"status\":\"ok\",\"service\":\"auth\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:43+00:00\"}"
+        ]
+    },
+    "msg": "auth OK · versión 1.1.8"
+}
+ok: [equipo-local] => (item=pacientes) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "ansible_loop_var": "item",
+        "attempts": 1,
+        "changed": false,
+        "cmd": [
+            "/mnt/c/Windows/System32/curl.exe",
+            "-s",
+            "--max-time",
+            "10",
+            "http://localhost/cv/api/pacientes/health"
+        ],
+        "delta": "0:00:00.079545",
+        "end": "2026-10-14 18:19:43.434239",
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/pacientes/health",
+                "_uses_shell": false,
+                "argv": null,
+                "chdir": null,
+                "creates": null,
+                "executable": null,
+                "expand_argument_vars": true,
+                "removes": null,
+                "stdin": null,
+                "stdin_add_newline": true,
+                "strip_empty_ends": true
+            }
+        },
+        "item": "pacientes",
+        "msg": "",
+        "rc": 0,
+        "start": "2026-10-14 18:19:43.354694",
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "{\"status\":\"ok\",\"service\":\"pacientes\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:43+00:00\"}",
+        "stdout_lines": [
+            "{\"status\":\"ok\",\"service\":\"pacientes\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:43+00:00\"}"
+        ]
+    },
+    "msg": "pacientes OK · versión 1.1.8"
+}
+ok: [equipo-local] => (item=citas) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "ansible_loop_var": "item",
+        "attempts": 1,
+        "changed": false,
+        "cmd": [
+            "/mnt/c/Windows/System32/curl.exe",
+            "-s",
+            "--max-time",
+            "10",
+            "http://localhost/cv/api/citas/health"
+        ],
+        "delta": "0:00:00.086337",
+        "end": "2026-10-14 18:19:43.744872",
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/citas/health",
+                "_uses_shell": false,
+                "argv": null,
+                "chdir": null,
+                "creates": null,
+                "executable": null,
+                "expand_argument_vars": true,
+                "removes": null,
+                "stdin": null,
+                "stdin_add_newline": true,
+                "strip_empty_ends": true
+            }
+        },
+        "item": "citas",
+        "msg": "",
+        "rc": 0,
+        "start": "2026-10-14 18:19:43.658535",
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "{\"status\":\"ok\",\"service\":\"citas\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:44+00:00\"}",
+        "stdout_lines": [
+            "{\"status\":\"ok\",\"service\":\"citas\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:44+00:00\"}"
+        ]
+    },
+    "msg": "citas OK · versión 1.1.8"
+}
+ok: [equipo-local] => (item=clinica) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "ansible_loop_var": "item",
+        "attempts": 1,
+        "changed": false,
+        "cmd": [
+            "/mnt/c/Windows/System32/curl.exe",
+            "-s",
+            "--max-time",
+            "10",
+            "http://localhost/cv/api/clinica/health"
+        ],
+        "delta": "0:00:00.082781",
+        "end": "2026-10-14 18:19:44.044118",
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/clinica/health",
+                "_uses_shell": false,
+                "argv": null,
+                "chdir": null,
+                "creates": null,
+                "executable": null,
+                "expand_argument_vars": true,
+                "removes": null,
+                "stdin": null,
+                "stdin_add_newline": true,
+                "strip_empty_ends": true
+            }
+        },
+        "item": "clinica",
+        "msg": "",
+        "rc": 0,
+        "start": "2026-10-14 18:19:43.961337",
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "{\"status\":\"ok\",\"service\":\"clinica\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:44+00:00\"}",
+        "stdout_lines": [
+            "{\"status\":\"ok\",\"service\":\"clinica\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:19:44+00:00\"}"
+        ]
+    },
+    "msg": "clinica OK · versión 1.1.8"
+}
+ok: [equipo-local] => (item=inventario) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "ansible_loop_var": "item",
+        "attempts": 21,
+        "changed": false,
+        "cmd": [
+            "/mnt/c/Windows/System32/curl.exe",
+            "-s",
+            "--max-time",
+            "10",
+            "http://localhost/cv/api/inventario/health"
+        ],
+        "delta": "0:00:00.064605",
+        "end": "2026-10-14 18:21:23.190460",
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/inventario/health",
+                "_uses_shell": false,
+                "argv": null,
+                "chdir": null,
+                "creates": null,
+                "executable": null,
+                "expand_argument_vars": true,
+                "removes": null,
+                "stdin": null,
+                "stdin_add_newline": true,
+                "strip_empty_ends": true
+            }
+        },
+        "item": "inventario",
+        "msg": "",
+        "rc": 0,
+        "start": "2026-10-14 18:21:23.125855",
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "{\"status\":\"ok\",\"service\":\"inventario\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:21:23+00:00\"}",
+        "stdout_lines": [
+            "{\"status\":\"ok\",\"service\":\"inventario\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:21:23+00:00\"}"
+        ]
+    },
+    "msg": "inventario OK · versión 1.1.8"
+}
+ok: [equipo-local] => (item=documentos) => {
+    "ansible_loop_var": "item",
+    "changed": false,
+    "item": {
+        "ansible_loop_var": "item",
+        "attempts": 1,
+        "changed": false,
+        "cmd": [
+            "/mnt/c/Windows/System32/curl.exe",
+            "-s",
+            "--max-time",
+            "10",
+            "http://localhost/cv/api/documentos/health"
+        ],
+        "delta": "0:00:00.065173",
+        "end": "2026-10-14 18:21:23.390966",
+        "failed": false,
+        "invocation": {
+            "module_args": {
+                "_raw_params": "/mnt/c/Windows/System32/curl.exe -s --max-time 10 http://localhost/cv/api/documentos/health",
+                "_uses_shell": false,
+                "argv": null,
+                "chdir": null,
+                "creates": null,
+                "executable": null,
+                "expand_argument_vars": true,
+                "removes": null,
+                "stdin": null,
+                "stdin_add_newline": true,
+                "strip_empty_ends": true
+            }
+        },
+        "item": "documentos",
+        "msg": "",
+        "rc": 0,
+        "start": "2026-10-14 18:21:23.325793",
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "{\"status\":\"ok\",\"service\":\"documentos\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:21:23+00:00\"}",
+        "stdout_lines": [
+            "{\"status\":\"ok\",\"service\":\"documentos\",\"version\":\"1.1.8\",\"checks\":{\"database\":\"ok\"},\"time\":\"2026-10-14T23:21:23+00:00\"}"
+        ]
+    },
+    "msg": "documentos OK · versión 1.1.8"
+}
 
-TASK [Validar que el frontend alcanza todas sus dependencias] ******************
-ok: [local] => 
-    changed: false
-    msg: 'Frontend OK · dependencias: {''auth'': ''ok'', ''pacientes'': ''ok'', ''citas'':
-        ''ok'', ''clinica'': ''ok'', ''inventario'': ''ok'', ''documentos'': ''ok''}'
+TASK [Salud agregada del frontend] *********************************************
+ok: [equipo-local]
+
+TASK [Página de login del frontend] ********************************************
+ok: [equipo-local]
 
 TASK [Registrar la reversión] **************************************************
-changed: [local] => (item={'dest': '/opt/controlvet/releases/current', 'content': '1.1.2'})
-changed: [local] => (item={'dest': '/opt/controlvet/releases/previous', 'content': '1.1.4'})
+changed: [equipo-local] => (item={'dest': '/mnt/c/controlvet/estado/produccion/current', 'content': '1.1.8'})
+changed: [equipo-local] => (item={'dest': '/mnt/c/controlvet/estado/produccion/previous', 'content': '1.1.9'})
 
-TASK [Anotar en el historial] **************************************************
-changed: [local]
+TASK [Historial] ***************************************************************
+changed: [equipo-local]
 
 PLAY RECAP *********************************************************************
-local                      : ok=26   changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+equipo-local               : ok=28   changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 

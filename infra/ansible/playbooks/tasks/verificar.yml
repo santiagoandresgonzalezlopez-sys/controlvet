@@ -1,12 +1,19 @@
 # Verificación posterior: /health de cada microservicio (incluida su base de
 # datos) con la versión esperada, salud agregada del frontend y login.
+#
+# Tras cambiar el enlace, Apache puede seguir sirviendo la versión anterior
+# hasta que expire la caché de rutas reales de PHP (realpath_cache_ttl, 120 s
+# por defecto en XAMPP): se reintenta hasta que TODOS los servicios reporten
+# la versión esperada (hasta cv_verificacion_reintentos x 5 s).
 - name: Consultar /health de cada microservicio
   ansible.builtin.command: "{{ cv_curl }} -s --max-time 10 {{ cv_url }}/api/{{ item }}/health"
   register: salud
   changed_when: false
-  retries: 5
-  delay: 2
-  until: salud.stdout is search('"status":"ok"')
+  retries: "{{ cv_verificacion_reintentos | default(40) }}"
+  delay: 5
+  until: >-
+    salud.stdout is search('"status":"ok"') and
+    (cv_version_esperada is not defined or salud.stdout is search('"version":"' ~ cv_version_esperada ~ '"'))
   loop: "{{ cv_servicios }}"
 
 - name: Validar estado, base de datos y versión
@@ -22,11 +29,15 @@
   loop_control:
     label: "{{ item.item }}"
 
-- name: Salud agregada del frontend
+- name: Salud agregada y versión del frontend
   ansible.builtin.command: "{{ cv_curl }} -s --max-time 15 {{ cv_url }}/web/health.php"
   register: salud_web
   changed_when: false
-  failed_when: (salud_web.stdout | from_json).status != 'ok'
+  retries: "{{ cv_verificacion_reintentos | default(40) }}"
+  delay: 5
+  until: >-
+    salud_web.stdout is search('"status":"ok"') and
+    (cv_version_esperada is not defined or salud_web.stdout is search('"version":"' ~ cv_version_esperada ~ '"'))
 
 - name: Página de login del frontend
   ansible.builtin.command: "{{ cv_curl }} -s -o NUL -w %{http_code} {{ cv_url }}/web/index.php?route=login"

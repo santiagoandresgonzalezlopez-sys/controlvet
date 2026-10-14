@@ -1,11 +1,11 @@
-﻿mariadb-controlvet  -                          UP        MYSQL OK - MariaDB de ControlVet responde (97 ms)
-xampp-apache        -                          UP        TCP OK - 0.001 second response time on 172.20.240.1 port 80
-mariadb-controlvet  MariaDB conexion           OK        MYSQL OK - MariaDB de ControlVet responde (178 ms)
-xampp-apache        API auth                   OK        HTTP OK: Status line output matched "200" - 337 bytes in 0.034 second response t
-xampp-apache        API citas                  OK        HTTP OK: Status line output matched "200" - 338 bytes in 0.021 second response t
-xampp-apache        API clinica                OK        HTTP OK: Status line output matched "200" - 340 bytes in 0.033 second response t
-xampp-apache        API documentos             OK        HTTP OK: Status line output matched "200" - 343 bytes in 0.019 second response t
-xampp-apache        API inventario             OK        HTTP OK: Status line output matched "200" - 343 bytes in 0.022 second response t
-xampp-apache        API pacientes              OK        HTTP OK: Status line output matched "200" - 342 bytes in 0.037 second response t
-xampp-apache        Dependencias del frontend  OK        HTTP OK: Status line output matched "200" - 444 bytes in 0.291 second response t
-xampp-apache        Login web                  OK        HTTP OK: Status line output matched "200" - 2250 bytes in 0.029 second response 
+mariadb-controlvet  -                          UP        MYSQL OK - MariaDB de ControlVet responde (49 ms)
+xampp-apache        -                          UP        TCP OK - 0.000 second response time on 172.20.240.1 port 80
+mariadb-controlvet  MariaDB conexion           OK        MYSQL OK - MariaDB de ControlVet responde (53 ms)
+xampp-apache        API auth                   OK        HTTP OK: Status line output matched "200" - 337 bytes in 0.011 second response t
+xampp-apache        API citas                  OK        HTTP OK: Status line output matched "200" - 338 bytes in 0.011 second response t
+xampp-apache        API clinica                OK        HTTP OK: Status line output matched "200" - 340 bytes in 0.031 second response t
+xampp-apache        API documentos             OK        HTTP OK: Status line output matched "200" - 343 bytes in 0.033 second response t
+xampp-apache        API inventario             OK        HTTP OK: Status line output matched "200" - 343 bytes in 0.031 second response t
+xampp-apache        API pacientes              OK        HTTP OK: Status line output matched "200" - 342 bytes in 0.012 second response t
+xampp-apache        Dependencias del frontend  OK        HTTP OK: Status line output matched "200" - 444 bytes in 0.224 second response t
+xampp-apache        Login web                  OK        HTTP OK: Status line output matched "200" - 2250 bytes in 0.022 second response 
