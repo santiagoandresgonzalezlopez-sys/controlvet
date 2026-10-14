@@ -41,10 +41,24 @@ try {
     if ($prohibidos) { throw "Archivos de secretos versionados: $prohibidos" }
 
     # Asignaciones de secretos con un valor literal largo (no variables ni ejemplos).
-    $patron = 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|(JWT_SECRET|DB_PASSWORD|DB_ROOT_PASSWORD|JENKINS_ADMIN_PASSWORD)[''"]?[ ]*(=|=>)[ ]*[''"]?[A-Za-z0-9_-]{20,}'
-    $hallazgos = git grep -nE $patron -- . ':!*.example'
-    if ($LASTEXITCODE -eq 0) { Write-Host $hallazgos; throw 'Posible secreto en el repositorio' }
+    # El patrón va en un archivo: PowerShell 5.1 no escapa las comillas internas
+    # al pasar argumentos a programas externos y el patrón llegaría partido.
+    $patrones = New-TemporaryFile
+    try {
+        Set-Content $patrones -Encoding ascii -Value @(
+            'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY',
+            '(JWT_SECRET|DB_PASSWORD|DB_ROOT_PASSWORD|JENKINS_ADMIN_PASSWORD)[''"]?[ ]*(=|=>)[ ]*[''"]?[A-Za-z0-9_-]{20,}'
+        )
+        $hallazgos = git grep -nE -f $patrones.FullName -- . ':!*.example'
+        $codigo = $LASTEXITCODE
+    } finally {
+        Remove-Item $patrones -Force
+    }
+    # git grep: 0 = encontró coincidencias, 1 = ninguna, otro = error (no se asume "limpio").
+    if ($codigo -eq 0) { Write-Host $hallazgos; throw 'Posible secreto en el repositorio' }
+    if ($codigo -ne 1) { throw "El control de secretos no pudo ejecutarse (git grep terminó con código $codigo)" }
     Write-Host 'Sin secretos detectados'
 } finally {
     Pop-Location
 }
+exit 0
