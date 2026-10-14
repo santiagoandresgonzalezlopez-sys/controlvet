@@ -42,7 +42,7 @@
       no_log: true
 
     - name: Ruta Windows del archivo de opciones
-      ansible.builtin.command: wslpath -w {{ cv_secretos }}/respaldo.cnf
+      ansible.builtin.command: wslpath -m {{ cv_secretos }}/respaldo.cnf
       register: cnf_win
       changed_when: false
 

@@ -1,25 +1,38 @@
 # Activa la versión cv_version_objetivo en el entorno: cambia el enlace
 # (junction de NTFS) htdocs\<ruta> -> C:\controlvet\releases\<entorno>\<versión>.
 # El cambio es casi instantáneo y reversible.
+# Se usa la forma argv: el módulo command en forma de cadena interpreta "\"
+# como escape (estilo shell) y eliminaría las barras de las rutas de Windows.
 - name: Ruta Windows de la versión {{ cv_version_objetivo }}
-  ansible.builtin.command: wslpath -w {{ cv_releases }}/{{ cv_entorno }}/{{ cv_version_objetivo }}
+  ansible.builtin.command:
+    argv: [wslpath, -w, "{{ cv_releases }}/{{ cv_entorno }}/{{ cv_version_objetivo }}"]
   register: destino_win
   changed_when: false
 
 - name: Ruta Windows del enlace publicado
-  ansible.builtin.command: wslpath -w {{ cv_enlace }}
+  ansible.builtin.command:
+    argv: [wslpath, -w, "{{ cv_enlace }}"]
   register: enlace_win
   changed_when: false
 
 - name: Comprobar que el enlace no es un directorio real (no se borran datos)
-  ansible.builtin.command: >-
-    {{ cv_powershell }} -NoProfile -Command
-    "$i = Get-Item '{{ enlace_win.stdout }}' -ErrorAction SilentlyContinue; if ($null -eq $i) { 'NO_EXISTE' } elseif ($i.LinkType) { 'ENLACE' } else { 'DIRECTORIO' }"
+  ansible.builtin.command:
+    argv:
+      - "{{ cv_powershell }}"
+      - -NoProfile
+      - -Command
+      - "$i = Get-Item -LiteralPath '{{ enlace_win.stdout }}' -ErrorAction SilentlyContinue; if ($null -eq $i) { 'NO_EXISTE' } elseif ($i.LinkType) { 'ENLACE' } else { 'DIRECTORIO' }"
   register: tipo_enlace
   changed_when: false
   failed_when: "'DIRECTORIO' in tipo_enlace.stdout"
 
+- name: Retirar el enlace anterior (solo el enlace; la versión queda intacta)
+  ansible.builtin.command:
+    argv: ["{{ cv_cmd }}", /c, rmdir, "{{ enlace_win.stdout }}"]
+  when: "'ENLACE' in tipo_enlace.stdout"
+  changed_when: true
+
 - name: Apuntar {{ cv_enlace }} a la versión {{ cv_version_objetivo }}
-  ansible.builtin.command: >-
-    {{ cv_cmd }} /c "{{ 'rmdir ' ~ enlace_win.stdout ~ ' && ' if 'ENLACE' in tipo_enlace.stdout else '' }}mklink /J {{ enlace_win.stdout }} {{ destino_win.stdout }}"
+  ansible.builtin.command:
+    argv: ["{{ cv_cmd }}", /c, mklink, /J, "{{ enlace_win.stdout }}", "{{ destino_win.stdout }}"]
   changed_when: true

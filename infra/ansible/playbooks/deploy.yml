@@ -38,7 +38,7 @@
         creates: "{{ release_dir }}/VERSION"
 
     - name: Ruta Windows del instalador de la versión
-      ansible.builtin.command: wslpath -w {{ release_dir }}/infra/xampp/instalar.php
+      ansible.builtin.command: wslpath -m {{ release_dir }}/infra/xampp/instalar.php
       register: instalador
       changed_when: false
 

@@ -10,7 +10,7 @@ if [ ! -r "$CNF" ]; then
     echo "UNKNOWN - falta $CNF (ejecute playbooks/monitoreo.yml)"
     exit 3
 fi
-CNF_WIN=$(wslpath -w "$CNF")
+CNF_WIN=$(wslpath -m "$CNF")
 INICIO=$(date +%s%N)
 SALIDA=$("$MYSQLADMIN" --defaults-extra-file="$CNF_WIN" ping 2>&1 | tr -d '\r')
 MS=$(( ($(date +%s%N) - INICIO) / 1000000 ))

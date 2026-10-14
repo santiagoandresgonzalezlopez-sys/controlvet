@@ -44,7 +44,7 @@
         msg: "Apache caído={{ apache_caido }} · BD caída={{ bd_caida }} · servicios con fallo={{ servicios_mal }}"
 
     - name: Ruta Windows del script de la base de datos
-      ansible.builtin.command: wslpath -w {{ cv_bd_script }}
+      ansible.builtin.command: wslpath -m {{ cv_bd_script }}
       register: bd_script
       changed_when: false
       when: bd_caida

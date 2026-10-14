@@ -12,7 +12,7 @@
     cv_estado_dir: "{{ cv_estado }}/{{ cv_entorno }}"
 
 - name: Verificar la interoperabilidad WSL -> Windows
-  ansible.builtin.command: "{{ cv_cmd }} /c ver"
+  ansible.builtin.command: "{{ cv_cmd }} /c echo interop-ok"
   register: ver_windows
   changed_when: false
 
