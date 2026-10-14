@@ -17,9 +17,11 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
+    owner: "0"
+    group: "{{ item.group | default('0') }}"
     mode: "{{ item.mode }}"
   loop:
-    - { path: "{{ cv_ops_dir }}", mode: "0751" }  # 0751: Nagios puede atravesarlo hasta monitor/ (sin listar)
+    - { path: "{{ cv_ops_dir }}", mode: "0750", group: "{{ cv_nagios_gid }}" }  # grupo nagios: solo atraviesa hasta monitor/
     - { path: "{{ cv_ops_dir }}/secrets", mode: "0700" }
     - { path: "{{ cv_ops_dir }}/releases", mode: "0750" }
     - { path: "{{ cv_ops_dir }}/logs", mode: "0750" }

@@ -1,0 +1,38 @@
+﻿docker : [WARNING]: Skipping callback plugin 'profile_tasks', unable to load
+En C:\xampp\htdocs\controlvet\ops.ps1: 43 Carácter: 1
++ docker run --rm `
++ ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([WARNING]: Skip... unable to load:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+PLAY [Respaldar las bases de datos de ControlVet] ******************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [local]
+
+TASK [Crear el directorio de respaldos] ****************************************
+ok: [local]
+
+TASK [Generar volcado consistente (mariadb-dump --single-transaction)] *********
+changed: [local]
+
+TASK [Validar que el respaldo contiene todos los esquemas] *********************
+ok: [local]
+
+TASK [Aplicar retención (conservar los 7 más recientes)] ***********************
+ok: [local]
+
+TASK [Tamaño del respaldo] *****************************************************
+ok: [local]
+
+TASK [Resultado] ***************************************************************
+ok: [local] => 
+    msg: Respaldo /backups/controlvet-2026-10-14_123453.sql.gz (3610 bytes, 6 esquemas)
+
+TASK [Anotar en el historial de operación] *************************************
+changed: [local]
+
+PLAY RECAP *********************************************************************
+local                      : ok=8    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

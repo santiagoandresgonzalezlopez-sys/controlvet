@@ -38,6 +38,8 @@ $vars = @('-e', 'cv_backup_dir=/backups', '-e', "cv_registry=$Registry")
 if ($Version) { $vars += @('-e', "cv_version=$Version") }
 foreach ($v in $ExtraVars) { $vars += @('-e', $v) }
 
+# Ansible escribe avisos en stderr: no deben interrumpir el script.
+$ErrorActionPreference = 'Continue'
 docker run --rm `
     -v /var/run/docker.sock:/var/run/docker.sock `
     -v controlvet_ops:/opt/controlvet `
