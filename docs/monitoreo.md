@@ -28,7 +28,7 @@ Cada notificación (`PROBLEM`, `RECOVERY`) se registra en `/var/log/nagios4/cont
 wsl -d Ubuntu-24.04 -u root -- cat /var/log/nagios4/controlvet-alertas.log
 ```
 
-El envío por correo o chat no está configurado (no hay servidor de correo; tarea CV-42).
+El envío por correo o chat no está configurado (no hay servidor de correo; tarea CV-61).
 
 ## Investigación de incidentes
 

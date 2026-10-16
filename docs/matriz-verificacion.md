@@ -8,10 +8,10 @@ Evidencias en `docs/evidencias/` y en Jenkins (`http://localhost:8091/job/contro
 
 | Fase | Herramienta | Tarea | Responsable | Comando / procedimiento | Resultado | Estado | Evidencia |
 |---|---|---|---|---|---|---|---|
-| Plan | Jira | Backlog con épicas por fase, historias, tareas, defectos, prioridades, puntos, responsables y dependencias | Santiago Gonzalez | `docs/jira/backlog-controlvet.csv` (importación CSV) | 8 épicas, 53 incidencias (27/26 por responsable, 71/67 puntos), 16 defectos reales | **Configurada** (no importada: sin acceso a Jira) | `docs/jira/` |
-| Plan | Jira | Crear proyecto CV, tablero y seguimiento | Ambos | Importar CSV (CV-1, CV-2) | Pendiente | **Planificada** | `docs/jira/README.md` |
+| Plan | Jira | Backlog con épicas por fase, historias, tareas, defectos, prioridades, puntos, responsables y dependencias | Santiago Gonzalez | Importación CSV de `docs/jira/backlog-controlvet.csv` en Jira Cloud | 61 elementos (8 épicas + 53) enlazados con su épica, 16 defectos reales; responsables 31/30 por cambio masivo; 21 vínculos "es bloqueada por" | **Verificada** | Tablero CV en Jira, `docs/jira/README.md` |
+| Plan | Jira | Crear proyecto CV, tablero y seguimiento | Ambos | Proyecto ControlVet (CV) con tablero Kanban (CV-9, CV-10) | Backlog 6 · En curso 1 · Listo 54 | **Verificada** | Capturas del tablero y de la lista |
 | Code | Git | Línea base y control de versiones | Santiago Gonzalez | `git init`, etiqueta `v1.0.0-monolito`, commits convencionales | Historial completo de la migración | **Verificada** | `git log` |
-| Code | GitHub | Repositorio remoto (solo VCS) | Santiago Gonzalez | Crear repo, `git push`, `infra\jenkins\iniciar.ps1 -GitUrl <url>` (CV-16) | Sin remoto: requiere cuenta y autorización | **Planificada** | ADR-007 |
+| Code | GitHub | Repositorio remoto (solo VCS) | Santiago Gonzalez | `git push` a `github.com/santiagoandresgonzalezlopez-sys/controlvet` + `infra\jenkins\iniciar.ps1 -GitUrl <url>` (CV-24) | `main` y etiqueta `v1.0.0-monolito` publicados; Issues, Projects, Wiki y Discussions desactivados; Jenkins #12 clonó desde GitHub y terminó en SUCCESS | **Verificada** | Jenkins #12, API pública de GitHub, ADR-007 |
 | Code | Confluence | Arquitectura, endpoints, convenciones, contratos API, ADR, runbook, monitoreo | Sebastian Gomez | Markdown listo para Confluence | 14 páginas preparadas | **Configurada** (no publicadas: sin acceso) | `docs/confluence/README.md` |
 | Code | PHP | 6 microservicios **sin Docker** con `controller/ validador/ microservicio/` y endpoints `/api/<servicio>/` | Ambos | `.htaccess` + `services/*/public/index.php` en Apache de XAMPP | 6 servicios con `/health` OK; código interno y secretos responden 403 | **Verificada** | `docs/endpoints.md`, e2e |
 | Build | Composer | Dependencias reproducibles | Santiago Gonzalez | `composer validate` + `composer install` (Jenkins) | 8 componentes válidos | **Verificada** | Jenkins #8 |
@@ -20,7 +20,7 @@ Evidencias en `docs/evidencias/` y en Jenkins (`http://localhost:8091/job/contro
 | Test | PHPUnit | Unitarias (validadores y reglas de negocio) | Sebastian Gomez | `vendor/bin/phpunit` por componente (Jenkins) | 98 pruebas OK (kernel 24, auth 14, pacientes 17, citas 18, clínica 10, inventario 8, documentos 7) | **Verificada** | `junit-unit-*.xml` (Jenkins #8) |
 | Test | PHPUnit | Integración BD, API REST, autenticación/autorización, aislamiento de datos y de esquemas, citas, mascotas, consultas, regresión web | Santiago Gonzalez | `tests\e2e\ejecutar.ps1` contra staging (Jenkins) y contra desarrollo | 87 pruebas OK (237 aserciones) | **Verificada** | `junit-e2e.xml`, `docs/evidencias/e2e-xampp.txt` |
 | Test | PHPUnit | Cobertura | Sebastian Gomez | — | En la etapa Docker se midió 30–80 % por componente; el PHP de XAMPP no trae pcov/xdebug | **Ejecutada** (solo etapa Docker) | `historico-docker/cobertura-1.1.2.txt` |
-| Test | Jira | Registro de defectos | Ambos | Defectos hallados por pruebas, pipeline y revisiones | 16 defectos registrados y corregidos (CV-24…CV-30, CV-43, CV-44, CV-46…CV-49, CV-51…CV-53) | **Verificada** | `backlog-controlvet.csv` |
+| Test | Jira | Registro de defectos | Ambos | Defectos hallados por pruebas, pipeline y revisiones | 16 defectos registrados y corregidos (CV-33…CV-42, CV-46, CV-47, CV-51, CV-55…CV-57) | **Verificada** | `backlog-controlvet.csv` |
 | Release | Jenkins | Jenkins nativo como código (usuario, job, polling SCM) | Santiago Gonzalez | `infra\jenkins\iniciar.ps1` | Job creado sin pasos manuales; build #1 iniciado por "cambios en el repositorio" | **Verificada** | API de Jenkins |
 | Release | Jenkins | Pipeline declarativo con gates | Santiago Gonzalez | `Jenkinsfile` (PowerShell) | #1–#7 fallaron por defectos reales del pipeline (corregidos); **#8 SUCCESS en todas las etapas**; #9 falló en producción y el rollback automático actuó; **#10 SUCCESS** (producción 1.1.9 → 1.1.10 esperando la caché de PHP) | **Verificada** | `jenkins-nativo-build-8-console.txt` |
 | Release | Jenkins | Versiones, promoción y notas | Sebastian Gomez | `infra\ci\publicar.ps1` | Candidato → publicado tras staging; SHA-256 verificado; notas y registro | **Verificada** | `C:\controlvet\artefactos\registro.log` |
@@ -34,17 +34,17 @@ Evidencias en `docs/evidencias/` y en Jenkins (`http://localhost:8091/job/contro
 | Monitor | Nagios (WSL2) | Instalación y configuración por Ansible | Sebastian Gomez | `ops.ps1 monitoreo` | `nagios4 -v`: 0 errores, 0 avisos | **Verificada** | `ansible-monitoreo.txt` |
 | Monitor | Nagios | Disponibilidad, endpoints de salud, BD, errores HTTP y umbrales | Sebastian Gomez | 2 hosts + 9 servicios, cada 60 s, HARD tras 2 fallos | 11/11 en OK/UP con producción sana | **Verificada** | `nagios-estado.txt` |
 | Monitor | Nagios | Alerta por fallo controlado y acción correctiva | Ambos | `bd.ps1 detener` → alertas → `ops.ps1 recover` | Fallo 23:22:28Z · PROBLEM 23:23:38Z (MariaDB DOWN, 6 API CRITICAL 503, frontend CRITICAL) · RECOVERY 23:24:38–55Z | **Verificada** | `prueba-alerta-nativa.txt`, `nagios-alertas.log` |
-| Monitor | Nagios | Alertas por correo/chat | Sebastian Gomez | — (CV-42) | Solo registro en archivo; no hay servidor de correo | **Planificada** | `docs/monitoreo.md` |
+| Monitor | Nagios | Alertas por correo/chat | Sebastian Gomez | — (CV-61) | Solo registro en archivo; no hay servidor de correo | **Planificada** | `docs/monitoreo.md` |
 
 ## Limitaciones y pendientes
 
-1. **Jira y Confluence**: sin acceso desde este entorno; el contenido está listo para importar y publicar. No se afirma que la integración esté activa.
-2. **GitHub**: repositorio local; Jenkins usa `file:///C:/xampp/htdocs/controlvet`. Para usar GitHub basta crear el remoto y reiniciar Jenkins con `-GitUrl`. Sin Actions, Projects ni Packages.
+1. **Jira**: backlog importado en Jira Cloud. Las claves de Jira (CV-1…CV-61) difieren de los identificadores del CSV porque las épicas se crearon primero; la equivalencia está en `docs/jira/README.md`. Las descripciones importadas conservan el texto "Depende de" con los identificadores del CSV; los vínculos de Jira son la referencia. **Confluence**: contenido preparado; la publicación es la tarea CV-23.
+2. **GitHub**: repositorio `santiagoandresgonzalezlopez-sys/controlvet`, usado solo como control de versiones (sin Actions, Projects, Issues, Wiki ni Packages). Jenkins lo consulta por polling cada 5 minutos. Si Jenkins se reinicia sin `-GitUrl`, vuelve al repositorio local.
 3. **Maven**: no aplica a un proyecto 100 % PHP (ADR-005); pendiente confirmar con el docente.
 4. **Docker**: retirado por requisito del docente. La primera etapa del proyecto lo usó; sus evidencias quedan como histórico.
 5. **Aislamiento de procesos**: sin contenedores, los 6 servicios comparten el proceso de Apache. El aislamiento se garantiza en código (configuración por petición), datos (usuario MariaDB por servicio) y exposición web (`.htaccess`).
 6. **Cambio de versión**: tras activar una versión, Apache puede servir la anterior hasta 2 minutos por la caché de rutas de PHP; la verificación espera y no da por buena la versión hasta que todos los servicios la reportan.
 7. **Base de datos**: una instancia con un esquema y usuario por servicio (ADR-002); los tres entornos comparten instancia con prefijos distintos.
-8. **JWT HS256** compartido por entorno (ADR-004); RS256 pendiente (CV-41).
+8. **JWT HS256** compartido por entorno (ADR-004); RS256 pendiente (CV-60).
 9. **Cobertura** no medida en el pipeline nativo (el PHP de XAMPP no incluye pcov/xdebug).
 10. **MySQL general de XAMPP (3306)**: tenía tablas de sistema dañadas antes de este trabajo; se repararon con respaldo previo en `backups/`, y ControlVet no lo usa.

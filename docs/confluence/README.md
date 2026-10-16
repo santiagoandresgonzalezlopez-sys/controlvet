@@ -1,6 +1,6 @@
 # CODE · Espacio de Confluence "CONTROLVET"
 
-> **Estado: contenido preparado, NO publicado.** No hubo acceso a Confluence desde este entorno (tarea CV-15). Cada página corresponde a un archivo Markdown del repositorio; en Confluence Cloud se pega el Markdown en el editor (se convierte automáticamente) o se usa la macro *Markdown*.
+> **Estado: contenido preparado, NO publicado.** No hubo acceso a Confluence desde este entorno (tarea CV-23). Cada página corresponde a un archivo Markdown del repositorio; en Confluence Cloud se pega el Markdown en el editor (se convierte automáticamente) o se usa la macro *Markdown*.
 
 | Página de Confluence | Fuente en el repositorio | Responsable |
 |---|---|---|
