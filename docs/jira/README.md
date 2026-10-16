@@ -98,4 +98,6 @@ Jira creó primero las 8 épicas, así que **las claves de Jira no coinciden con
 
 ## Pendientes (Por hacer)
 
-CV-9 crear el proyecto e importar el backlog (hecho; falta moverla a Listo) · CV-10 tablero (hecho; falta moverla a Listo) · CV-23 publicar en Confluence · CV-24 repositorio GitHub (hecho; falta moverla a Listo) · CV-60 JWT RS256 · CV-61 alertas por correo/chat.
+Completadas tras la importación: CV-9 (proyecto e importación), CV-10 (tablero), CV-23 (Confluence) y CV-24 (GitHub).
+
+Quedan como mejoras futuras: CV-60 JWT RS256 · CV-61 alertas por correo/chat.

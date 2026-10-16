@@ -1,6 +1,8 @@
 # CODE · Espacio de Confluence "CONTROLVET"
 
-> **Estado: contenido preparado, NO publicado.** No hubo acceso a Confluence desde este entorno (tarea CV-23). Cada página corresponde a un archivo Markdown del repositorio; en Confluence Cloud se pega el Markdown en el editor (se convierte automáticamente) o se usa la macro *Markdown*.
+> **Estado: publicado** en Confluence Cloud, espacio **CONTROLVET** (https://santiagoandresgonzalezlopez.atlassian.net/wiki/spaces/CONTROLVET/overview), tarea CV-23. Cada página se creó pegando el Markdown del repositorio. El espacio es privado: para verlo hace falta una cuenta con acceso al sitio de Atlassian.
+>
+> Estructura: página de inicio (README) y páginas padre **Code** (10 hijas), **Operate**, **Monitor** y **DevOps**.
 
 | Página de Confluence | Fuente en el repositorio | Responsable |
 |---|---|---|
