@@ -40,7 +40,7 @@ Evidencias en `docs/evidencias/` y en Jenkins (`http://localhost:8091/job/contro
 
 1. **Jira**: backlog importado en Jira Cloud. Las claves de Jira (CV-1…CV-61) difieren de los identificadores del CSV porque las épicas se crearon primero; la equivalencia está en `docs/jira/README.md`. Las descripciones importadas conservan el texto "Depende de" con los identificadores del CSV; los vínculos de Jira son la referencia. **Confluence**: espacio CONTROLVET publicado (CV-23); el repositorio sigue siendo la fuente y cada cambio de una página se refleja en su Markdown. El espacio es privado, así que su verificación se apoya en las capturas del equipo.
 2. **GitHub**: repositorio `santiagoandresgonzalezlopez-sys/controlvet`, usado solo como control de versiones (sin Actions, Projects, Issues, Wiki ni Packages). Jenkins lo consulta por polling cada 5 minutos. Si Jenkins se reinicia sin `-GitUrl`, vuelve al repositorio local.
-3. **Maven**: no aplica a un proyecto 100 % PHP (ADR-005); pendiente confirmar con el docente.
+3. **Maven**: no aplica a un proyecto 100 % PHP. El equipo decidió mantener Composer como herramienta de build (ADR-005); no se añade un componente Java artificial.
 4. **Docker**: retirado por requisito del docente. La primera etapa del proyecto lo usó; sus evidencias quedan como histórico.
 5. **Aislamiento de procesos**: sin contenedores, los 6 servicios comparten el proceso de Apache. El aislamiento se garantiza en código (configuración por petición), datos (usuario MariaDB por servicio) y exposición web (`.htaccess`).
 6. **Cambio de versión**: tras activar una versión, Apache puede servir la anterior hasta 2 minutos por la caché de rutas de PHP; la verificación espera y no da por buena la versión hasta que todos los servicios la reportan.

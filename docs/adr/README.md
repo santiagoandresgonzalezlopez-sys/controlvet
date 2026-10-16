@@ -36,7 +36,7 @@
 
 ## ADR-005 · Composer en lugar de Maven
 
-**Contexto.** La matriz asigna Maven a Build. ControlVet es 100 % PHP; Maven compila y empaqueta proyectos Java y no gestiona dependencias PHP. **Decisión.** Build con Composer (`composer.json` + `composer.lock` por componente) y empaquetado en un ZIP versionado con dependencias de producción y SHA-256 (`infra/ci/empaquetar.ps1`). No se crea un componente Java artificial. **Pendiente.** Confirmar con el docente si la rúbrica exige demostrar Maven.
+**Contexto.** La matriz asigna Maven a Build. ControlVet es 100 % PHP; Maven compila y empaqueta proyectos Java y no gestiona dependencias PHP. **Decisión.** Build con Composer (`composer.json` + `composer.lock` por componente) y empaquetado en un ZIP versionado con dependencias de producción y SHA-256 (`infra/ci/empaquetar.ps1`). No se crea un componente Java artificial. **Estado.** Decisión ratificada por el equipo (2026-10-16): Composer se mantiene como herramienta de build.
 
 ## ADR-006 · Consistencia eventual del peso
 
